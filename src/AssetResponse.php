@@ -42,6 +42,7 @@ class AssetResponse
    */
   public function assetByExtension($extension)
   {
+    $extension = strtolower($extension);
     if(isset(static::$assetMap[$extension]))
     {
       $class = '\Packaged\Dispatch\Assets\\';

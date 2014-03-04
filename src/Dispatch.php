@@ -6,12 +6,21 @@ use Packaged\Helpers\ValueAs;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Dispatch implements HttpKernelInterface
 {
   protected $_app;
   protected $_config;
   protected $_baseDirectory;
+  protected $_hashTable;
+
+  const EVENT_RESOURCE_GENERATE = 'resource.generate';
+
+  /**
+   * @var EventDispatcher
+   */
+  protected static $dispatcher;
 
   public function __construct(HttpKernelInterface $app, $options)
   {
@@ -29,6 +38,16 @@ class Dispatch implements HttpKernelInterface
   }
 
   /**
+   * Get the dispatch config
+   *
+   * @return ConfigSection
+   */
+  public function getConfig()
+  {
+    return $this->_config;
+  }
+
+  /**
    * Set the directory where all paths should start
    *
    * @param $directory
@@ -41,9 +60,36 @@ class Dispatch implements HttpKernelInterface
     return $this;
   }
 
+  /**
+   * Get the base directory for paths to start from
+   *
+   * @return mixed
+   */
+  public function getBaseDirectory()
+  {
+    return $this->_baseDirectory;
+  }
+
   public function prepare()
   {
     return $this;
+  }
+
+  public function setFileHashTable(array $hash)
+  {
+    $this->_hashTable = $hash;
+    return $this;
+  }
+
+  public function addFileHashEntry($file, $hash)
+  {
+    $this->_hashTable[$file] = $hash;
+    return $this;
+  }
+
+  public function getFileHash($key)
+  {
+    return isset($this->_hashTable[$key]) ? $this->_hashTable[$key] : null;
   }
 
   /**
@@ -68,13 +114,25 @@ class Dispatch implements HttpKernelInterface
     Request $request, $type = self::MASTER_REQUEST, $catch = true
   )
   {
-    if(!$this->isDispatchRequest($request))
+    if($this->isDispatchRequest($request))
     {
-      return $this->_app->handle($request, $type, $catch);
+      //Process the response for a dispatchable
+      return $this->getResponseForPath($this->getDispatchablePath($request));
     }
     else
     {
-      return $this->getResponseForPath($this->getDispatchablePath($request));
+      //Start listening for resource uri generation requests
+      $generator          = new ResourceGenerator($this, $request);
+      static::$dispatcher = new EventDispatcher();
+
+      //Listen in for resource generate requests
+      static::$dispatcher->addListener(
+        self::EVENT_RESOURCE_GENERATE,
+        [$generator, 'processEvent']
+      );
+
+      //Handle to request through the next/final app
+      return $this->_app->handle($request, $type, $catch);
     }
   }
 
@@ -135,11 +193,23 @@ class Dispatch implements HttpKernelInterface
     }
 
     $response = new AssetResponse();
+
     //Grab the correct asset for the requesting extension
     $asset = $response->assetByExtension($pathInfo['extension']);
     if($asset === null)
     {
       return $this->unsupportedResponse($pathInfo['extension']);
+    }
+
+    //Load the options
+    $options = ValueAs::arr(
+      $this->_config->getItem($pathInfo['extension'] . '_config'),
+      null
+    );
+
+    if($options !== null)
+    {
+      $asset->setOptions($options);
     }
 
     //Lookup the full path on the filesystem
@@ -206,5 +276,25 @@ class Dispatch implements HttpKernelInterface
         return ends_with_any($request->getHost(), $domains, false);
     };
     return false;
+  }
+
+  /**
+   * Trigger a dispatch event
+   *
+   * @param DispatchEvent $event
+   * @param string        $eventName
+   *
+   * @return DispatchEvent
+   */
+  public static function trigger(
+    DispatchEvent $event, $eventName = self::EVENT_RESOURCE_GENERATE
+  )
+  {
+    if(!isset(static::$dispatcher))
+    {
+      return null;
+    }
+
+    return static::$dispatcher->dispatch($eventName, $event);
   }
 }

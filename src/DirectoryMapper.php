@@ -10,6 +10,14 @@ class DirectoryMapper
   protected $_config;
   protected $_hashMap;
 
+  protected static $_pathCache;
+
+  const MAP_VENDOR = 'v';
+  const MAP_SOURCE = 's';
+  const MAP_HASH   = 'h';
+  const MAP_ALIAS  = 'a';
+  const MAP_ASSET  = 'p';
+
   public function __construct($workingDirectory, ConfigSection $dispatchConfig)
   {
     $this->_workingDirectory = $workingDirectory;
@@ -41,37 +49,52 @@ class DirectoryMapper
     $parts     = explode('/', $path);
     $partCount = count($parts);
 
-    //Handle Fully Hash URLs
-    if($partCount > 2 && $parts[0] == 'h')
+    if($partCount > 3 && $parts[0] == self::MAP_HASH)
     {
-      return $this->urlToHashedPath($parts);
+      //Handle Fully Hash URLs
+      // h/hash/b/filehash/filepath
+      $pathHash = 'b';
+      $filename = array_slice($parts, 4);
+      $base     = $this->hashedPath($parts);
+    }
+    else if($partCount > 4 && $parts[0] == self::MAP_ALIAS)
+    {
+      //Handle Alias URLs
+      // a/alias/domain/b/filehash/filepath
+      $pathHash = 'b';
+      $filename = array_slice($parts, 4);
+      $base     = $this->aliasPath($parts);
+    }
+    else if($partCount > 3 && $parts[0] == self::MAP_SOURCE)
+    {
+      //Handle Source Paths
+      // s/domain/pathHash/fileHash/filePath
+      $pathHash = $parts[2];
+      $filename = array_slice($parts, 4);
+      $base     = $this->sourcePath($parts);
+    }
+    else if($partCount > 5 && $parts[0] == self::MAP_VENDOR)
+    {
+      //Handle Vendor Paths
+      // v/vendor/package/domain/pathHash/fileHash/filePath
+      $pathHash = $parts[4];
+      $filename = array_slice($parts, 6);
+      $base     = $this->vendorPath($parts);
+    }
+    else if($partCount > 3 && $parts[0] == self::MAP_ASSET)
+    {
+      //Handle Asset Paths
+      // p/domain/pathHash/fileHash/filePath
+      $pathHash = $parts[2];
+      $filename = array_slice($parts, 4);
+      $base     = $this->assetPath($parts);
+    }
+    else
+    {
+      return null;
     }
 
-    //Handle Alias URLs
-    if($partCount > 3 && $parts[0] == 'a')
-    {
-      return $this->urlToAliasPath($parts);
-    }
-
-    //Handle Source URLs
-    if($partCount > 2 && $parts[0] == 's')
-    {
-      return $this->urlToSourcePath($parts);
-    }
-
-    //Handle Vendor URLs
-    if($partCount > 4 && $parts[0] == 'v')
-    {
-      return $this->urlToVendorPath($parts);
-    }
-
-    //Handle Asset URLs
-    if($partCount > 2 && $parts[0] == 'p')
-    {
-      return $this->urlToAssetPath($parts);
-    }
-
-    return null;
+    return $this->processDirHash($base, $pathHash, $filename);
   }
 
   /**
@@ -81,14 +104,11 @@ class DirectoryMapper
    *
    * @return null|string
    */
-  public function urlToHashedPath($parts)
+  public function hashedPath($parts)
   {
     if(isset($this->_hashMap[$parts[1]]))
     {
-      return build_path_custom(
-        DIRECTORY_SEPARATOR,
-        [$this->_hashMap[$parts[1]]] + array_slice($parts, 2)
-      );
+      return $this->_hashMap[$parts[1]];
     }
     return null;
   }
@@ -100,46 +120,30 @@ class DirectoryMapper
    *
    * @return null|string
    */
-  public function urlToVendorPath($parts)
+  public function vendorPath($parts)
   {
     list($vendor, $package) = array_slice($parts, 1, 2);
-    return $this->processDirHash(
-      build_path('vendor', $vendor, $package),
-      $parts[4],
-      array_slice($parts, 5)
-    );
+    return build_path('vendor', $vendor, $package);
   }
 
   /**
    * Convert a source directory file to a path
    *
-   * @param $parts
-   *
    * @return null|string
    */
-  public function urlToSourcePath($parts)
+  public function sourcePath()
   {
-    return $this->processDirHash(
-      $this->_config->getItem('source_dir', 'src'),
-      $parts[2],
-      array_slice($parts, 3)
-    );
+    return $this->_config->getItem('source_dir', 'src');
   }
 
   /**
    * Convert an asset dir to path
    *
-   * @param $parts
-   *
    * @return null|string
    */
-  public function urlToAssetPath($parts)
+  public function assetPath()
   {
-    return $this->processDirHash(
-      $this->_config->getItem('assets_dir', 'assets'),
-      $parts[2],
-      array_slice($parts, 3)
-    );
+    return $this->_config->getItem('assets_dir', 'assets');
   }
 
   /**
@@ -149,21 +153,15 @@ class DirectoryMapper
    *
    * @return null|string
    */
-  public function urlToAliasPath($parts)
+  public function aliasPath($parts)
   {
     $check   = $parts[1];
     $aliases = ValueAs::arr($this->_config['aliases']);
-    foreach($aliases as $alias => $path)
+    if(isset($aliases[$check]))
     {
-      if($alias == $check)
-      {
-        return build_path(
-          $this->_workingDirectory,
-          $path,
-          array_slice($parts, 3)
-        );
-      }
+      return $aliases[$check];
     }
+    return null;
   }
 
   /**
@@ -187,24 +185,24 @@ class DirectoryMapper
       return null;
     }
 
-    return build_path($path, implode('DS', $url));
+    return build_path($path, implode(DIRECTORY_SEPARATOR, $url));
   }
 
   /**
    * Create a hash of the directories for a url
    *
-   * @param     $parts
-   * @param int $hashLength
+   * @param array $parts
+   * @param int   $hashLength
    *
    * @return string
    */
-  public function hashDirectoryArray($parts, $hashLength = 5)
+  public function hashDirectoryArray(array $parts, $hashLength = 5)
   {
     $result = [];
     foreach($parts as $part)
     {
-      $result[] = substr($part, 0, 1) .
-        substr(md5($part), 0, $hashLength);
+      //Build up the hash for each part
+      $result[] = substr($part, 0, 2) . substr(md5($part), 0, $hashLength);
     }
     return implode(';', $result);
   }
@@ -219,11 +217,23 @@ class DirectoryMapper
    */
   public function findPathFromHash($base, $hash)
   {
+    //If the requesting path is the base, return the base
+    if($hash === 'b')
+    {
+      return $base;
+    }
+
+    //Attempt to load the resource from disk
+    if(isset(static::$_pathCache[func_get_arg(0) . $hash]))
+    {
+      return static::$_pathCache[func_get_arg(0) . $hash];
+    }
+
     $hashParts = explode(';', $hash);
     foreach($hashParts as $part)
     {
       //Search for directories matching the hash
-      $dirs = glob(build_path($base, substr($part, 0, 1) . '*'), GLOB_ONLYDIR);
+      $dirs = glob(build_path($base, substr($part, 0, 2) . '*'), GLOB_ONLYDIR);
       if(!$dirs)
       {
         return null;
@@ -242,8 +252,8 @@ class DirectoryMapper
       //Loop over the directories to match the path
       foreach($dirs as $path)
       {
-        $folder = [substr($path, strlen($base) + 1)];
-        if($part == $this->hashDirectoryArray($folder, strlen($part) - 1))
+        $folder = [substr($path, strlen($base) + 2)];
+        if($part == $this->hashDirectoryArray($folder, strlen($part) - 2))
         {
           $base  = $path;
           $found = true;
@@ -258,7 +268,24 @@ class DirectoryMapper
       }
     }
 
+    //Cache the path to stop future lookups on disk
+    $this->cachePath(func_get_arg(0), $hash, $base);
+
     //Path finally matched
     return $base;
+  }
+
+  /**
+   * @param $base
+   * @param $hash
+   * @param $destination
+   */
+  public function cachePath($base, $hash, $destination)
+  {
+    //There is no point in caching the base
+    if($hash != 'b')
+    {
+      static::$_pathCache[$base . $hash] = $destination;
+    }
   }
 }

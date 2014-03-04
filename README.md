@@ -1,4 +1,4 @@
 Dispatch
 ========
 
-Asset Management Middleware for PHP
+Asset Management Middleware for Stack PHP

@@ -8,4 +8,6 @@ interface IAsset
   public function getContent();
 
   public function getContentType();
+
+  public function setOptions(array $options);
 }
