@@ -61,6 +61,16 @@ class AssetManager
   }
 
   /**
+   * Asset manager for the source directory
+   *
+   * @return static
+   */
+  public static function sourceType()
+  {
+    return new static(null, DirectoryMapper::MAP_SOURCE);
+  }
+
+  /**
    * Asset manager for a vendor package
    *
    * @param $vendor
