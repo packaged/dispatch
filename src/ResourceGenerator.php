@@ -232,6 +232,6 @@ class ResourceGenerator
    */
   public static function getFileHash($path)
   {
-    return hash_file('md5', $path);
+    return md5_file($path);
   }
 }
