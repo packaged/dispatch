@@ -89,6 +89,8 @@ class AssetManager
    * @param object $callee
    * @param string $forceType DirectoryMapper::MAP_*
    * @param mixed  $lookupParts
+   *
+   * @throws \Exception
    */
   public function __construct(
     $callee = null, $forceType = null, $lookupParts = null
@@ -98,7 +100,15 @@ class AssetManager
 
     if($forceType === null)
     {
-      $this->_mapType = $this->mapType($callee);
+      if(!is_object($callee))
+      {
+        throw new \Exception(
+          "You cannot construct an asset manager without specifying " .
+          "either a callee or forceType"
+        );
+      }
+
+      $this->_mapType = $this->lookupMapType($callee);
     }
 
     //If provided, use the lookup parts
@@ -109,23 +119,35 @@ class AssetManager
   }
 
   /**
+   * Retrieve the map type currently set
+   *
+   * @return string
+   */
+  public function getMapType()
+  {
+    return $this->_mapType;
+  }
+
+  protected function ownFile()
+  {
+    return __FILE__;
+  }
+
+  /**
    * Find the map type based on the provided object
    *
    * @param $object
    *
    * @return string
    */
-  public function mapType($object)
+  public function lookupMapType($object)
   {
     $reflection = new \ReflectionObject($object);
     $filename   = $reflection->getFileName();
 
     //Find the common start to the filename of the callee and this file, which
     //is known to be in the vendor directory
-    $prefix = Strings::commonPrefix(
-      $filename,
-      '/Websites/cubex/skeleton/vendor/packaged/dispatch/asset.php'
-    );
+    $prefix = Strings::commonPrefix($filename, $this->ownFile());
 
     //Account for other packaged repos that may offer resources
     if(ends_with($prefix, 'packaged/'))

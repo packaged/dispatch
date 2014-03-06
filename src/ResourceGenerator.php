@@ -46,6 +46,9 @@ class ResourceGenerator
     $this->_mapper     = new DirectoryMapper(
       $dispatcher->getBaseDirectory(), $dispatcher->getConfig()
     );
+    $this->_mapper->setHashMap(
+      ValueAs::arr($dispatcher->getConfig()->getItem('hashtable', []))
+    );
   }
 
   /**
@@ -61,6 +64,13 @@ class ResourceGenerator
       $event->getPath(),
       $event->getFilename()
     );
+
+    //Invalid resource requested
+    if($uri === null)
+    {
+      $event->setResult(null);
+      return;
+    }
 
     $cfg = $this->_dispatcher->getConfig();
     switch($cfg->getItem('run_on', 'path'))
@@ -173,41 +183,33 @@ class ResourceGenerator
    */
   public function getBasePath(DirectoryMapper $mapper, $type, array $lookup)
   {
-    $cacheKey = $type . '-' . implode('.', $lookup);
+    $cache = $type . '-' . implode('.', $lookup);
 
     //If the path is cached, return it
-    if(isset($this->_baseHash[$cacheKey]))
+    if(isset($this->_baseHash[$cache]))
     {
-      return $this->_baseHash[$cacheKey];
+      return $this->_baseHash[$cache];
     }
 
     $parts = array_merge([$type], $lookup);
     switch($type)
     {
       case DirectoryMapper::MAP_ALIAS:
-        $this->_baseHash[$cacheKey] = $mapper->aliasPath($parts);
+        $this->_baseHash[$cache] = $mapper->aliasPath($parts);
         break;
       case DirectoryMapper::MAP_SOURCE:
-        $this->_baseHash[$cacheKey] = $mapper->sourcePath();
+        $this->_baseHash[$cache] = $mapper->sourcePath();
         break;
       case DirectoryMapper::MAP_ASSET:
-        $this->_baseHash[$cacheKey] = $mapper->assetPath();
+        $this->_baseHash[$cache] = $mapper->assetPath();
         break;
       case DirectoryMapper::MAP_VENDOR:
-        $this->_baseHash[$cacheKey] = $mapper->vendorPath($parts);
-        break;
-      case DirectoryMapper::MAP_HASH:
-        $this->_baseHash[$cacheKey] = $mapper->hashedPath($parts);
+        $this->_baseHash[$cache] = $mapper->vendorPath($parts);
         break;
     }
 
     //Return the cache
-    if(isset($this->_baseHash[$cacheKey]))
-    {
-      return $this->_baseHash[$cacheKey];
-    }
-
-    return null;
+    return isset($this->_baseHash[$cache]) ? $this->_baseHash[$cache] : null;
   }
 
   /**
@@ -232,6 +234,11 @@ class ResourceGenerator
    */
   public static function getFileHash($path)
   {
+    if(!file_exists($path))
+    {
+      return null;
+    }
+
     return md5_file($path);
   }
 }

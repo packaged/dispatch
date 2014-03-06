@@ -5,11 +5,11 @@ class PfmAsset extends AbstractFontAsset
 {
   public function getExtension()
   {
-    return 'pmf';
+    return 'pfm';
   }
 
   public function getContentType()
   {
-    return "application/x-font-pmf";
+    return "application/x-font-pfm";
   }
 }

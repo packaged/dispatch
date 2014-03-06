@@ -14,7 +14,6 @@ class DirectoryMapper
 
   const MAP_VENDOR = 'v';
   const MAP_SOURCE = 's';
-  const MAP_HASH   = 'h';
   const MAP_ALIAS  = 'a';
   const MAP_ASSET  = 'p';
 
@@ -49,20 +48,12 @@ class DirectoryMapper
     $parts     = explode('/', $path);
     $partCount = count($parts);
 
-    if($partCount > 3 && $parts[0] == self::MAP_HASH)
-    {
-      //Handle Fully Hash URLs
-      // h/hash/b/filehash/filepath
-      $pathHash = 'b';
-      $filename = array_slice($parts, 4);
-      $base     = $this->hashedPath($parts);
-    }
-    else if($partCount > 4 && $parts[0] == self::MAP_ALIAS)
+    if($partCount > 4 && $parts[0] == self::MAP_ALIAS)
     {
       //Handle Alias URLs
       // a/alias/domain/b/filehash/filepath
       $pathHash = 'b';
-      $filename = array_slice($parts, 4);
+      $filename = array_slice($parts, 5);
       $base     = $this->aliasPath($parts);
     }
     else if($partCount > 3 && $parts[0] == self::MAP_SOURCE)
@@ -95,22 +86,6 @@ class DirectoryMapper
     }
 
     return $this->processDirHash($base, $pathHash, $filename);
-  }
-
-  /**
-   * Convert a hash cache url to a pth
-   *
-   * @param $parts
-   *
-   * @return null|string
-   */
-  public function hashedPath($parts)
-  {
-    if(isset($this->_hashMap[$parts[1]]))
-    {
-      return $this->_hashMap[$parts[1]];
-    }
-    return null;
   }
 
   /**
@@ -156,7 +131,7 @@ class DirectoryMapper
   public function aliasPath($parts)
   {
     $check   = $parts[1];
-    $aliases = ValueAs::arr($this->_config['aliases']);
+    $aliases = ValueAs::arr($this->_config->getItem('aliases'));
     if(isset($aliases[$check]))
     {
       return $aliases[$check];
@@ -252,7 +227,7 @@ class DirectoryMapper
       //Loop over the directories to match the path
       foreach($dirs as $path)
       {
-        $folder = [substr($path, strlen($base) + 2)];
+        $folder = [substr($path, strlen($base) + 1)];
         if($part == $this->hashDirectoryArray($folder, strlen($part) - 2))
         {
           $base  = $path;

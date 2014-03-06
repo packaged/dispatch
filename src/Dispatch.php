@@ -117,7 +117,10 @@ class Dispatch implements HttpKernelInterface
     if($this->isDispatchRequest($request))
     {
       //Process the response for a dispatchable
-      return $this->getResponseForPath($this->getDispatchablePath($request));
+      return $this->getResponseForPath(
+        $this->getDispatchablePath($request),
+        $request
+      );
     }
     else
     {
@@ -172,11 +175,12 @@ class Dispatch implements HttpKernelInterface
   /**
    * Create the response for the given path
    *
-   * @param $path
+   * @param         $path
+   * @param Request $request
    *
    * @return Response
    */
-  public function getResponseForPath($path)
+  public function getResponseForPath($path, Request $request)
   {
     if(empty($path))
     {
@@ -228,7 +232,7 @@ class Dispatch implements HttpKernelInterface
     $asset->setContent(file_get_contents($filePath));
 
     //Create and return the response
-    return $response->createResponse($asset);
+    return $response->createResponse($asset, $request);
   }
 
   /**

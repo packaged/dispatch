@@ -3,12 +3,14 @@ namespace Packaged\Dispatch;
 
 use Packaged\Dispatch\Assets\AbstractAsset;
 use Packaged\Dispatch\Assets\IAsset;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class AssetResponse
 {
-  protected static $assetMap = [
+  public static $assetMap = [
     'js'    => 'Javascript',
+    'json'  => 'Json',
     'css'   => 'Css',
     'swf'   => 'Flash',
     'pdf'   => 'Pdf',
@@ -25,7 +27,7 @@ class AssetResponse
     'mov'   => 'Video\Quicktime',
     'afm'   => 'Font\Afm',
     'dfont' => 'Font\Dfont',
-    'eot'   => 'Font\eot',
+    'eot'   => 'Font\Eot',
     'otf'   => 'Font\OpenType',
     'pfa'   => 'Font\Pfa',
     'pfb'   => 'Font\Pfb',
@@ -52,10 +54,44 @@ class AssetResponse
     return null;
   }
 
-  public function createResponse(IAsset $asset)
+  public function createResponse(IAsset $asset, Request $request)
   {
-    $response = new Response($asset->getContent(), 200);
+    $response = new Response();
+
+    //Set the correct content type based on the asset
     $response->headers->set('Content-Type', $asset->getContentType());
+
+    //Ensure the cache varies on the language and encoding
+    //Domain specific content will vary on the uri itself
+    $response->headers->set("Vary", "Accept-Encoding,Accept-Language");
+
+    //Set the etag to the hash of the request uri, as it is in itself a hash
+    $response->setEtag(md5($request->getPathInfo()));
+    $response->setPublic();
+
+    //This resource should last for 30 days in cache
+    $response->setMaxAge(2592000);
+    $response->setSharedMaxAge(2592000);
+    $response->setExpires((new \DateTime())->add(new \DateInterval('P30D')));
+
+    //Set the last modified date to now
+    $date = new \DateTime();
+    $date->setTimezone(new \DateTimeZone('UTC'));
+    $response->headers->set(
+      'Last-Modified',
+      $date->format('D, d M Y H:i:s') . ' GMT'
+    );
+
+    //Check to see if the client already has the content
+    if($request->server->has('HTTP_IF_MODIFIED_SINCE'))
+    {
+      $response->setNotModified();
+    }
+    else
+    {
+      $response->setContent($asset->getContent());
+    }
+
     return $response;
   }
 }
