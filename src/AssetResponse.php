@@ -66,7 +66,7 @@ class AssetResponse
     $response->headers->set("Vary", "Accept-Encoding,Accept-Language");
 
     //Set the etag to the hash of the request uri, as it is in itself a hash
-    $response->setEtag(md5($request->getPathInfo()));
+    $response->setEtag(md5($asset->getContent()));
     $response->setPublic();
 
     //This resource should last for 30 days in cache
