@@ -2,6 +2,7 @@
 namespace Packaged\Dispatch;
 
 use Packaged\Config\Provider\ConfigSection;
+use Packaged\Dispatch\Assets\IDispatchableAsset;
 use Packaged\Helpers\ValueAs;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -114,6 +115,16 @@ class Dispatch implements HttpKernelInterface
     Request $request, $type = self::MASTER_REQUEST, $catch = true
   )
   {
+    //Start listening for resource uri generation requests
+    $generator          = new ResourceGenerator($this, $request);
+    static::$dispatcher = new EventDispatcher();
+
+    //Listen in for resource generate requests
+    static::$dispatcher->addListener(
+      self::EVENT_RESOURCE_GENERATE,
+      [$generator, 'processEvent']
+    );
+
     if($this->isDispatchRequest($request))
     {
       //Process the response for a dispatchable
@@ -124,16 +135,6 @@ class Dispatch implements HttpKernelInterface
     }
     else
     {
-      //Start listening for resource uri generation requests
-      $generator          = new ResourceGenerator($this, $request);
-      static::$dispatcher = new EventDispatcher();
-
-      //Listen in for resource generate requests
-      static::$dispatcher->addListener(
-        self::EVENT_RESOURCE_GENERATE,
-        [$generator, 'processEvent']
-      );
-
       //Handle to request through the next/final app
       return $this->_app->handle($request, $type, $catch);
     }
@@ -230,6 +231,12 @@ class Dispatch implements HttpKernelInterface
 
     //Give the asset its file content
     $asset->setContent(file_get_contents($filePath));
+
+    if($asset instanceof IDispatchableAsset)
+    {
+      //Set the asset manager
+      $asset->setAssetManager(AssetManager::buildFromUri($path));
+    }
 
     //Create and return the response
     return $response->createResponse($asset, $request);

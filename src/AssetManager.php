@@ -83,6 +83,23 @@ class AssetManager
     return new static(null, DirectoryMapper::MAP_VENDOR, [$vendor, $package]);
   }
 
+  public static function buildFromUri($uri)
+  {
+    $parts = explode('/', $uri);
+    switch($parts[0])
+    {
+      case DirectoryMapper::MAP_ALIAS:
+        return static::aliasType($parts[1]);
+      case DirectoryMapper::MAP_SOURCE:
+        return static::sourceType();
+      case DirectoryMapper::MAP_VENDOR:
+        return static::vendorType($parts[1], $parts[2]);
+      case DirectoryMapper::MAP_ASSET:
+        return static::assetType();
+    }
+    return null;
+  }
+
   /**
    * Create a new asset manager based on the calling class
    *
@@ -163,6 +180,15 @@ class AssetManager
       return DirectoryMapper::MAP_VENDOR;
     }
     return DirectoryMapper::MAP_SOURCE;
+  }
+
+  /**
+   * Return the configured lookup parts e.g. Vendor,Package
+   * @return array
+   */
+  public function getLookupParts()
+  {
+    return $this->_lookupParts;
   }
 
   /**

@@ -57,7 +57,7 @@ class ResourceGeneratorTest extends PHPUnit_Framework_TestCase
     $event->setFilename('test.css');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_SOURCE);
     $event->setPath('asset');
-    $expect  = '//packaged.in/res/s/dfcbf/asc04e3/edc2182/test.css';
+    $expect  = '//packaged.in/res/s/dfcbf/asc04e3/76d6c18/test.css';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch(['run_on' => 'subdomain']);
@@ -65,7 +65,7 @@ class ResourceGeneratorTest extends PHPUnit_Framework_TestCase
     $event->setFilename('test.css');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_SOURCE);
     $event->setPath('asset');
-    $expect  = '//static.packaged.in/s/dfcbf/asc04e3/edc2182/test.css';
+    $expect  = '//static.packaged.in/s/dfcbf/asc04e3/76d6c18/test.css';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
@@ -76,7 +76,7 @@ class ResourceGeneratorTest extends PHPUnit_Framework_TestCase
     $event->setFilename('test.css');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_SOURCE);
     $event->setPath('asset');
-    $expect  = '//static.packaged.in/s/8cac7/asc04e3/edc2182/test.css';
+    $expect  = '//static.packaged.in/s/8cac7/asc04e3/76d6c18/test.css';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch(
@@ -86,7 +86,7 @@ class ResourceGeneratorTest extends PHPUnit_Framework_TestCase
     $event->setFilename('test.css');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_SOURCE);
     $event->setPath('asset');
-    $expect  = '//packagedstatic.com/s/8cac7/asc04e3/edc2182/test.css';
+    $expect  = '//packagedstatic.com/s/8cac7/asc04e3/76d6c18/test.css';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch();
@@ -124,7 +124,7 @@ class ResourceGeneratorTest extends PHPUnit_Framework_TestCase
     $event    = new \Packaged\Dispatch\DispatchEvent();
     $event->setFilename('test.css');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_ASSET);
-    $expect  = '//www.packaged.in/res/p/8cac7/b/edc2182/test.css';
+    $expect  = '//www.packaged.in/res/p/8cac7/b/76d6c18/test.css';
     $tests[] = [$event, $dispatch, $request, $expect, 2];
 
     return $tests;

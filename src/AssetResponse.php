@@ -65,8 +65,10 @@ class AssetResponse
     //Domain specific content will vary on the uri itself
     $response->headers->set("Vary", "Accept-Encoding,Accept-Language");
 
+    $content = $asset->getContent();
+
     //Set the etag to the hash of the request uri, as it is in itself a hash
-    $response->setEtag(md5($asset->getContent()));
+    $response->setEtag(md5($content));
     $response->setPublic();
 
     //This resource should last for 30 days in cache
@@ -89,7 +91,7 @@ class AssetResponse
     }
     else
     {
-      $response->setContent($asset->getContent());
+      $response->setContent($content);
     }
 
     return $response;

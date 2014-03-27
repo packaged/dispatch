@@ -31,7 +31,7 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
     $manager->requireJs('test');
     $this->assertEquals(
       [
-        '//www.packaged.in/res/p/8cac7/b/edc2182/test.css' => ['delay' => true]
+        '//www.packaged.in/res/p/8cac7/b/76d6c18/test.css' => ['delay' => true]
       ],
       \Packaged\Dispatch\AssetManager::getUrisByType('css')
     );
@@ -73,6 +73,42 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
       [
         new \Packaged\Config\Provider\ConfigSection(),
         \Packaged\Dispatch\DirectoryMapper::MAP_VENDOR
+      ],
+    ];
+  }
+
+  /**
+   * @dataProvider buildUriProvider
+   *
+   * @param $uri
+   * @param $mapType
+   * @param $parts
+   */
+  public function testBuildFromUri($uri, $mapType, $parts)
+  {
+    $am = \Packaged\Dispatch\AssetManager::buildFromUri($uri);
+    if($mapType === null)
+    {
+      $this->assertNull($am);
+    }
+    else
+    {
+      $this->assertEquals($mapType, $am->getMapType());
+      $this->assertEquals($parts, $am->getLookupParts());
+    }
+  }
+
+  public function buildUriProvider()
+  {
+    return [
+      ["gh/sdf", null, null],
+      ["a/b/c", \Packaged\Dispatch\DirectoryMapper::MAP_ALIAS, ['b']],
+      ["s/na/c", \Packaged\Dispatch\DirectoryMapper::MAP_SOURCE, []],
+      ["p/na/c", \Packaged\Dispatch\DirectoryMapper::MAP_ASSET, []],
+      [
+        "v/packaged/dispatch",
+        \Packaged\Dispatch\DirectoryMapper::MAP_VENDOR,
+        ['packaged', 'dispatch']
       ],
     ];
   }

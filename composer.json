@@ -1,19 +1,22 @@
 {
-  "name":     "packaged/dispatch",
-  "license":  "MIT",
-  "authors":  [
+  "name":        "packaged/dispatch",
+  "license":     "MIT",
+  "authors":     [
     {
       "name":  "Brooke Bryan",
       "email": "brooke@bajb.net"
     }
   ],
-  "require":  {
+  "require":     {
     "php":                 ">=5.4.0",
     "packaged/helpers":    "0.0.*",
     "packaged/config":     "0.0.*",
     "symfony/http-kernel": "2.4.*"
   },
-  "autoload": {
+  "require-dev": {
+    "phpunit/phpunit": "*"
+  },
+  "autoload":    {
     "psr-4": {
       "Packaged\\Dispatch\\": "src"
     }

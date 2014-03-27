@@ -3,7 +3,7 @@ namespace Packaged\Dispatch\Assets;
 
 use Packaged\Helpers\ValueAs;
 
-class JavascriptAsset extends AbstractAsset
+class JavascriptAsset extends AbstractDispatchableAsset
 {
   protected $_options = [
     'minify' => 'true'
@@ -21,19 +21,19 @@ class JavascriptAsset extends AbstractAsset
 
   public function getContent()
   {
+    $data = parent::getContent();
+
     //Return the raw content if minification has been disabled
     if(!ValueAs::bool($this->getOption('minify', true)))
     {
-      return $this->_content;
+      return $data;
     }
 
     //Do not minify scripts containing the @do-not-minify
-    if(strpos($this->_content, '@' . 'do-not-minify') !== false)
+    if(strpos($data, '@' . 'do-not-minify') !== false)
     {
-      return $this->_content;
+      return $data;
     }
-
-    $data = $this->_content;
 
     //Strip Comments
     $data = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $data);

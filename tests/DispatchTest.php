@@ -94,14 +94,15 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       array_merge($baseConfig, []),
       'res/s/domain/b/filehash/asset/test.css',
       'www.packaged.in',
-      'body { background: yellow; }'
+      'body { background: yellow url(\'\'); }'
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/p/domain/b/filehash/test.css',
       'www.packaged.in',
-      'body { background: yellow; }'
+      'body { background: yellow ' .
+      'url(\'//www.packaged.in/res/p/8cac7/b/d41d8cd/x.jpg\'); }'
     ];
 
     $tests[] = [
@@ -122,7 +123,8 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       array_merge($baseConfig, []),
       'res/a/tdir/domain/b/filehash/test.css',
       'www.packaged.in',
-      'body { background: yellow; }'
+      'body { background: yellow ' .
+      'url(\'//www.packaged.in/res/a/tdir/8cac7/b/d41d8cd/x.jpg\'); }'
     ];
 
     $tests[] = [
@@ -175,7 +177,8 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       ),
       'a/tdir/domain/b/filehash/test.css',
       'static.packaged.in',
-      'body { background: yellow; }'
+      'body { background: yellow ' .
+      'url(\'//static.packaged.in/a/tdir/6ea79/b/d41d8cd/x.jpg\'); }'
     ];
 
     $tests[] = [
@@ -185,7 +188,8 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       ),
       'a/tdir/domain/b/filehash/test.css',
       'static.packaged.tld',
-      'body { background: yellow; }'
+      'body { background: yellow ' .
+      'url(\'//static.packaged.tld/a/tdir/71084/b/d41d8cd/x.jpg\'); }'
     ];
 
     $tests[] = [
@@ -196,6 +200,16 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'a/tdir/domain/b/filehash/test.css',
       'static.packaged.tld',
       'Original'
+    ];
+
+    $tests[] = [
+      array_merge(
+        $baseConfig,
+        ['run_on' => 'subdomain', 'run_match' => 'static.']
+      ),
+      'a/tdir/domain/b/filehash/no-parse-test.css',
+      'static.packaged.in',
+      'body { background: yellow url(x.jpg); }'
     ];
 
     return $tests;
@@ -221,7 +235,7 @@ class DispatchTest extends PHPUnit_Framework_TestCase
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_SOURCE);
     $event->setPath('asset');
     \Packaged\Dispatch\Dispatch::trigger($event);
-    $expect = '//packaged.in/res/s/dfcbf/asc04e3/edc2182/test.css';
+    $expect = '//packaged.in/res/s/dfcbf/asc04e3/76d6c18/test.css';
     $this->assertEquals($expect, $event->getResult());
   }
 }
