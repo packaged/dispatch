@@ -7,11 +7,15 @@
       "email": "brooke@bajb.net"
     }
   ],
+  "bin":         [
+    "bin/dispatch"
+  ],
   "require":     {
     "php":                 ">=5.4.0",
     "packaged/helpers":    "0.0.*",
     "packaged/config":     "0.0.*",
-    "symfony/http-kernel": "2.4.*"
+    "symfony/http-kernel": "2.4.*",
+    "symfony/console":     "2.4.*"
   },
   "require-dev": {
     "phpunit/phpunit": "*"
