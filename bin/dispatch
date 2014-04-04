@@ -4,7 +4,7 @@ $projectRoot = dirname(__DIR__);
 
 if(!file_exists($projectRoot . '/vendor/autoload.php'))
 {
-  $projectRoot = dirname($projectRoot);
+  $projectRoot = dirname(dirname(dirname($projectRoot)));
 }
 
 require $projectRoot . '/vendor/autoload.php';
