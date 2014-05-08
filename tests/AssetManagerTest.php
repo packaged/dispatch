@@ -29,11 +29,58 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
     $manager = \Packaged\Dispatch\AssetManager::assetType();
     $manager->requireCss('test', ['delay' => true]);
     $manager->requireJs('test');
+
     $this->assertEquals(
       [
         '//www.packaged.in/res/p/8cac7/b/76d6c18/test.css' => ['delay' => true]
       ],
       \Packaged\Dispatch\AssetManager::getUrisByType('css')
+    );
+
+    $this->assertEquals(
+      [
+        '//www.packaged.in/res/p/8cac7/b/e2218e4/test.js' => null
+      ],
+      \Packaged\Dispatch\AssetManager::getUrisByType('js')
+    );
+
+    $this->assertNotNull(\Packaged\Dispatch\AssetManager::getUrisByType('css'));
+    $manager->clearStore('css');
+    $this->assertEmpty(\Packaged\Dispatch\AssetManager::getUrisByType('css'));
+
+    $this->assertNotNull(\Packaged\Dispatch\AssetManager::getUrisByType('js'));
+    $manager->clearStore();
+    $this->assertEmpty(\Packaged\Dispatch\AssetManager::getUrisByType('js'));
+  }
+
+  public function testGenerateHtmlIncludes()
+  {
+    $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    $request->headers->set('HOST', 'www.packaged.in');
+    $request->server->set('REQUEST_URI', '/');
+    $opts       = ['assets_dir' => 'asset'];
+    $opt        = new \Packaged\Config\Provider\ConfigSection('', $opts);
+    $dispatcher = new \Packaged\Dispatch\Dispatch(new DummyKernel(), $opt);
+    $dispatcher->setBaseDirectory(__DIR__);
+    $dispatcher->handle($request);
+    $manager = \Packaged\Dispatch\AssetManager::assetType();
+    $manager->requireCss('test');
+    $manager->requireJs('test', ['delay' => true]);
+
+    $this->assertEquals(
+      '<link href="//www.packaged.in/res/p/8cac7/b/76d6c18/test.css"' .
+      ' rel="stylesheet" type="text/css">',
+      \Packaged\Dispatch\AssetManager::generateHtmlIncludes('css')
+    );
+
+    $this->assertEquals(
+      '<script src="//www.packaged.in/res/p/8cac7/b/e2218e4/test.js"' .
+      ' delay="true"></script>',
+      \Packaged\Dispatch\AssetManager::generateHtmlIncludes('js')
+    );
+    $this->assertEquals(
+      '',
+      \Packaged\Dispatch\AssetManager::generateHtmlIncludes('fnt')
     );
   }
 

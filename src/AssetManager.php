@@ -31,11 +31,50 @@ class AssetManager
    *
    * @param string $type
    *
-   * @return mixed
+   * @return array|null
    */
   public static function getUrisByType($type = 'js')
   {
-    return static::$_resourceStore[$type];
+    return isset(static::$_resourceStore[$type]) ?
+      static::$_resourceStore[$type] : null;
+  }
+
+  public static function generateHtmlIncludes($for = 'css')
+  {
+    if(!isset(static::$_resourceStore[$for])
+      || empty(static::$_resourceStore[$for])
+    )
+    {
+      return '';
+    }
+
+    $template = '<link href="%s"%s>';
+
+    if($for == 'css')
+    {
+      $template = '<link href="%s" rel="stylesheet" type="text/css"%s>';
+    }
+    else if($for == 'js')
+    {
+      $template = '<script src="%s"%s></script>';
+    }
+
+    $return = '';
+    foreach(static::$_resourceStore[$for] as $uri => $options)
+    {
+      $opts = $options;
+      if(is_array($options))
+      {
+        $opts = '';
+        foreach($options as $key => $value)
+        {
+          $value = ValueAs::string($value);
+          $opts .= " $key=\"$value\"";
+        }
+      }
+      $return .= sprintf($template, $uri, $opts);
+    }
+    return $return;
   }
 
   /**
@@ -232,6 +271,24 @@ class AssetManager
   }
 
   /**
+   * Clear the entire resource store with a type of null, or all items stored
+   * by a type if supplied
+   *
+   * @param null $type
+   */
+  public function clearStore($type = null)
+  {
+    if($type === null)
+    {
+      static::$_resourceStore = [];
+    }
+    else
+    {
+      unset(static::$_resourceStore[$type]);
+    }
+  }
+
+  /**
    * Add a js file to the store
    *
    * @param $filename
@@ -239,11 +296,15 @@ class AssetManager
    */
   public function requireJs($filename, $options = null)
   {
-    static::_addToStore(
-      'js',
-      $this->getResourceUri($filename . '.js'),
-      $options
-    );
+    $filenames = ValueAs::arr($filename);
+    foreach($filenames as $filename)
+    {
+      static::_addToStore(
+        'js',
+        $this->getResourceUri($filename . '.js'),
+        $options
+      );
+    }
   }
 
   /**
@@ -254,10 +315,14 @@ class AssetManager
    */
   public function requireCss($filename, $options = null)
   {
-    static::_addToStore(
-      'css',
-      $this->getResourceUri($filename . '.css'),
-      $options
-    );
+    $filenames = ValueAs::arr($filename);
+    foreach($filenames as $filename)
+    {
+      static::_addToStore(
+        'css',
+        $this->getResourceUri($filename . '.css'),
+        $options
+      );
+    }
   }
 }
