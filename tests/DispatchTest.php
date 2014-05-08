@@ -107,6 +107,22 @@ class DispatchTest extends PHPUnit_Framework_TestCase
 
     $tests[] = [
       array_merge($baseConfig, []),
+      'res/p/domain/b/filehash/test.css',
+      'www.packaged.in',
+      'body { background: yellow ' .
+      'url(\'//www.packaged.in/res/p/8cac7/b/d41d8cd/x.jpg\'); }'
+    ];
+
+    $tests[] = [
+      array_merge($baseConfig, []),
+      'res/p/domain/b/filehash/tester.css',
+      'www.packaged.in',
+      'body { background: yellow ' .
+      'url(\'//www.packaged.in/res/p/8cac7/b/d41d8cd/x.jpg?v1\'); }'
+    ];
+
+    $tests[] = [
+      array_merge($baseConfig, []),
       'res/p/domain//filehash/test.css',
       'www.packaged.in',
       'could not be located'

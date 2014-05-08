@@ -68,7 +68,13 @@ abstract class AbstractDispatchableAsset extends AbstractAsset
    */
   protected function _dispatchNestedUrl($uri)
   {
-    $url = $this->_assetManager->getResourceUri($uri[1]);
+    list($path, $append) = exploded('?', $uri[1], [$uri[1], null], 2);
+    $url = $this->_assetManager->getResourceUri($path);
+
+    if(!empty($append))
+    {
+      return "url('$url?$append')";
+    }
     return "url('$url')";
   }
 
