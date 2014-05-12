@@ -20,11 +20,19 @@ class AssetManager
    * @var string
    */
   protected $_mapType = DirectoryMapper::MAP_SOURCE;
+
   /**
    * Parts to build the uri with, e.g. vendor,package
    * @var array
    */
   protected $_lookupParts = [];
+
+  /**
+   * Relative path on the current asset (when handling sub asset construction)
+   *
+   * @var array folders in the path
+   */
+  protected $_path;
 
   /**
    * Retrieve all requested resources by type
@@ -122,21 +130,55 @@ class AssetManager
     return new static(null, DirectoryMapper::MAP_VENDOR, [$vendor, $package]);
   }
 
+  /**
+   * Create an asset manager based on an existing dispatched uri
+   *
+   * @param $uri
+   *
+   * @return null|AssetManager
+   */
   public static function buildFromUri($uri)
   {
     $parts = explode('/', $uri);
     switch($parts[0])
     {
       case DirectoryMapper::MAP_ALIAS:
-        return static::aliasType($parts[1]);
+        return static::aliasType($parts[1])
+          ->_setRelativePath(array_slice($parts, 5, -1));
       case DirectoryMapper::MAP_SOURCE:
-        return static::sourceType();
+        return static::sourceType()
+          ->_setRelativePath(array_slice($parts, 4, -1));
       case DirectoryMapper::MAP_VENDOR:
-        return static::vendorType($parts[1], $parts[2]);
+        return static::vendorType($parts[1], $parts[2])
+          ->_setRelativePath(array_slice($parts, 6, -1));
       case DirectoryMapper::MAP_ASSET:
-        return static::assetType();
+        return static::assetType()
+          ->_setRelativePath(array_slice($parts, 4, -1));
     }
     return null;
+  }
+
+  /**
+   * Set the path of the dispatching asset, when building from uri
+   *
+   * @param $path
+   *
+   * @return $this
+   */
+  protected function _setRelativePath($path)
+  {
+    $this->_path = $path;
+    return $this;
+  }
+
+  /**
+   * Return the relative path of the parent dispatching asset
+   *
+   * @return string
+   */
+  public function getRelativePath()
+  {
+    return $this->_path;
   }
 
   /**

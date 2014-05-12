@@ -50,7 +50,11 @@ class DispatchTest extends PHPUnit_Framework_TestCase
     $baseConfig = [
       'source_dir' => 'tests',
       'assets_dir' => 'tests/asset',
-      'aliases'    => ['tdir' => 'tests/asset', 'vend' => 'vendor'],
+      'aliases'    => [
+        'tdir' => 'tests/asset',
+        'ast2' => 'tests/asset2',
+        'vend' => 'vendor'
+      ],
       'css_config' => ['minify' => false]
     ];
     $tests      = [];
@@ -88,13 +92,6 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'res/test',
       'www.packaged.in',
       'The URL you requested appears to be mythical'
-    ];
-
-    $tests[] = [
-      array_merge($baseConfig, []),
-      'res/s/domain/b/filehash/asset/test.css',
-      'www.packaged.in',
-      'body { background: yellow url(\'\'); }'
     ];
 
     $tests[] = [
@@ -141,6 +138,30 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'www.packaged.in',
       'body { background: yellow ' .
       'url(\'//www.packaged.in/res/a/tdir/8cac7/b/d41d8cd/x.jpg\'); }'
+    ];
+
+    $tests[] = [
+      array_merge($baseConfig, []),
+      'res/a/ast2/domain/b/filehash/sub/test.css',
+      'www.packaged.in',
+      'body { background: yellow ' .
+      'url(\'//www.packaged.in/res/a/ast2/8cac7/b/d41d8cd/x.jpg\'); }'
+    ];
+
+    $tests[] = [
+      array_merge($baseConfig, []),
+      'res/a/ast2/domain/b/filehash/sub/tester.css',
+      'www.packaged.in',
+      'body { background: yellow ' .
+      'url(\'//www.packaged.in/res/a/ast2/8cac7/b/d41d8cd/sub2/x.jpg\'); }'
+    ];
+
+    $tests[] = [
+      array_merge($baseConfig, []),
+      'res/a/ast2/domain/b/filehash/sub/subsub/tester.css',
+      'www.packaged.in',
+      'body { background: yellow ' .
+      'url(\'//www.packaged.in/res/a/ast2/8cac7/b/d41d8cd/sub/x.jpg\'); }'
     ];
 
     $tests[] = [
