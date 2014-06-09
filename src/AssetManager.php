@@ -9,6 +9,8 @@ use Packaged\Helpers\ValueAs;
  */
 class AssetManager
 {
+  const TYPE_CSS = 'css';
+  const TYPE_JS = 'js';
   /**
    * Storage container for the resources requested from all asset managers
    */
@@ -41,13 +43,13 @@ class AssetManager
    *
    * @return array|null
    */
-  public static function getUrisByType($type = 'js')
+  public static function getUrisByType($type = self::TYPE_JS)
   {
     return isset(static::$_resourceStore[$type]) ?
       static::$_resourceStore[$type] : null;
   }
 
-  public static function generateHtmlIncludes($for = 'css')
+  public static function generateHtmlIncludes($for = self::TYPE_CSS)
   {
     if(!isset(static::$_resourceStore[$for])
       || empty(static::$_resourceStore[$for])
@@ -58,11 +60,11 @@ class AssetManager
 
     $template = '<link href="%s"%s>';
 
-    if($for == 'css')
+    if($for == self::TYPE_CSS)
     {
       $template = '<link href="%s" rel="stylesheet" type="text/css"%s>';
     }
-    else if($for == 'js')
+    else if($for == self::TYPE_JS)
     {
       $template = '<script src="%s"%s></script>';
     }
