@@ -72,6 +72,11 @@ class AssetManager
     $return = '';
     foreach(static::$_resourceStore[$for] as $uri => $options)
     {
+      if(empty($uri))
+      {
+        continue;
+      }
+
       $opts = $options;
       if(is_array($options))
       {

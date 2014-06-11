@@ -66,6 +66,7 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
     $manager = \Packaged\Dispatch\AssetManager::assetType();
     $manager->requireCss('test');
     $manager->requireJs('test', ['delay' => true]);
+    $manager->requireJs('testnotfound', ['delay' => true]);
 
     $this->assertEquals(
       '<link href="//www.packaged.in/res/p/8cac7/b/76d6c18/test.css"' .
