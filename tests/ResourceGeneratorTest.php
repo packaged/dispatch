@@ -96,7 +96,7 @@ class ResourceGeneratorTest extends PHPUnit_Framework_TestCase
     $event->setPath('');
     $event->setLookupParts(['packaged', 'config']);
     $expect  = '//www.packaged.in/res/v/packaged/' .
-      'config/8cac7/b/90c1901/composer.json';
+      'config/8cac7/b/d510932/composer.json';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch();
@@ -115,7 +115,7 @@ class ResourceGeneratorTest extends PHPUnit_Framework_TestCase
     $event->setFilename('composer.json');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_ALIAS);
     $event->setLookupParts(['cfger']);
-    $expect  = '//www.packaged.in/res/a/cfger/8cac7/b/90c1901/composer.json';
+    $expect  = '//www.packaged.in/res/a/cfger/8cac7/b/d510932/composer.json';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch(
