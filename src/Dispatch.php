@@ -223,6 +223,12 @@ class Dispatch implements HttpKernelInterface
 
     $filePath = build_path($directory, $pathInfo['basename']);
 
+    //Do not minify files ending in .min.ext
+    if(substr($pathInfo['filename'], -4) == '.min')
+    {
+      $asset->setOption('minify', false);
+    }
+
     //If the asset does not exist on disk, return a not found error
     if($directory === null || !file_exists($filePath))
     {
