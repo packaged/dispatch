@@ -1,26 +1,27 @@
 {
-  "name":              "packaged/dispatch",
-  "license":           "MIT",
-  "authors":           [
+  "name":        "packaged/dispatch",
+  "license":     "MIT",
+  "authors":     [
     {
       "name":  "Brooke Bryan",
       "email": "brooke@bajb.net"
     }
   ],
-  "bin":               [
+  "bin":         [
     "bin/dispatch"
   ],
-  "require":           {
+  "require":     {
     "php":                 ">=5.4.0",
     "packaged/helpers":    "0.*",
     "packaged/config":     "0.*",
     "symfony/http-kernel": "2.*",
-    "symfony/console":     "2.*"
+    "symfony/console":     "2.*",
+    "tedivm/jshrink":      "~1.0"
   },
-  "require-dev":       {
+  "require-dev": {
     "phpunit/phpunit": "*"
   },
-  "autoload":          {
+  "autoload":    {
     "psr-4": {
       "Packaged\\Dispatch\\": "src"
     }

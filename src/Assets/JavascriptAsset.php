@@ -1,6 +1,7 @@
 <?php
 namespace Packaged\Dispatch\Assets;
 
+use JShrink\Minifier;
 use Packaged\Helpers\ValueAs;
 
 class JavascriptAsset extends AbstractDispatchableAsset
@@ -35,18 +36,6 @@ class JavascriptAsset extends AbstractDispatchableAsset
       return $data;
     }
 
-    //Strip Comments
-    $data = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $data);
-    $data = preg_replace('!^(?:[\t ]+)?\/\/(?:.*)?$!m', '', $data);
-
-    //remove tabs, spaces, newlines, etc.
-    $data = str_replace(array("\t"), ' ', $data);
-    $data = str_replace(
-      array("\r\n", "\r", "\n", '  ', '    ', '    '),
-      '',
-      $data
-    );
-
-    return $data;
+    return Minifier::minify($data);
   }
 }
