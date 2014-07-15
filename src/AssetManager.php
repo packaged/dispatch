@@ -374,4 +374,23 @@ class AssetManager
       );
     }
   }
+
+  /**
+   * Add a less file to the css store
+   *
+   * @param $filename
+   * @param $options
+   */
+  public function requireLess($filename, $options = null)
+  {
+    $filenames = ValueAs::arr($filename);
+    foreach($filenames as $filename)
+    {
+      static::_addToStore(
+        'css',
+        $this->getResourceUri($filename . '.less'),
+        $options
+      );
+    }
+  }
 }

@@ -12,6 +12,7 @@ class AssetResponse
     'js'    => 'Javascript',
     'json'  => 'Json',
     'css'   => 'Css',
+    'less'  => 'Less',
     'swf'   => 'Flash',
     'pdf'   => 'Pdf',
     'zip'   => 'Zip',

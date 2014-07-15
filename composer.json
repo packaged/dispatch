@@ -16,7 +16,8 @@
     "packaged/config":     "0.*",
     "symfony/http-kernel": "2.*",
     "symfony/console":     "2.*",
-    "tedivm/jshrink":      "~1.0"
+    "tedivm/jshrink":      "~1.0",
+    "leafo/lessphp":       "0.4.*"
   },
   "require-dev": {
     "phpunit/phpunit": "*"
