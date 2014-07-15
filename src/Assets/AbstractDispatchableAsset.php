@@ -93,8 +93,14 @@ abstract class AbstractDispatchableAsset extends AbstractAsset
     }
 
     $path = ltrim($path, '/');
+    $url  = $this->_assetManager->getResourceUri(
+      build_path_unix($prefix, $path)
+    );
 
-    $url = $this->_assetManager->getResourceUri(build_path_unix($prefix, $path));
+    if(empty($url))
+    {
+      return $uri[0];
+    }
 
     if(!empty($append))
     {

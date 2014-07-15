@@ -110,20 +110,6 @@ class DispatchTest extends PHPUnit_Framework_TestCase
 {alert("Hello\nHow are you?");}'
     ];
 
-    /**
-     * Do not minify .min.ext files
-     * @link https://github.com/packaged/dispatch/issues/1
-     * */
-    $tests[] = [
-      array_merge($baseConfig, []),
-      'res/p/domain/b/filehash/test.min.js',
-      'www.packaged.in',
-      'function myFunction()
-{
-  alert("Hello\nHow are you?");
-}'
-    ];
-
     $tests[] = [
       array_merge($baseConfig, []),
       'res/p/domain/b/filehash/test.css',
@@ -269,6 +255,33 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'a/tdir/domain/b/filehash/no-parse-test.css',
       'static.packaged.in',
       'body { background: yellow url(x.jpg); }'
+    ];
+
+    /**
+     * Do not minify .min.ext files
+     * @link https://github.com/packaged/dispatch/issues/1
+     * */
+    $tests[] = [
+      array_merge($baseConfig, []),
+      'res/p/domain/b/filehash/test.min.js',
+      'www.packaged.in',
+      'function myFunction()
+{
+  alert("Hello\nHow are you?");
+}'
+    ];
+
+    /**
+     * Invalid dispatch links should remain as the default
+     * @link https://github.com/packaged/dispatch/issues/5
+     * */
+    $tests[] = [
+      array_merge($baseConfig, []),
+      'res/p/domain/b/filehash/dispatch.test.js',
+      'www.packaged.in',
+      'function f(){setCss(\'background:url(https://),url(https://),'
+      . 'red url(https://)\');return(/(url\s*\(.*?){3}/).'
+      . 'test(mStyle.background);}'
     ];
 
     return $tests;

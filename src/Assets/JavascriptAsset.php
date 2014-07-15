@@ -36,6 +36,13 @@ class JavascriptAsset extends AbstractDispatchableAsset
       return $data;
     }
 
-    return Minifier::minify($data);
+    try
+    {
+      return Minifier::minify($data);
+    }
+    catch(\Exception $e)
+    {
+      return $data;
+    }
   }
 }
