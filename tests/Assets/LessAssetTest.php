@@ -2,7 +2,7 @@
 
 class LessAssetTest extends PHPUnit_Framework_TestCase
 {
-  public function testMinify()
+  public function testCompile()
   {
     $original = '@base: 24px;
 @border-color: #B2B;

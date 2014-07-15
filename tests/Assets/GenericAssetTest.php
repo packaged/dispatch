@@ -11,6 +11,7 @@ class GenericAssetTest extends PHPUnit_Framework_TestCase
       "ico"   => "image/x-icon",
       "css"   => "text/css",
       "less"  => "text/css",
+      "scss"  => "text/css",
       "js"    => "text/javascript",
       "json"  => "application/json",
       "png"   => "image/png",
