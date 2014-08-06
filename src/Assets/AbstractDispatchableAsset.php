@@ -50,7 +50,7 @@ abstract class AbstractDispatchableAsset extends AbstractAsset
 
     //Find all URL(.*) and dispatch their values
     $this->_content = preg_replace_callback(
-      '~url\(\s*[\'"]?([^\s\'"]*)[\'"]?\s*\)~',
+      '~url\(\s*[\'"]?([^\s\'"]*?)[\'"]?\s*\)~',
       array($this, "_dispatchNestedUrl"),
       $this->_content
     );

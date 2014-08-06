@@ -17,8 +17,8 @@ class JavascriptAssetTest extends PHPUnit_Framework_TestCase
 
     $asset->setContent($original);
     $this->assertEquals(
-      'function myFunction(){alert("Hello\nHow are you?");}',
-      $asset->getContent()
+    'function myFunction(){alert("Hello\nHow are you?");}',
+    $asset->getContent()
     );
 
     $asset->setContent($nominify);
@@ -55,9 +55,20 @@ class JavascriptAssetTest extends PHPUnit_Framework_TestCase
     $asset = new \Packaged\Dispatch\Assets\JavascriptAsset();
     $asset->setContent($raw);
     $this->assertEquals(
-      '$(document).ready(function(){$(window).scroll(function()'
-      . '{var max_scroll=273;var navbar=$(".main-nav");});});',
-      $asset->getContent()
+    '$(document).ready(function(){$(window).scroll(function()'
+    . '{var max_scroll=273;var navbar=$(".main-nav");});});',
+    $asset->getContent()
     );
+  }
+
+  public function testMinifyException()
+  {
+    $raw   = 'var string = "This string is hanging out.
+
+    alert($x)';
+    $asset = new \Packaged\Dispatch\Assets\JavascriptAsset();
+    $asset->setContent($raw);
+    $asset->setOptions(['minify' => 'true']);
+    $this->assertEquals($raw, $asset->getContent());
   }
 }

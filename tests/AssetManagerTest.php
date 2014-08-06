@@ -164,6 +164,13 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
       ],
     ];
   }
+
+  public function testExternalResource()
+  {
+    $am = \Packaged\Dispatch\AssetManager::sourceType();
+    $location = 'http://test.com/css.css';
+    $this->assertEquals($location, $am->getResourceUri($location));
+  }
 }
 
 class AssetManagerTester extends \Packaged\Dispatch\AssetManager
