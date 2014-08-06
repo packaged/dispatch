@@ -284,11 +284,20 @@ class AssetManager
    *
    * @param $filename
    * @param $path
+   * @param $extension
    *
    * @return mixed
    */
-  public function getResourceUri($filename, $path = null)
+  public function getResourceUri($filename, $path = null, $extension = null)
   {
+    if ($this->isExternalUrl($filename))
+    {
+      return $filename;
+    }
+    if($extension !== null)
+    {
+      $filename .= '.'.$extension;
+    }
     $event = new DispatchEvent();
     $event->setFilename($filename);
     $event->setLookupParts((array)$this->_lookupParts);
@@ -300,6 +309,18 @@ class AssetManager
       return $result->getResult();
     }
     return null;
+  }
+
+  /**
+   * Detect if URL has a protocol
+   *
+   * @param string $path
+   *
+   * @return bool
+   */
+  private function isExternalUrl($path)
+  {
+    return starts_with_any($path, ['http://', 'https://', '//']) && strlen($path) > 8;
   }
 
   /**
@@ -350,7 +371,7 @@ class AssetManager
     {
       static::_addToStore(
         'js',
-        $this->getResourceUri($filename . '.js'),
+        $this->getResourceUri($filename, null, 'js'),
         $options
       );
     }
@@ -369,7 +390,7 @@ class AssetManager
     {
       static::_addToStore(
         'css',
-        $this->getResourceUri($filename . '.css'),
+        $this->getResourceUri($filename, null, 'css'),
         $options
       );
     }
@@ -388,7 +409,7 @@ class AssetManager
     {
       static::_addToStore(
         'css',
-        $this->getResourceUri($filename . '.less'),
+        $this->getResourceUri($filename, null, 'less'),
         $options
       );
     }
@@ -407,9 +428,10 @@ class AssetManager
     {
       static::_addToStore(
         'css',
-        $this->getResourceUri($filename . '.scss'),
+        $this->getResourceUri($filename, null, 'scss'),
         $options
       );
     }
   }
+
 }

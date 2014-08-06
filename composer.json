@@ -21,7 +21,7 @@
     "leafo/scssphp":       "0.*"
   },
   "require-dev": {
-    "phpunit/phpunit": "*"
+    "phpunit/phpunit": "4.1"
   },
   "autoload":    {
     "psr-4": {
