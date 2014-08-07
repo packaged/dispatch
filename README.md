@@ -1,6 +1,13 @@
 Dispatch
 ========
 
+[![Latest Stable Version](https://poser.pugx.org/packaged/dispatch/version.png)](https://packagist.org/packages/packaged/dispatch)
+[![Total Downloads](https://poser.pugx.org/packaged/dispatch/d/total.png)](https://packagist.org/packages/packaged/dispatch)
+[![Build Status](https://travis-ci.org/packaged/dispatch.png)](https://travis-ci.org/packaged/dispatch)
+[![Dependency Status](https://www.versioneye.com/php/packaged:dispatch/badge.png)](https://www.versioneye.com/php/packaged:dispatch)
+[![HHVM Status](http://hhvm.h4cc.de/badge/packaged/dispatch.png)](http://hhvm.h4cc.de/package/packaged/dispatch)
+[![Coverage Status](https://coveralls.io/repos/packaged/dispatch/badge.png)](https://coveralls.io/r/packaged/dispatch)
+
 Asset Management Middleware for Stack PHP
 
 

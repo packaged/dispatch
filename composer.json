@@ -1,5 +1,6 @@
 {
   "name":        "packaged/dispatch",
+  "description": "Asset Management Middleware for Stack PHP",
   "license":     "MIT",
   "authors":     [
     {
