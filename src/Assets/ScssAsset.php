@@ -1,6 +1,8 @@
 <?php
 namespace Packaged\Dispatch\Assets;
 
+use Leafo\ScssPhp\Compiler;
+
 class ScssAsset extends AbstractDispatchableAsset
 {
   public function getExtension()
@@ -15,6 +17,6 @@ class ScssAsset extends AbstractDispatchableAsset
 
   public function getContent()
   {
-    return (new \scssc)->compile(parent::getContent());
+    return (new Compiler())->compile(parent::getContent());
   }
 }
