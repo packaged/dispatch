@@ -27,6 +27,7 @@ class AssetResponse
     'mp4'   => 'Video\Mp4',
     'mpeg'  => 'Video\Mpeg',
     'mov'   => 'Video\Quicktime',
+    'webm'  => 'Video\Webm',
     'afm'   => 'Font\Afm',
     'dfont' => 'Font\Dfont',
     'eot'   => 'Font\Eot',

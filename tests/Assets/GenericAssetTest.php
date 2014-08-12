@@ -22,6 +22,7 @@ class GenericAssetTest extends PHPUnit_Framework_TestCase
       "flv"   => "video/x-flv",
       "mp4"   => "video/mp4",
       "mpeg"  => "video/mpeg",
+      "webm"  => "video/webm",
       "mov"   => "video/quicktime",
       "ttf"   => "application/x-font-ttf",
       "ttc"   => "application/x-font-ttc",
