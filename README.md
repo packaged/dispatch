@@ -56,6 +56,21 @@ There are a few types of asset manager you can use to generate static resource
 uris.  An asset manager defines a route path by which processing should start
  when searching for your specified resources.
 
+Config Options
+====
+
+run_on / run_match
+=====
+
+These options determine how asset paths are generated.
+
+| run_on Option | run_match Default | Description                            |
+| ------------- | ----------------- | -------------------------------------- |
+| path          | res               | //domain.tld/**res**/*resource_url*    |
+| subdomain     | static.           | //**static.**domain.tld/*resource_url* |
+| domain        | (current domain)  | //**domain.tld**/*resource_url*        |
+
+
 Asset Type
 ====
 

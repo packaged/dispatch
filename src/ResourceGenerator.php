@@ -76,10 +76,12 @@ class ResourceGenerator
     switch($cfg->getItem('run_on', 'path'))
     {
       case 'path':
+        // asset urls are determined by path prefix
         $path = $cfg->getItem('run_match', 'res');
         $uri  = build_path_unix($this->_httpHost, $path, $uri);
         break;
       case 'subdomain':
+        // asset urls are determined by domain prefix
         $sub     = $cfg->getItem('run_match', 'static.');
         $domainP = explode('.', $this->_httpHost);
         if(count($domainP) > 2)
@@ -94,6 +96,7 @@ class ResourceGenerator
         $uri = build_path_unix($sub . $domain, $uri);
         break;
       case 'domain':
+        // asset urls are determined by FQDN
         $domain = $cfg->getItem('run_match', $this->_httpHost);
         $uri    = build_path_unix($domain, $uri);
         break;
