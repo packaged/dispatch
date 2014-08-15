@@ -1,5 +1,4 @@
-Dispatch
-========
+# Dispatch
 
 [![Latest Stable Version](https://poser.pugx.org/packaged/dispatch/version.png)](https://packagist.org/packages/packaged/dispatch)
 [![Total Downloads](https://poser.pugx.org/packaged/dispatch/d/total.png)](https://packagist.org/packages/packaged/dispatch)
@@ -11,8 +10,7 @@ Dispatch
 Asset Management Middleware for Stack PHP
 
 
-Basic Installation
-===
+## Basic Installation
 
 The following should be included in your public/index.php file
 
@@ -49,30 +47,26 @@ Raw Call
     $app = $dispatch->handle($request)
 
 
-Using Dispatch
-===
+### Using Dispatch
 
 There are a few types of asset manager you can use to generate static resource 
 uris.  An asset manager defines a route path by which processing should start
  when searching for your specified resources.
 
-Config Options
-====
+#### Config Options
 
-run_on / run_match
-=====
+##### run\_on / run_match
 
 These options determine how asset paths are generated.
 
-| run_on Option | run_match Default | Description                            |
+| run\_on Option | run_match Default | Description                            |
 | ------------- | ----------------- | -------------------------------------- |
-| path          | res               | //domain.tld/**res**/*resource_url*    |
-| subdomain     | static.           | //**static.**domain.tld/*resource_url* |
-| domain        | (current domain)  | //**domain.tld**/*resource_url*        |
+| path          | res               | //domain.tld/ **res** /*resource_url*    |
+| subdomain     | static.           | // **static.** domain.tld/*resource_url* |
+| domain        | (current domain)  | // **domain.tld** /*resource_url*        |
 
 
-Asset Type
-====
+#### Asset Type
 
     $am = \Packaged\Dispatch\AssetManager::assetType();
 
@@ -82,8 +76,7 @@ the default assets path, you can use the 'assets_dir' config item, relative to
 your project base.
 
 
-Alias Type
-====
+#### Alias Type
 
     $am = \Packaged\Dispatch\AssetManager::aliasType('alias');
 
@@ -92,8 +85,7 @@ which could be a deep path within your source or vendor directories.
 Aliases can be configured in the config as a keyed array within the 'aliases' 
 config item
 
-Source Type
-====
+#### Source Type
 
     $am = \Packaged\Dispatch\AssetManager::sourceType();
 
@@ -101,16 +93,14 @@ Source type will load data from your source folder.  By default this is 'src'
 however, if you store your source files in another directory, this can be
 changed using the 'source_dir' config item.
 
-Vendor Type
-====
+#### Vendor Type
 
     $am = \Packaged\Dispatch\AssetManager::vendorType('vendor','package');
 
 Vendor type will set the base to a vendors folder specified by composer, this
 will usually be /vendor/{vendor}/{package}
 
-Automatic Detection
-====
+#### Automatic Detection
 
     $am = new \Packaged\Dispatch\AssetManager(new Class());
 
@@ -120,8 +110,7 @@ or created by a vendor package.  This will give you either a vendor type or
 source type.
 
 
-Generating Resource Uris
-===
+### Generating Resource Uris
 
 Now you have your asset manager object, you can generate resource uris to use
 within your project.  All you need to do is pass the relative path (from the
@@ -132,8 +121,7 @@ returned.
     <script src="<?= $am->getResourceUri('javascripts/ie.js'); ?>"></script>
     <![endif]-->
     
-CSS &amp; JS Global Store
-===
+### CSS &amp; JS Global Store
 
 For simplicity within your code, you are also able to add css and js files to a
 store for the render, which can be pulled out on demand.  This allows you to 
