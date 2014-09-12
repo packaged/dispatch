@@ -35,6 +35,19 @@ class ScssAssetTest extends PHPUnit_Framework_TestCase
     $this->assertEquals($expect, $asset->getContent());
   }
 
+  public function testCompileScssImports()
+  {
+    $testPath = __DIR__ . '/../asset3/';
+    $content  = file_get_contents($testPath . 'test.scss');
+    $expect   = file_get_contents($testPath . 'expect.css');
+
+    $asset = new \Packaged\Dispatch\Assets\ScssAsset();
+    $asset->setContent($content);
+    $asset->setImportPath(realpath($testPath));
+
+    $this->assertEquals($expect, $asset->getContent());
+  }
+
   public function testAsset()
   {
     $asset = new \Packaged\Dispatch\Assets\ScssAsset();
