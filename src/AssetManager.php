@@ -255,13 +255,13 @@ class AssetManager
     $prefix = Strings::commonPrefix($filename, $this->ownFile());
 
     //Account for other packaged repos that may offer resources
-    if(ends_with($prefix, 'packaged/'))
+    if(ends_with($prefix, 'packaged' . DIRECTORY_SEPARATOR))
     {
       $prefix = substr($prefix, 0, -9);
     }
 
     //Calculate the vendor and package names
-    if(ends_with($prefix, '/vendor/'))
+    if(ends_with($prefix, 'vendor' . DIRECTORY_SEPARATOR))
     {
       $path               = substr($filename, strlen($prefix));
       $this->_lookupParts = array_slice(explode('/', $path, 3), 0, 2);
@@ -290,13 +290,13 @@ class AssetManager
    */
   public function getResourceUri($filename, $path = null, $extension = null)
   {
-    if ($this->isExternalUrl($filename))
+    if($this->isExternalUrl($filename))
     {
       return $filename;
     }
     if($extension !== null)
     {
-      $filename .= '.'.$extension;
+      $filename .= '.' . $extension;
     }
     $event = new DispatchEvent();
     $event->setFilename($filename);
@@ -320,7 +320,10 @@ class AssetManager
    */
   private function isExternalUrl($path)
   {
-    return starts_with_any($path, ['http://', 'https://', '//']) && strlen($path) > 8;
+    return (strlen($path) > 8) && starts_with_any(
+      $path,
+      ['http://', 'https://', '//']
+    );
   }
 
   /**
@@ -433,5 +436,4 @@ class AssetManager
       );
     }
   }
-
 }

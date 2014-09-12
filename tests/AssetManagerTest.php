@@ -167,7 +167,7 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
 
   public function testExternalResource()
   {
-    $am = \Packaged\Dispatch\AssetManager::sourceType();
+    $am       = \Packaged\Dispatch\AssetManager::sourceType();
     $location = 'http://test.com/css.css';
     $this->assertEquals($location, $am->getResourceUri($location));
   }
@@ -177,6 +177,12 @@ class AssetManagerTester extends \Packaged\Dispatch\AssetManager
 {
   protected function ownFile()
   {
-    return dirname(__DIR__) . '/vendor/packaged/dispatch/src/AssetManager.php';
+    return dirname(__DIR__) . DIRECTORY_SEPARATOR . build_path(
+      'vendor',
+      'packaged',
+      'dispatch',
+      'src',
+      'AssetManager.php'
+    );
   }
 }
