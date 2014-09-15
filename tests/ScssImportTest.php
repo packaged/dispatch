@@ -26,7 +26,7 @@ class ScssImportTest extends PHPUnit_Framework_TestCase
     $request->server->set('REQUEST_URI', $urlInfo['path']);
 
     $expect = file_get_contents(__DIR__ . '/asset3/' . 'expect.css');
-    $this->assertEquals($expect, $dispatch->handle($request));
+    $this->assertEquals($expect, $dispatch->handle($request)->getContent());
   }
 
   public function getDispatch(array $options = [])
