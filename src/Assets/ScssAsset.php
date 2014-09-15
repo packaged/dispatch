@@ -17,18 +17,27 @@ class ScssAsset extends AbstractDispatchableAsset
     return "text/css";
   }
 
-  public function setImportPath($importPath) {
+  public function setImportPath($importPath)
+  {
     $this->_importPath = $importPath;
   }
 
-  public function getImportPath() {
+  public function getImportPath()
+  {
     return $this->_importPath;
   }
 
   public function getContent()
   {
+    //Set the import path
+    if($importPath = $this->getOption('importPath', null))
+    {
+      $this->setImportPath($importPath);
+    }
+
     $Compiler = new Compiler();
-    if(! is_null($this->_importPath) ) {
+    if(!is_null($this->_importPath))
+    {
       $Compiler->setImportPaths($this->_importPath);
     }
 
