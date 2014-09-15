@@ -48,6 +48,12 @@ class ScssAssetTest extends PHPUnit_Framework_TestCase
     $this->assertEquals($expect, $asset->getContent());
   }
 
+  public function testImportPath() {
+    $asset = new \Packaged\Dispatch\Assets\ScssAsset();
+    $asset->setImportPath(__DIR__);
+    $this->assertEquals(__DIR__, $asset->getImportPath());
+  }
+
   public function testAsset()
   {
     $asset = new \Packaged\Dispatch\Assets\ScssAsset();
