@@ -290,6 +290,12 @@ class AssetManager
    */
   public function getResourceUri($filename, $path = null, $extension = null)
   {
+    //If no filename is sent, the resource is very unlikely to be valid
+    if(empty($filename))
+    {
+      return null;
+    }
+
     if($this->isExternalUrl($filename))
     {
       return $filename;
