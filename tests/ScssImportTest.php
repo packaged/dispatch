@@ -5,28 +5,16 @@ class ScssImportTest extends PHPUnit_Framework_TestCase
 
   public function testScssImports()
   {
-    $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
-    $request->headers->set('HOST', 'packaged.in');
-
-    $dispatch = $this->getDispatch(
-      ['assets_dir' => 'tests/asset3']
-    );
-    $event    = new \Packaged\Dispatch\DispatchEvent();
-    $event->setFilename('test.scss');
-    $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_ASSET);
-
-    $gen = new \Packaged\Dispatch\ResourceGenerator($dispatch, $request);
-    $gen->processEvent($event);
-
-    $url     = $event->getResult();
-    $urlInfo = parse_url($url);
-
-    $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
-    $request->headers->set('HOST', $urlInfo['host']);
-    $request->server->set('REQUEST_URI', $urlInfo['path']);
-
     $expect = file_get_contents(__DIR__ . '/asset3/' . 'expect.css');
-    $this->assertEquals($expect, $dispatch->handle($request)->getContent());
+
+    $asset = new \Packaged\Dispatch\Assets\ScssAsset();
+    $am    = RelativePathAssetManager::assetType();
+    $am->setRelativePath(__DIR__ . '/asset3/');
+    $asset->setAssetManager($am);
+    $asset->setContent(file_get_contents(__DIR__ . '/asset3/' . 'test.scss'));
+    $asset->setContent(file_get_contents(__DIR__ . '/asset3/' . 'test.scss'));
+
+    $this->assertEquals($expect, $asset->getContent());
   }
 
   public function getDispatch(array $options = [])
@@ -41,5 +29,14 @@ class ScssImportTest extends PHPUnit_Framework_TestCase
     $dispatch = new \Packaged\Dispatch\Dispatch($kernel, $options);
     $dispatch->setBaseDirectory(dirname(__DIR__));
     return $dispatch;
+  }
+}
+
+class RelativePathAssetManager extends \Packaged\Dispatch\AssetManager
+{
+  public function setRelativePath($path)
+  {
+    $this->_path = $path;
+    return $this;
   }
 }

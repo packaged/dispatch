@@ -5,8 +5,6 @@ use Leafo\ScssPhp\Compiler;
 
 class ScssAsset extends AbstractDispatchableAsset
 {
-  private $_importPath = null;
-
   public function getExtension()
   {
     return 'scss';
@@ -17,30 +15,14 @@ class ScssAsset extends AbstractDispatchableAsset
     return "text/css";
   }
 
-  public function setImportPath($importPath)
-  {
-    $this->_importPath = $importPath;
-  }
-
-  public function getImportPath()
-  {
-    return $this->_importPath;
-  }
-
   public function getContent()
   {
-    //Set the import path
-    if($importPath = $this->getOption('importPath', null))
-    {
-      $this->setImportPath($importPath);
-    }
+    $compiler = new Compiler();
 
-    $Compiler = new Compiler();
-    if(!is_null($this->_importPath))
+    if($this->_assetManager !== null)
     {
-      $Compiler->setImportPaths($this->_importPath);
+      $compiler->setImportPaths($this->_assetManager->getRelativePath());
     }
-
-    return $Compiler->compile(parent::getContent());
+    return $compiler->compile(parent::getContent());
   }
 }

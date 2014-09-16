@@ -229,11 +229,6 @@ class Dispatch implements HttpKernelInterface
       $asset->setOption('minify', false);
     }
 
-    if($pathInfo['extension'] == 'scss')
-    {
-      $asset->setOption('importPath', $directory);
-    }
-
     //If the asset does not exist on disk, return a not found error
     if($directory === null || !file_exists($filePath))
     {
