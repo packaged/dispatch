@@ -68,6 +68,12 @@ abstract class AbstractDispatchableAsset extends AbstractAsset
    */
   protected function _dispatchNestedUrl($uri)
   {
+    // if url path is empty, return unchanged
+    if(empty($uri[1]))
+    {
+      return $uri[0];
+    }
+
     $prefix = '';
     list($path, $append) = exploded('?', $uri[1], [$uri[1], null], 2);
 
