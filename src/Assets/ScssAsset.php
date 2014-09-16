@@ -17,6 +17,12 @@ class ScssAsset extends AbstractDispatchableAsset
 
   public function getContent()
   {
-    return (new Compiler())->compile(parent::getContent());
+    $compiler = new Compiler();
+
+    if($this->_assetManager !== null)
+    {
+      $compiler->setImportPaths($this->_assetManager->getRelativePath());
+    }
+    return $compiler->compile(parent::getContent());
   }
 }
