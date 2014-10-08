@@ -12,7 +12,6 @@ class ScssImportTest extends PHPUnit_Framework_TestCase
     $am->setRelativePath(__DIR__ . '/asset3/');
     $asset->setAssetManager($am);
     $asset->setContent(file_get_contents(__DIR__ . '/asset3/' . 'test.scss'));
-    $asset->setContent(file_get_contents(__DIR__ . '/asset3/' . 'test.scss'));
 
     $this->assertEquals($expect, $asset->getContent());
   }
