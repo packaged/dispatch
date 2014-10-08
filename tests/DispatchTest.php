@@ -284,6 +284,16 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       . 'test(mStyle.background);}'
     ];
 
+    /**
+     * Scss import paths should work correctly when accessed through dispatch
+     */
+    $tests[] = [
+      array_merge($baseConfig, []),
+      'res/p/domain/b/filehash/test-import.scss',
+      'www.packaged.in',
+      file_get_contents(__DIR__ . '/asset/test-import.expect.css')
+    ];
+
     return $tests;
   }
 
