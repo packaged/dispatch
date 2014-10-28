@@ -10,11 +10,25 @@ abstract class AbstractDispatchableAsset extends AbstractAsset
    * @var AssetManager
    */
   protected $_assetManager;
+  protected $_workingDirectory;
   protected $_processedContent = false;
 
   public function setAssetManager(AssetManager $am)
   {
     $this->_assetManager = $am;
+  }
+
+  /**
+   * Set the current working directory for an asset
+   *
+   * @param $directory
+   *
+   * @return static
+   */
+  public function setWorkingDirectory($directory)
+  {
+    $this->_workingDirectory = $directory;
+    return $this;
   }
 
   /**
@@ -51,7 +65,7 @@ abstract class AbstractDispatchableAsset extends AbstractAsset
     //Find all URL(.*) and dispatch their values
     $this->_content = preg_replace_callback(
       '~url\(\s*[\'"]?([^\s\'"]*?)[\'"]?\s*\)~',
-      array($this, "_dispatchNestedUrl"),
+      [$this, "_dispatchNestedUrl"],
       $this->_content
     );
 

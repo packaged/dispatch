@@ -241,6 +241,8 @@ class Dispatch implements HttpKernelInterface
     if($asset instanceof IDispatchableAsset)
     {
       //Set the asset manager
+
+      $asset->setWorkingDirectory(realpath($directory));
       $asset->setAssetManager(AssetManager::buildFromUri($path));
     }
 

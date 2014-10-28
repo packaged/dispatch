@@ -13,4 +13,13 @@ interface IDispatchableAsset extends IAsset
    * @return IDispatchableAsset
    */
   public function setAssetManager(AssetManager $am);
+
+  /**
+   * Set the current working directory for an asset
+   *
+   * @param $directory
+   *
+   * @return IDispatchableAsset
+   */
+  public function setWorkingDirectory($directory);
 }
