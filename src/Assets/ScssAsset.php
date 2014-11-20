@@ -24,7 +24,7 @@ class ScssAsset extends AbstractDispatchableAsset
       $compiler->setImportPaths(
         build_path(
           $this->_workingDirectory,
-          build_path($this->_assetManager->getRelativePath())
+          build_path_custom(DS, $this->_assetManager->getRelativePath())
         )
       );
     }
