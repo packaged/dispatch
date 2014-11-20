@@ -2,6 +2,7 @@
 namespace Packaged\Dispatch\Assets;
 
 use Leafo\ScssPhp\Compiler;
+use Packaged\Helpers\ValueAs;
 
 class ScssAsset extends AbstractDispatchableAsset
 {
@@ -24,7 +25,10 @@ class ScssAsset extends AbstractDispatchableAsset
       $compiler->setImportPaths(
         build_path(
           $this->_workingDirectory,
-          build_path_custom(DS, $this->_assetManager->getRelativePath())
+          build_path_custom(
+            DS,
+            ValueAs::arr($this->_assetManager->getRelativePath())
+          )
         )
       );
     }
