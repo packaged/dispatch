@@ -104,6 +104,14 @@ class DispatchTest extends PHPUnit_Framework_TestCase
 
     $tests[] = [
       array_merge($baseConfig, []),
+      'res/p/domain/b/filehash/testurl.js',
+      'www.packaged.in',
+      'function myFunction()
+{url();url(\'\');url(\'//www.packaged.in/res/p/8cac7/b/e2218e4/test.js\');}'
+    ];
+
+    $tests[] = [
+      array_merge($baseConfig, []),
       'res/p/domain/b/filehash/test.js',
       'www.packaged.in',
       'function myFunction()

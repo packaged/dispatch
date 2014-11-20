@@ -181,7 +181,7 @@ class AssetManager
   /**
    * Return the relative path of the parent dispatching asset
    *
-   * @return string
+   * @return array
    */
   public function getRelativePath()
   {
