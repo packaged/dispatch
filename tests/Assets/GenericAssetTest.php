@@ -21,6 +21,7 @@ class GenericAssetTest extends PHPUnit_Framework_TestCase
       "swf"   => "application/x-shockwave-flash",
       "flv"   => "video/x-flv",
       "mp4"   => "video/mp4",
+      'mp3'   => "audio/mp3",
       "mpeg"  => "video/mpeg",
       "webm"  => "video/webm",
       "mov"   => "video/quicktime",
