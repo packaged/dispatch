@@ -142,6 +142,13 @@ class DispatchTest extends PHPUnit_Framework_TestCase
     ];
 
     $tests[] = [
+      array_merge($baseConfig, ['assets_dir'=>'tests/empty']),
+      'res/p/domain//filehash/test.css',
+      'www.packaged.in',
+      'could not be located'
+    ];
+
+    $tests[] = [
       array_merge($baseConfig, []),
       'res/v/packaged/config/domain/b/filehash/composer.json',
       'www.packaged.in',

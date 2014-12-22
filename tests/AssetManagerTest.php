@@ -14,6 +14,7 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
     $this->assertInstanceOf('\Packaged\Dispatch\AssetManager', $manager);
 
     $this->assertNull($manager->getResourceUri('missing.png'));
+    $this->assertNull($manager->getResourceUri(''));
   }
 
   public function testStore()
