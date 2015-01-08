@@ -13,16 +13,16 @@
   ],
   "require":     {
     "php":                 ">=5.4.0",
-    "packaged/helpers":    "0.*",
-    "packaged/config":     "0.*",
-    "symfony/http-kernel": "2.*",
-    "symfony/console":     "2.*",
-    "tedivm/jshrink":      "~1.0",
-    "leafo/lessphp":       "0.4.*",
-    "leafo/scssphp":       "0.*"
+    "packaged/helpers":    "~0",
+    "packaged/config":     "~0",
+    "symfony/http-kernel": "~2",
+    "symfony/console":     "~2",
+    "tedivm/jshrink":      "~1",
+    "leafo/lessphp":       "~0",
+    "leafo/scssphp":       "~0"
   },
   "require-dev": {
-    "phpunit/phpunit":        "4.1",
+    "phpunit/phpunit":        "~4",
     "satooshi/php-coveralls": "dev-master"
   },
   "autoload":    {
