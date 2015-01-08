@@ -34,7 +34,7 @@ class Dispatch implements HttpKernelInterface
       $config = new ConfigSection('dispatch', (array)$options);
     }
 
-    $this->_app    = $app;
+    $this->_app = $app;
     $this->_config = $config;
   }
 
@@ -116,7 +116,7 @@ class Dispatch implements HttpKernelInterface
   )
   {
     //Start listening for resource uri generation requests
-    $generator          = new ResourceGenerator($this, $request);
+    $generator = new ResourceGenerator($this, $request);
     static::$dispatcher = new EventDispatcher();
 
     //Listen in for resource generate requests
@@ -159,21 +159,6 @@ class Dispatch implements HttpKernelInterface
   }
 
   /**
-   * Response for unsupported extension
-   *
-   * @param string $extension
-   *
-   * @return Response
-   */
-  public function unsupportedResponse($extension)
-  {
-    return new Response(
-      '*.' . $extension . ' files are not currently unsupported',
-      500
-    );
-  }
-
-  /**
    * Create the response for the given path
    *
    * @param         $path
@@ -201,10 +186,6 @@ class Dispatch implements HttpKernelInterface
 
     //Grab the correct asset for the requesting extension
     $asset = $response->assetByExtension($pathInfo['extension']);
-    if($asset === null)
-    {
-      return $this->unsupportedResponse($pathInfo['extension']);
-    }
 
     //Load the options
     $options = ValueAs::arr(
@@ -259,13 +240,13 @@ class Dispatch implements HttpKernelInterface
    */
   public function getDispatchablePath(Request $request)
   {
-    $path  = ltrim($request->getPathInfo(), '/');
+    $path = ltrim($request->getPathInfo(), '/');
     $runOn = $this->_config->getItem('run_on', 'path');
     if($runOn == 'path')
     {
       //If we are using a path based url, strip off the identifier
       $match = $this->_config->getItem('run_match', 'res');
-      $path  = substr($path, strlen($match) + 1);
+      $path = substr($path, strlen($match) + 1);
     }
     return $path;
   }
@@ -286,12 +267,12 @@ class Dispatch implements HttpKernelInterface
         $match = $this->_config->getItem('run_match', 'res');
         return starts_with($request->getPathInfo() . '/', "/$match/");
       case 'subdomain':
-        $matchCfg   = $this->_config->getItem('run_match', 'static.,assets.');
+        $matchCfg = $this->_config->getItem('run_match', 'static.,assets.');
         $subDomains = ValueAs::arr($matchCfg, ['static.']);
         return starts_with_any($request->getHost(), $subDomains);
       case 'domain':
         $matchCfg = $this->_config->getItem('run_match', null);
-        $domains  = ValueAs::arr($matchCfg, []);
+        $domains = ValueAs::arr($matchCfg, []);
         return ends_with_any($request->getHost(), $domains, false);
     };
     return false;

@@ -3,6 +3,7 @@ namespace Packaged\Dispatch;
 
 use Packaged\Dispatch\Assets\AbstractAsset;
 use Packaged\Dispatch\Assets\IAsset;
+use Packaged\Dispatch\Assets\UnknownAsset;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -54,7 +55,7 @@ class AssetResponse
       $class .= static::$assetMap[$extension] . 'Asset';
       return new $class;
     }
-    return null;
+    return new UnknownAsset();
   }
 
   public function createResponse(IAsset $asset, Request $request)

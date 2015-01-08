@@ -75,9 +75,9 @@ class DispatchTest extends PHPUnit_Framework_TestCase
 
     $tests[] = [
       array_merge($baseConfig, []),
-      'res/test.php',
+      'res/p/domain/b/filehash/test.unknown',
       'www.packaged.in',
-      '*.php files are not currently unsupported'
+      'test file content'
     ];
 
     $tests[] = [

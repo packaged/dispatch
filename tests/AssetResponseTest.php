@@ -5,24 +5,19 @@ class AssetResponseTest extends PHPUnit_Framework_TestCase
   public function testClassGeneration()
   {
     $response = new \Packaged\Dispatch\AssetResponse();
-    $class    = $response->assetByExtension('css');
-    $this->assertInstanceOf(
-      '\Packaged\Dispatch\Assets\IAsset',
-      $class
-    );
-    $this->assertInstanceOf(
-      '\Packaged\Dispatch\Assets\CssAsset',
-      $class
-    );
+    $class = $response->assetByExtension('css');
+    $this->assertInstanceOf('\Packaged\Dispatch\Assets\IAsset', $class);
+    $this->assertInstanceOf('\Packaged\Dispatch\Assets\CssAsset', $class);
 
-    $class = $response->assetByExtension('invalid');
-    $this->assertNull($class);
+    $class = $response->assetByExtension('unknown');
+    $this->assertInstanceOf('Packaged\Dispatch\Assets\UnknownAsset', $class);
+    $this->assertNull($class->getExtension());
   }
 
   public function testResponse()
   {
     $builder = new \Packaged\Dispatch\AssetResponse();
-    $asset   = new \Packaged\Dispatch\Assets\CssAsset();
+    $asset = new \Packaged\Dispatch\Assets\CssAsset();
     $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
     $asset->setContent('body{ background:blue; }');
 
