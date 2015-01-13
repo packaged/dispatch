@@ -39,7 +39,7 @@ class AssetResponseTest extends PHPUnit_Framework_TestCase
   public function testCustomType()
   {
     $exts = \Packaged\Dispatch\AssetResponse::getExtensions();
-    $this->assertFalse(array_search('mock',$exts));
+    $this->assertFalse(array_search('mock', $exts));
 
     $builder = new \Packaged\Dispatch\AssetResponse();
     $this->assertInstanceOf(
@@ -47,10 +47,12 @@ class AssetResponseTest extends PHPUnit_Framework_TestCase
       $builder->assetByExtension('mock')
     );
     \Packaged\Dispatch\AssetResponse::addAssetType('mock', new MockAssetType());
-    $this->assertInstanceOf(
-      '\MockAssetType',
-      $builder->assetByExtension('mock')
-    );
+
+    $asset = $builder->assetByExtension('mock');
+    $this->assertInstanceOf('\MockAssetType', $asset);
+
+    $this->assertEquals('mock', $asset->getExtension());
+    $this->assertEquals('mock/asset', $asset->getContentType());
   }
 }
 
