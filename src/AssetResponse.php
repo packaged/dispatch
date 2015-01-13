@@ -9,37 +9,51 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AssetResponse
 {
-  public static $assetMap = [
-    'js'    => 'Javascript',
-    'json'  => 'Json',
-    'css'   => 'Css',
-    'scss'  => 'Scss',
-    'less'  => 'Less',
-    'swf'   => 'Flash',
-    'pdf'   => 'Pdf',
-    'zip'   => 'Zip',
-    'gif'   => 'Image\Gif',
-    'ico'   => 'Image\Icon',
-    'jpeg'  => 'Image\Jpeg',
-    'jpg'   => 'Image\Jpg',
-    'png'   => 'Image\Png',
-    'svg'   => 'Image\Svg',
-    'flv'   => 'Video\Flv',
-    'mp4'   => 'Video\Mp4',
-    'mpeg'  => 'Video\Mpeg',
-    'mov'   => 'Video\Quicktime',
-    'webm'  => 'Video\Webm',
-    'afm'   => 'Font\Afm',
-    'dfont' => 'Font\Dfont',
-    'eot'   => 'Font\Eot',
-    'otf'   => 'Font\OpenType',
-    'pfa'   => 'Font\Pfa',
-    'pfb'   => 'Font\Pfb',
-    'pfm'   => 'Font\Pfm',
-    'ttc'   => 'Font\Ttc',
-    'ttf'   => 'Font\Ttf',
-    'woff'  => 'Font\Woff',
+  private static $_assetMap = [
+    'js'    => '\Packaged\Dispatch\Assets\JavascriptAsset',
+    'json'  => '\Packaged\Dispatch\Assets\JsonAsset',
+    'css'   => '\Packaged\Dispatch\Assets\CssAsset',
+    'scss'  => '\Packaged\Dispatch\Assets\ScssAsset',
+    'less'  => '\Packaged\Dispatch\Assets\LessAsset',
+    'swf'   => '\Packaged\Dispatch\Assets\FlashAsset',
+    'pdf'   => '\Packaged\Dispatch\Assets\PdfAsset',
+    'zip'   => '\Packaged\Dispatch\Assets\ZipAsset',
+    'gif'   => '\Packaged\Dispatch\Assets\Image\GifAsset',
+    'ico'   => '\Packaged\Dispatch\Assets\Image\IconAsset',
+    'jpeg'  => '\Packaged\Dispatch\Assets\Image\JpegAsset',
+    'jpg'   => '\Packaged\Dispatch\Assets\Image\JpgAsset',
+    'png'   => '\Packaged\Dispatch\Assets\Image\PngAsset',
+    'svg'   => '\Packaged\Dispatch\Assets\Image\SvgAsset',
+    'flv'   => '\Packaged\Dispatch\Assets\Video\FlvAsset',
+    'mp4'   => '\Packaged\Dispatch\Assets\Video\Mp4Asset',
+    'mpeg'  => '\Packaged\Dispatch\Assets\Video\MpegAsset',
+    'mov'   => '\Packaged\Dispatch\Assets\Video\QuicktimeAsset',
+    'webm'  => '\Packaged\Dispatch\Assets\Video\WebmAsset',
+    'afm'   => '\Packaged\Dispatch\Assets\Font\AfmAsset',
+    'dfont' => '\Packaged\Dispatch\Assets\Font\DfontAsset',
+    'eot'   => '\Packaged\Dispatch\Assets\Font\EotAsset',
+    'otf'   => '\Packaged\Dispatch\Assets\Font\OpenTypeAsset',
+    'pfa'   => '\Packaged\Dispatch\Assets\Font\PfaAsset',
+    'pfb'   => '\Packaged\Dispatch\Assets\Font\PfbAsset',
+    'pfm'   => '\Packaged\Dispatch\Assets\Font\PfmAsset',
+    'ttc'   => '\Packaged\Dispatch\Assets\Font\TtcAsset',
+    'ttf'   => '\Packaged\Dispatch\Assets\Font\TtfAsset',
+    'woff'  => '\Packaged\Dispatch\Assets\Font\WoffAsset',
   ];
+
+  public static function getExtensions()
+  {
+    return array_keys(self::$_assetMap);
+  }
+
+  public static function addAssetType($ext, $classname)
+  {
+    if (is_object($classname))
+    {
+      $classname = get_class($classname);
+    }
+    self::$_assetMap[$ext] = $classname;
+  }
 
   /**
    * @param $extension
@@ -49,10 +63,9 @@ class AssetResponse
   public function assetByExtension($extension)
   {
     $extension = strtolower($extension);
-    if(isset(static::$assetMap[$extension]))
+    if(isset(self::$_assetMap[$extension]))
     {
-      $class = '\Packaged\Dispatch\Assets\\';
-      $class .= static::$assetMap[$extension] . 'Asset';
+      $class = self::$_assetMap[$extension];
       return new $class;
     }
     return new UnknownAsset();

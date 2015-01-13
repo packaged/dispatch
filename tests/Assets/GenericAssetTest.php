@@ -47,7 +47,7 @@ class GenericAssetTest extends PHPUnit_Framework_TestCase
   {
     $attempt = [];
     $resp    = new \Packaged\Dispatch\AssetResponse();
-    foreach(\Packaged\Dispatch\AssetResponse::$assetMap as $ext => $class)
+    foreach(\Packaged\Dispatch\AssetResponse::getExtensions() as $ext)
     {
       $attempt[] = [$ext, $resp->assetByExtension($ext)];
     }

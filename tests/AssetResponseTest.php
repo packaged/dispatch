@@ -35,4 +35,34 @@ class AssetResponseTest extends PHPUnit_Framework_TestCase
     $response = $builder->createResponse($asset, $request);
     $this->assertEquals(304, $response->getStatusCode());
   }
+
+  public function testCustomType()
+  {
+    $exts = \Packaged\Dispatch\AssetResponse::getExtensions();
+    $this->assertFalse(array_search('mock',$exts));
+
+    $builder = new \Packaged\Dispatch\AssetResponse();
+    $this->assertInstanceOf(
+      '\Packaged\Dispatch\Assets\UnknownAsset',
+      $builder->assetByExtension('mock')
+    );
+    \Packaged\Dispatch\AssetResponse::addAssetType('mock', new MockAssetType());
+    $this->assertInstanceOf(
+      '\MockAssetType',
+      $builder->assetByExtension('mock')
+    );
+  }
+}
+
+class MockAssetType extends \Packaged\Dispatch\Assets\AbstractAsset
+{
+  public function getExtension()
+  {
+    return 'mock';
+  }
+
+  public function getContentType()
+  {
+    return 'mock/asset';
+  }
 }

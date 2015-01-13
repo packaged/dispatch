@@ -60,7 +60,7 @@ class FileHashCommand extends Command
 
     $baseDir = rtrim($baseDir, '/') . '/';
 
-    $extensions = array_keys(AssetResponse::$assetMap);
+    $extensions = AssetResponse::getExtensions();
     $pattern    = '*.' . implode(',*.', $extensions);
     $fileList   = $this->globRecursive(
       $baseDir . '{' . $pattern . '}',
