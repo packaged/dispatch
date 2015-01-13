@@ -164,3 +164,34 @@ with js in method names and parameters.
 
 We recommed using AssetManager::TYPE_CSS and AssetManager::TYPE_JS within your
 code, however, for shorter examples, the string version is also valid.
+
+## Custom Asset Types
+
+Custom assets are used if you need an asset to be dispatched with a specific
+mime type, or your asset must be rendered or compiled before being dispatched.
+Simply create a class implementing IAsset (you can extend AbstractAsset) and
+register it with AssetResponse.
+ 
+The following example will cause all requested files with the extension 'ext' to
+be served with the 'application/x-my-asset' content type, and return an MD5 hash
+of the file contents.
+
+    class MyAsset extends AbstractAsset
+    {
+      public function getExtension()
+      {
+        return 'ext';
+      }
+    
+      public function getContentType()
+      {
+        return "application/x-my-asset";
+      }
+      
+      public function getContent()
+      {
+        return md5(parent::getContent());
+      }
+    }
+    
+    AssetResponse::addAssetType('ext', '\MyAsset');
