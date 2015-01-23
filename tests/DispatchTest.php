@@ -4,9 +4,9 @@ class DispatchTest extends PHPUnit_Framework_TestCase
 {
   public function testNonDispatchPath()
   {
-    $opt        = [];
+    $opt = [];
     $dispatcher = new \Packaged\Dispatch\Dispatch(new DummyKernel(), $opt);
-    $response   = $dispatcher->handle(
+    $response = $dispatcher->handle(
       \Symfony\Component\HttpFoundation\Request::createFromGlobals()
     );
     $this->assertEquals('Original', $response->getContent());
@@ -14,8 +14,8 @@ class DispatchTest extends PHPUnit_Framework_TestCase
 
   public function testSetters()
   {
-    $opts       = [];
-    $opt        = new \Packaged\Config\Provider\ConfigSection('', $opts);
+    $opts = [];
+    $opt = new \Packaged\Config\Provider\ConfigSection('', $opts);
     $dispatcher = new \Packaged\Dispatch\Dispatch(new DummyKernel(), $opt);
     $dispatcher->setBaseDirectory(__DIR__);
     $this->assertEquals(__DIR__, $dispatcher->getBaseDirectory());
@@ -41,7 +41,7 @@ class DispatchTest extends PHPUnit_Framework_TestCase
     $request->server->set('REQUEST_URI', '/' . $path);
 
     $dispatcher = new \Packaged\Dispatch\Dispatch(new DummyKernel(), $config);
-    $resp       = $dispatcher->handle($request);
+    $resp = $dispatcher->handle($request);
     $this->assertContains($expect, $resp->getContent());
   }
 
@@ -57,7 +57,7 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       ],
       'css_config' => ['minify' => false]
     ];
-    $tests      = [];
+    $tests = [];
 
     $tests[] = [
       array_merge($baseConfig, []),
@@ -142,7 +142,7 @@ class DispatchTest extends PHPUnit_Framework_TestCase
     ];
 
     $tests[] = [
-      array_merge($baseConfig, ['assets_dir'=>'tests/empty']),
+      array_merge($baseConfig, ['assets_dir' => 'tests/empty']),
       'res/p/domain//filehash/test.css',
       'www.packaged.in',
       'could not be located'
@@ -297,16 +297,6 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'function f(){setCss(\'background:url(https://),url(https://),'
       . 'red url(https://)\');return(/(url\s*\(.*?){3}/).'
       . 'test(mStyle.background);}'
-    ];
-
-    /**
-     * Scss import paths should work correctly when accessed through dispatch
-     */
-    $tests[] = [
-      array_merge($baseConfig, []),
-      'res/p/domain/b/filehash/test-import.scss',
-      'www.packaged.in',
-      file_get_contents(__DIR__ . '/asset/test-import.expect.css')
     ];
 
     return $tests;

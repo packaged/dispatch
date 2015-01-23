@@ -248,7 +248,7 @@ class AssetManager
   public function lookupMapType($object)
   {
     $reflection = new \ReflectionObject($object);
-    $filename   = $reflection->getFileName();
+    $filename = $reflection->getFileName();
 
     //Find the common start to the filename of the callee and this file, which
     //is known to be in the vendor directory
@@ -263,7 +263,7 @@ class AssetManager
     //Calculate the vendor and package names
     if(ends_with($prefix, 'vendor' . DIRECTORY_SEPARATOR))
     {
-      $path               = substr($filename, strlen($prefix));
+      $path = substr($filename, strlen($prefix));
       $this->_lookupParts = array_slice(explode('/', $path, 3), 0, 2);
       return DirectoryMapper::MAP_VENDOR;
     }
@@ -400,44 +400,6 @@ class AssetManager
       static::_addToStore(
         'css',
         $this->getResourceUri($filename, null, 'css'),
-        $options
-      );
-    }
-  }
-
-  /**
-   * Add a less file to the css store
-   *
-   * @param $filename
-   * @param $options
-   */
-  public function requireLess($filename, $options = null)
-  {
-    $filenames = ValueAs::arr($filename);
-    foreach($filenames as $filename)
-    {
-      static::_addToStore(
-        'css',
-        $this->getResourceUri($filename, null, 'less'),
-        $options
-      );
-    }
-  }
-
-  /**
-   * Add a scss file to the css store
-   *
-   * @param $filename
-   * @param $options
-   */
-  public function requireScss($filename, $options = null)
-  {
-    $filenames = ValueAs::arr($filename);
-    foreach($filenames as $filename)
-    {
-      static::_addToStore(
-        'css',
-        $this->getResourceUri($filename, null, 'scss'),
         $options
       );
     }

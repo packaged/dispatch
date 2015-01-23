@@ -29,15 +29,11 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
     $dispatcher->handle($request);
     $manager = \Packaged\Dispatch\AssetManager::assetType();
     $manager->requireCss('test', ['delay' => true]);
-    $manager->requireLess('test');
-    $manager->requireScss('test');
     $manager->requireJs('test');
 
     $this->assertEquals(
       [
         '//www.packaged.in/res/p/8cac7/b/76d6c18/test.css'  => ['delay' => true],
-        '//www.packaged.in/res/p/8cac7/b/2900bb5/test.less' => null,
-        '//www.packaged.in/res/p/8cac7/b/d22435c/test.scss' => null,
       ],
       \Packaged\Dispatch\AssetManager::getUrisByType('css')
     );

@@ -13,8 +13,6 @@ class AssetResponse
     'js'    => '\Packaged\Dispatch\Assets\JavascriptAsset',
     'json'  => '\Packaged\Dispatch\Assets\JsonAsset',
     'css'   => '\Packaged\Dispatch\Assets\CssAsset',
-    'scss'  => '\Packaged\Dispatch\Assets\ScssAsset',
-    'less'  => '\Packaged\Dispatch\Assets\LessAsset',
     'swf'   => '\Packaged\Dispatch\Assets\FlashAsset',
     'pdf'   => '\Packaged\Dispatch\Assets\PdfAsset',
     'zip'   => '\Packaged\Dispatch\Assets\ZipAsset',
@@ -48,7 +46,7 @@ class AssetResponse
 
   public static function addAssetType($ext, $classname)
   {
-    if (is_object($classname))
+    if(is_object($classname))
     {
       $classname = get_class($classname);
     }
