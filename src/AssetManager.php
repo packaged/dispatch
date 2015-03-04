@@ -375,7 +375,7 @@ class AssetManager
    */
   public function requireJs($filename, $options = null)
   {
-    $filenames = ValueAs::arr($filename);
+    $filenames = (array)$filename;
     foreach($filenames as $filename)
     {
       static::_addToStore(
@@ -394,7 +394,7 @@ class AssetManager
    */
   public function requireCss($filename, $options = null)
   {
-    $filenames = ValueAs::arr($filename);
+    $filenames = (array)$filename;
     foreach($filenames as $filename)
     {
       static::_addToStore(
