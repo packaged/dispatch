@@ -17,23 +17,40 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
     $this->assertNull($manager->getResourceUri(''));
   }
 
+  public function testUnfoundAssets()
+  {
+    $mgr = \Packaged\Dispatch\AssetManager::assetType();
+    $mgr->clearStore();
+    $mgr->requireJs('this/doesnt/exist');
+    $mgr->requireCss('this/doesnt/exist/either');
+    $js = \Packaged\Dispatch\AssetManager::getUrisByType(
+      \Packaged\Dispatch\AssetManager::TYPE_JS
+    );
+    $this->assertEmpty($js);
+    $css = \Packaged\Dispatch\AssetManager::getUrisByType(
+      \Packaged\Dispatch\AssetManager::TYPE_CSS
+    );
+    $this->assertEmpty($css);
+  }
+
   public function testStore()
   {
     $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
     $request->headers->set('HOST', 'www.packaged.in');
     $request->server->set('REQUEST_URI', '/');
-    $opts       = ['assets_dir' => 'asset'];
-    $opt        = new \Packaged\Config\Provider\ConfigSection('', $opts);
+    $opts = ['assets_dir' => 'asset'];
+    $opt = new \Packaged\Config\Provider\ConfigSection('', $opts);
     $dispatcher = new \Packaged\Dispatch\Dispatch(new DummyKernel(), $opt);
     $dispatcher->setBaseDirectory(__DIR__);
     $dispatcher->handle($request);
     $manager = \Packaged\Dispatch\AssetManager::assetType();
+    $manager->clearStore();
     $manager->requireCss('test', ['delay' => true]);
     $manager->requireJs('test');
 
     $this->assertEquals(
       [
-        '//www.packaged.in/res/p/8cac7/b/76d6c18/test.css'  => ['delay' => true],
+        '//www.packaged.in/res/p/8cac7/b/76d6c18/test.css' => ['delay' => true],
       ],
       \Packaged\Dispatch\AssetManager::getUrisByType('css')
     );
@@ -59,8 +76,8 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
     $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
     $request->headers->set('HOST', 'www.packaged.in');
     $request->server->set('REQUEST_URI', '/');
-    $opts       = ['assets_dir' => 'asset'];
-    $opt        = new \Packaged\Config\Provider\ConfigSection('', $opts);
+    $opts = ['assets_dir' => 'asset'];
+    $opt = new \Packaged\Config\Provider\ConfigSection('', $opts);
     $dispatcher = new \Packaged\Dispatch\Dispatch(new DummyKernel(), $opt);
     $dispatcher->setBaseDirectory(__DIR__);
     $dispatcher->handle($request);
@@ -164,7 +181,7 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
 
   public function testExternalResource()
   {
-    $am       = \Packaged\Dispatch\AssetManager::sourceType();
+    $am = \Packaged\Dispatch\AssetManager::sourceType();
     $location = 'http://test.com/css.css';
     $this->assertEquals($location, $am->getResourceUri($location));
   }

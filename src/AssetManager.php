@@ -341,12 +341,15 @@ class AssetManager
    */
   protected function _addToStore($type, $uri, $options = null)
   {
-    if(!isset(static::$_resourceStore[$type]))
+    if(!empty($uri))
     {
-      static::$_resourceStore[$type] = [];
-    }
+      if(!isset(static::$_resourceStore[$type]))
+      {
+        static::$_resourceStore[$type] = [];
+      }
 
-    static::$_resourceStore[$type][$uri] = $options;
+      static::$_resourceStore[$type][$uri] = $options;
+    }
   }
 
   /**
