@@ -72,22 +72,20 @@ class AssetManager
     $return = '';
     foreach(static::$_resourceStore[$for] as $uri => $options)
     {
-      if(empty($uri))
+      if(!empty($uri))
       {
-        continue;
-      }
-
-      $opts = $options;
-      if(is_array($options))
-      {
-        $opts = '';
-        foreach($options as $key => $value)
+        $opts = $options;
+        if(is_array($options))
         {
-          $value = ValueAs::string($value);
-          $opts .= " $key=\"$value\"";
+          $opts = '';
+          foreach($options as $key => $value)
+          {
+            $value = ValueAs::string($value);
+            $opts .= " $key=\"$value\"";
+          }
         }
+        $return .= sprintf($template, $uri, $opts);
       }
-      $return .= sprintf($template, $uri, $opts);
     }
     return $return;
   }
