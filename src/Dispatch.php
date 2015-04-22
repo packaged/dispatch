@@ -273,7 +273,7 @@ class Dispatch implements HttpKernelInterface
       case 'domain':
         $matchCfg = $this->_config->getItem('run_match', null);
         $domains = ValueAs::arr($matchCfg, []);
-        return ends_with_any($request->getHost(), $domains, false);
+        return ends_with_any($request->getHttpHost(), $domains, false);
     };
     return false;
   }

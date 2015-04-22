@@ -14,13 +14,13 @@ class DirectoryMapper
 
   const MAP_VENDOR = 'v';
   const MAP_SOURCE = 's';
-  const MAP_ALIAS  = 'a';
-  const MAP_ASSET  = 'p';
+  const MAP_ALIAS = 'a';
+  const MAP_ASSET = 'p';
 
   public function __construct($workingDirectory, ConfigSection $dispatchConfig)
   {
     $this->_workingDirectory = $workingDirectory;
-    $this->_config           = $dispatchConfig;
+    $this->_config = $dispatchConfig;
   }
 
   /**
@@ -45,7 +45,7 @@ class DirectoryMapper
    */
   public function urlToPath($path)
   {
-    $parts     = explode('/', $path);
+    $parts = explode('/', $path);
     $partCount = count($parts);
 
     if($partCount > 4 && $parts[0] == self::MAP_ALIAS)
@@ -54,7 +54,7 @@ class DirectoryMapper
       // a/alias/domain/b/filehash/filepath
       $pathHash = 'b';
       $filename = array_slice($parts, 5);
-      $base     = $this->aliasPath($parts);
+      $base = $this->aliasPath($parts);
     }
     else if($partCount > 3 && $parts[0] == self::MAP_SOURCE)
     {
@@ -62,7 +62,7 @@ class DirectoryMapper
       // s/domain/pathHash/fileHash/filePath
       $pathHash = $parts[2];
       $filename = array_slice($parts, 4);
-      $base     = $this->sourcePath($parts);
+      $base = $this->sourcePath($parts);
     }
     else if($partCount > 5 && $parts[0] == self::MAP_VENDOR)
     {
@@ -70,7 +70,7 @@ class DirectoryMapper
       // v/vendor/package/domain/pathHash/fileHash/filePath
       $pathHash = $parts[4];
       $filename = array_slice($parts, 6);
-      $base     = $this->vendorPath($parts);
+      $base = $this->vendorPath($parts);
     }
     else if($partCount > 3 && $parts[0] == self::MAP_ASSET)
     {
@@ -78,7 +78,7 @@ class DirectoryMapper
       // p/domain/pathHash/fileHash/filePath
       $pathHash = $parts[2];
       $filename = array_slice($parts, 4);
-      $base     = $this->assetPath($parts);
+      $base = $this->assetPath($parts);
     }
     else
     {
@@ -130,7 +130,7 @@ class DirectoryMapper
    */
   public function aliasPath($parts)
   {
-    $check   = $parts[1];
+    $check = $parts[1];
     $aliases = ValueAs::arr($this->_config->getItem('aliases'));
     if(isset($aliases[$check]))
     {
@@ -230,7 +230,7 @@ class DirectoryMapper
         $folder = [substr($path, strlen($base) + 1)];
         if($part == $this->hashDirectoryArray($folder, strlen($part) - 2))
         {
-          $base  = $path;
+          $base = $path;
           $found = true;
           break;
         }

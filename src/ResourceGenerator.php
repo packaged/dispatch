@@ -41,9 +41,9 @@ class ResourceGenerator
   public function __construct(Dispatch $dispatcher, Request $request)
   {
     $this->_dispatcher = $dispatcher;
-    $this->_request    = $request;
-    $this->_httpHost   = $this->_request->getHttpHost();
-    $this->_mapper     = new DirectoryMapper(
+    $this->_request = $request;
+    $this->_httpHost = $this->_request->getHttpHost();
+    $this->_mapper = new DirectoryMapper(
       $dispatcher->getBaseDirectory(), $dispatcher->getConfig()
     );
     $this->_mapper->setHashMap(
@@ -78,11 +78,11 @@ class ResourceGenerator
       case 'path':
         // asset urls are determined by path prefix
         $path = $cfg->getItem('run_match', 'res');
-        $uri  = build_path_unix($this->_httpHost, $path, $uri);
+        $uri = build_path_unix($this->_httpHost, $path, $uri);
         break;
       case 'subdomain':
         // asset urls are determined by domain prefix
-        $sub     = $cfg->getItem('run_match', 'static.');
+        $sub = $cfg->getItem('run_match', 'static.');
         $domainP = explode('.', $this->_httpHost);
         if(count($domainP) > 2)
         {
@@ -98,7 +98,7 @@ class ResourceGenerator
       case 'domain':
         // asset urls are determined by FQDN
         $domain = $cfg->getItem('run_match', $this->_httpHost);
-        $uri    = build_path_unix($domain, $uri);
+        $uri = build_path_unix($domain, $uri);
         break;
     }
 

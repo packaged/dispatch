@@ -61,24 +61,24 @@ class FileHashCommand extends Command
     $baseDir = rtrim($baseDir, '/') . '/';
 
     $extensions = AssetResponse::getExtensions();
-    $pattern    = '*.' . implode(',*.', $extensions);
-    $fileList   = $this->globRecursive(
+    $pattern = '*.' . implode(',*.', $extensions);
+    $fileList = $this->globRecursive(
       $baseDir . '{' . $pattern . '}',
       GLOB_BRACE
     );
 
     $hashMap = [];
-    $data    = '';
+    $data = '';
     foreach($fileList as $file)
     {
-      $key           = str_replace($baseDir, '', $file);
-      $hash          = ResourceGenerator::getFileHash($file);
+      $key = str_replace($baseDir, '', $file);
+      $hash = ResourceGenerator::getFileHash($file);
       $hashMap[$key] = $hash;
       $data .= "$key = $hash\n";
     }
 
     $outputFile = $input->getOption('output');
-    $filename   = build_path($baseDir, $outputFile);
+    $filename = build_path($baseDir, $outputFile);
     if(!file_exists($filename) || is_writable($filename))
     {
       file_put_contents($filename, $data);

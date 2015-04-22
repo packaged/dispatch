@@ -97,12 +97,12 @@ abstract class AbstractDispatchableAsset extends AbstractAsset
       $relPath = $this->_assetManager->getRelativePath();
       if(starts_with($path, '../'))
       {
-        $max   = count($relPath);
+        $max = count($relPath);
         $depth = substr_count($path, '../');
-        $path  = substr($path, $depth * 3);
+        $path = substr($path, $depth * 3);
         if($depth > 0 && $depth < $max)
         {
-          $rel    = array_slice($relPath, 0, $depth);
+          $rel = array_slice($relPath, 0, $depth);
           $prefix = implode('/', $rel);
         }
       }
@@ -113,7 +113,7 @@ abstract class AbstractDispatchableAsset extends AbstractAsset
     }
 
     $path = ltrim($path, '/');
-    $url  = $this->_assetManager->getResourceUri(
+    $url = $this->_assetManager->getResourceUri(
       build_path_unix($prefix, $path)
     );
 
