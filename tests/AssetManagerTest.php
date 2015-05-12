@@ -84,6 +84,8 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
     $manager = \Packaged\Dispatch\AssetManager::assetType();
     $manager->requireCss('test');
     $manager->requireJs('test', ['delay' => true]);
+    $manager->requireJs('tests');
+    $manager->requireJs('tests.min');
     $manager->requireJs('testnotfound', ['delay' => true]);
 
     $this->assertEquals(
@@ -94,7 +96,9 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
 
     $this->assertEquals(
       '<script src="//www.packaged.in/res/p/8cac7/b/e2218e4/test.js"' .
-      ' delay="true"></script>',
+      ' delay="true"></script>'
+      . '<script src="//www.packaged.in/res/p/8cac7/b/9b0a055/tests.min.js">'
+      . '</script>',
       \Packaged\Dispatch\AssetManager::generateHtmlIncludes('js')
     );
     $this->assertEquals(

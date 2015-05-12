@@ -298,19 +298,34 @@ class AssetManager
     {
       return $filename;
     }
+
     if($extension !== null)
     {
-      $filename .= '.' . $extension;
+      if(substr($filename, -4) !== '.min')
+      {
+        $filename = [
+          $filename . '.min.' . $extension,
+          $filename . '.' . $extension,
+        ];
+      }
+      else
+      {
+        $filename = [$filename . '.' . $extension];
+      }
     }
     $event = new DispatchEvent();
-    $event->setFilename($filename);
     $event->setLookupParts((array)$this->_lookupParts);
     $event->setMapType($this->_mapType);
     $event->setPath($path);
-    $result = Dispatch::trigger($event);
-    if($result !== null)
+
+    foreach((array)$filename as $fname)
     {
-      return $result->getResult();
+      $event->setFilename($fname);
+      $result = Dispatch::trigger($event);
+      if($result !== null && $result->getResult() !== null)
+      {
+        return $result->getResult();
+      }
     }
     return null;
   }

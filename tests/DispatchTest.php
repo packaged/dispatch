@@ -278,12 +278,19 @@ class DispatchTest extends PHPUnit_Framework_TestCase
      * */
     $tests[] = [
       array_merge($baseConfig, []),
-      'res/p/domain/b/filehash/test.min.js',
+      'res/p/domain/b/filehash/test2.min.js',
       'www.packaged.in',
       'function myFunction()
 {
   alert("Hello\nHow are you?");
 }'
+    ];
+
+    $tests[] = [
+      array_merge($baseConfig, []),
+      'res/p/domain/b/filehash/tests.min.js',
+      'www.packaged.in',
+      'function myFunction(){alert("Hello\nHow are you?");}'
     ];
 
     /**
