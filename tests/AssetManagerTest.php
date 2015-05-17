@@ -107,6 +107,24 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
     );
   }
 
+  public function testGenerateHtmlIncludesInline()
+  {
+    $manager = \Packaged\Dispatch\AssetManager::assetType();
+    $manager->clearStore();
+    $manager->requireInlineCss('body{background: red:}');
+    $manager->requireInlineJs('alert(\'Testing\');');
+
+    $this->assertEquals(
+      '<style>body{background: red:}</style>',
+      \Packaged\Dispatch\AssetManager::generateHtmlIncludes('css')
+    );
+
+    $this->assertEquals(
+      '<script>alert(\'Testing\');</script>',
+      \Packaged\Dispatch\AssetManager::generateHtmlIncludes('js')
+    );
+  }
+
   public function testConstructException()
   {
     //Ensure a valid constructor does not throw an exception

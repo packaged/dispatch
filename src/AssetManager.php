@@ -72,7 +72,18 @@ class AssetManager
     $return = '';
     foreach(static::$_resourceStore[$for] as $uri => $options)
     {
-      if(!empty($uri))
+      if(strlen($uri) == 32 && !stristr($uri, '/'))
+      {
+        if($for == self::TYPE_CSS)
+        {
+          $return .= '<style>' . $options . '</style>';
+        }
+        else if($for == self::TYPE_JS)
+        {
+          $return .= '<script>' . $options . '</script>';
+        }
+      }
+      else if(!empty($uri))
       {
         $opts = $options;
         if(is_array($options))
@@ -403,6 +414,16 @@ class AssetManager
   }
 
   /**
+   * Add a js script to the store
+   *
+   * @param $javascript
+   */
+  public function requireInlineJs($javascript)
+  {
+    static::_addToStore('js', md5($javascript), $javascript);
+  }
+
+  /**
    * Add a css file to the store
    *
    * @param $filename
@@ -419,5 +440,15 @@ class AssetManager
         $options
       );
     }
+  }
+
+  /**
+   * Add css to the store
+   *
+   * @param $stylesheet
+   */
+  public function requireInlineCss($stylesheet)
+  {
+    static::_addToStore('css', md5($stylesheet), $stylesheet);
   }
 }
