@@ -3,6 +3,8 @@ namespace Packaged\Dispatch;
 
 use Packaged\Config\Provider\ConfigSection;
 use Packaged\Dispatch\Assets\IDispatchableAsset;
+use Packaged\Helpers\Path;
+use Packaged\Helpers\Strings;
 use Packaged\Helpers\ValueAs;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -202,7 +204,7 @@ class Dispatch implements HttpKernelInterface
     $dirMapper = new DirectoryMapper($this->_baseDirectory, $this->_config);
     $directory = $dirMapper->urlToPath($pathInfo['dirname']);
 
-    $filePath = build_path($directory, $pathInfo['basename']);
+    $filePath = Path::build($directory, $pathInfo['basename']);
 
     //Do not minify files ending in .min.ext
     if(substr($pathInfo['filename'], -4) == '.min')
@@ -265,15 +267,15 @@ class Dispatch implements HttpKernelInterface
     {
       case 'path':
         $match = $this->_config->getItem('run_match', 'res');
-        return starts_with($request->getPathInfo() . '/', "/$match/");
+        return Strings::startsWith($request->getPathInfo() . '/', "/$match/");
       case 'subdomain':
         $matchCfg = $this->_config->getItem('run_match', 'static.,assets.');
         $subDomains = ValueAs::arr($matchCfg, ['static.']);
-        return starts_with_any($request->getHost(), $subDomains);
+        return Strings::startsWithAny($request->getHost(), $subDomains);
       case 'domain':
         $matchCfg = $this->_config->getItem('run_match', null);
         $domains = ValueAs::arr($matchCfg, []);
-        return ends_with_any($request->getHttpHost(), $domains, false);
+        return Strings::endsWithAny($request->getHttpHost(), $domains, false);
     };
     return false;
   }

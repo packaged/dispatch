@@ -2,6 +2,8 @@
 namespace Packaged\Dispatch\Assets;
 
 use Packaged\Dispatch\AssetManager;
+use Packaged\Helpers\Path;
+use Packaged\Helpers\Strings;
 
 abstract class AbstractDispatchableAsset extends AbstractAsset
   implements IDispatchableAsset
@@ -89,13 +91,13 @@ abstract class AbstractDispatchableAsset extends AbstractAsset
     }
 
     $prefix = '';
-    list($path, $append) = exploded('?', $uri[1], [$uri[1], null], 2);
+    list($path, $append) = Strings::explode('?', $uri[1], [$uri[1], null], 2);
 
     //Take a root link as it comes
-    if(!starts_with($path, '/'))
+    if(!Strings::startsWith($path, '/'))
     {
       $relPath = $this->_assetManager->getRelativePath();
-      if(starts_with($path, '../'))
+      if(Strings::startsWith($path, '../'))
       {
         $max = count($relPath);
         $depth = substr_count($path, '../');
@@ -114,7 +116,7 @@ abstract class AbstractDispatchableAsset extends AbstractAsset
 
     $path = ltrim($path, '/');
     $url = $this->_assetManager->getResourceUri(
-      build_path_unix($prefix, $path)
+      Path::buildUnix($prefix, $path)
     );
 
     if(empty($url))

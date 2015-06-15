@@ -3,6 +3,7 @@ namespace Packaged\Dispatch\Console;
 
 use Packaged\Dispatch\AssetResponse;
 use Packaged\Dispatch\ResourceGenerator;
+use Packaged\Helpers\Path;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -78,7 +79,7 @@ class FileHashCommand extends Command
     }
 
     $outputFile = $input->getOption('output');
-    $filename = build_path($baseDir, $outputFile);
+    $filename = Path::build($baseDir, $outputFile);
     if(!file_exists($filename) || is_writable($filename))
     {
       file_put_contents($filename, $data);

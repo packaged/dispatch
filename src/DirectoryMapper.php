@@ -2,6 +2,7 @@
 namespace Packaged\Dispatch;
 
 use Packaged\Config\Provider\ConfigSection;
+use Packaged\Helpers\Path;
 use Packaged\Helpers\ValueAs;
 
 class DirectoryMapper
@@ -98,7 +99,7 @@ class DirectoryMapper
   public function vendorPath($parts)
   {
     list($vendor, $package) = array_slice($parts, 1, 2);
-    return build_path('vendor', $vendor, $package);
+    return Path::build('vendor', $vendor, $package);
   }
 
   /**
@@ -151,7 +152,7 @@ class DirectoryMapper
   public function processDirHash($base, $pathHash, $url)
   {
     $path = $this->findPathFromHash(
-      build_path($this->_workingDirectory, $base),
+      Path::build($this->_workingDirectory, $base),
       $pathHash
     );
 
@@ -160,7 +161,7 @@ class DirectoryMapper
       return null;
     }
 
-    return build_path($path, implode(DIRECTORY_SEPARATOR, $url));
+    return Path::build($path, implode(DIRECTORY_SEPARATOR, $url));
   }
 
   /**
@@ -208,7 +209,7 @@ class DirectoryMapper
     foreach($hashParts as $part)
     {
       //Search for directories matching the hash
-      $dirs = glob(build_path($base, substr($part, 0, 2) . '*'), GLOB_ONLYDIR);
+      $dirs = glob(Path::build($base, substr($part, 0, 2) . '*'), GLOB_ONLYDIR);
       if(!$dirs)
       {
         return null;

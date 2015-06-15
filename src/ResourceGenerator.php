@@ -1,6 +1,7 @@
 <?php
 namespace Packaged\Dispatch;
 
+use Packaged\Helpers\Path;
 use Packaged\Helpers\ValueAs;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -78,7 +79,7 @@ class ResourceGenerator
       case 'path':
         // asset urls are determined by path prefix
         $path = $cfg->getItem('run_match', 'res');
-        $uri = build_path_unix($this->_httpHost, $path, $uri);
+        $uri = Path::buildUnix($this->_httpHost, $path, $uri);
         break;
       case 'subdomain':
         // asset urls are determined by domain prefix
@@ -93,12 +94,12 @@ class ResourceGenerator
           $domain = implode('.', $domainP);
         }
 
-        $uri = build_path_unix($sub . $domain, $uri);
+        $uri = Path::buildUnix($sub . $domain, $uri);
         break;
       case 'domain':
         // asset urls are determined by FQDN
         $domain = $cfg->getItem('run_match', $this->_httpHost);
-        $uri = build_path_unix($domain, $uri);
+        $uri = Path::buildUnix($domain, $uri);
         break;
     }
 
@@ -151,12 +152,12 @@ class ResourceGenerator
 
     $baseDir = $this->getBasePath($this->_mapper, $type, (array)$lookup);
 
-    $filePath = build_path($baseDir, $path, $file);
+    $filePath = Path::build($baseDir, $path, $file);
     $fileHash = $this->_dispatcher->getFileHash($filePath);
     if($fileHash === null)
     {
       //File hash doesnt exist in the cache, so lets look it up
-      $fullPath = build_path($this->_dispatcher->getBaseDirectory(), $filePath);
+      $fullPath = Path::build($this->_dispatcher->getBaseDirectory(), $filePath);
       $fileHash = ResourceGenerator::getFileHash($fullPath);
       if(!$fileHash)
       {

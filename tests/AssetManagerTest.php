@@ -1,5 +1,7 @@
 <?php
 
+use Packaged\Helpers\Path;
+
 class AssetManagerTest extends PHPUnit_Framework_TestCase
 {
   public function testStaticBuilders()
@@ -213,7 +215,7 @@ class AssetManagerTester extends \Packaged\Dispatch\AssetManager
 {
   protected function ownFile()
   {
-    return dirname(__DIR__) . DIRECTORY_SEPARATOR . build_path(
+    return dirname(__DIR__) . DIRECTORY_SEPARATOR . Path::build(
       'vendor',
       'packaged',
       'dispatch',

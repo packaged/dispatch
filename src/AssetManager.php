@@ -264,13 +264,13 @@ class AssetManager
     $prefix = Strings::commonPrefix($filename, $this->ownFile());
 
     //Account for other packaged repos that may offer resources
-    if(ends_with($prefix, 'packaged' . DIRECTORY_SEPARATOR))
+    if(Strings::endsWith($prefix, 'packaged' . DIRECTORY_SEPARATOR))
     {
       $prefix = substr($prefix, 0, -9);
     }
 
     //Calculate the vendor and package names
-    if(ends_with($prefix, 'vendor' . DIRECTORY_SEPARATOR))
+    if(Strings::endsWith($prefix, 'vendor' . DIRECTORY_SEPARATOR))
     {
       $path = substr($filename, strlen($prefix));
       $this->_lookupParts = array_slice(explode('/', $path, 3), 0, 2);
@@ -350,7 +350,7 @@ class AssetManager
    */
   private function isExternalUrl($path)
   {
-    return (strlen($path) > 8) && starts_with_any(
+    return (strlen($path) > 8) && Strings::startsWithAny(
       $path,
       ['http://', 'https://', '//']
     );
