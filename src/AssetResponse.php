@@ -75,6 +75,7 @@ class AssetResponse
 
     //Set the correct content type based on the asset
     $response->headers->set('Content-Type', $asset->getContentType());
+    $response->headers->set('X-Content-Type-Options', 'nosniff');
 
     //Ensure the cache varies on the language and encoding
     //Domain specific content will vary on the uri itself
