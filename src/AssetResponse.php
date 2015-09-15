@@ -5,7 +5,6 @@ use Packaged\Dispatch\Assets\AbstractAsset;
 use Packaged\Dispatch\Assets\IAsset;
 use Packaged\Dispatch\Assets\UnknownAsset;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class AssetResponse
 {
@@ -71,7 +70,7 @@ class AssetResponse
 
   public function createResponse(IAsset $asset, Request $request)
   {
-    $response = new Response();
+    $response = new DispatchResponse();
 
     //Set the correct content type based on the asset
     $response->headers->set('Content-Type', $asset->getContentType());
