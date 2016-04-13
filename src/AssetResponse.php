@@ -76,9 +76,9 @@ class AssetResponse
     $response->headers->set('Content-Type', $asset->getContentType());
     $response->headers->set('X-Content-Type-Options', 'nosniff');
 
-    //Ensure the cache varies on the language and encoding
+    //Ensure the cache varies on the encoding
     //Domain specific content will vary on the uri itself
-    $response->headers->set("Vary", "Accept-Encoding,Accept-Language");
+    $response->headers->set("Vary", "Accept-Encoding");
 
     $content = $asset->getContent();
 
