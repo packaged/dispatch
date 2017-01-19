@@ -175,6 +175,9 @@ class Dispatch implements HttpKernelInterface
       //What resources do you expect to find with no path?
       return $this->invalidUrlResponse();
     }
+    
+    //decode so we can match filename on the filesystem
+    $path = urldecode($path);
 
     $pathInfo = pathinfo($path);
 
