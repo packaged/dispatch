@@ -16,7 +16,7 @@
     "packaged/helpers": "~1.0",
     "packaged/config": "~1.0",
     "symfony/http-kernel": "~3.2",
-    "symfony/console": "~2.0",
+    "symfony/console": "~3.2",
     "tedivm/jshrink": "~1.0"
   },
   "require-dev": {
