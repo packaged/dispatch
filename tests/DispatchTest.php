@@ -1,6 +1,6 @@
 <?php
 
-class DispatchTest extends PHPUnit_Framework_TestCase
+class DispatchTest extends \PHPUnit\Framework\TestCase
 {
   public function testNonDispatchPath()
   {
@@ -53,9 +53,9 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'aliases'    => [
         'tdir' => 'tests/asset',
         'ast2' => 'tests/asset2',
-        'vend' => 'vendor'
+        'vend' => 'vendor',
       ],
-      'css_config' => ['minify' => false]
+      'css_config' => ['minify' => false],
     ];
     $tests = [];
 
@@ -63,35 +63,35 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       array_merge($baseConfig, []),
       '',
       'www.packaged.in',
-      'Original'
+      'Original',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/test.css',
       'www.packaged.in',
-      'test.css could not be located'
+      'test.css could not be located',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/p/domain/b/filehash/test.unknown',
       'www.packaged.in',
-      'test file content'
+      'test file content',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/',
       'www.packaged.in',
-      'The URL you requested appears to be mythical'
+      'The URL you requested appears to be mythical',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/test',
       'www.packaged.in',
-      'The URL you requested appears to be mythical'
+      'The URL you requested appears to be mythical',
     ];
 
     $tests[] = [
@@ -99,23 +99,21 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'res/p/domain/b/filehash/test.css',
       'www.packaged.in',
       'body { background: yellow ' .
-      'url(\'//www.packaged.in/res/p/8cac7/b/d41d8cd/x.jpg\'); }'
+      'url(\'//www.packaged.in/res/p/8cac7/b/d41d8cd/x.jpg\'); }',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/p/domain/b/filehash/testurl.js',
       'www.packaged.in',
-      'function myFunction()
-{url();url(\'\');url(\'//www.packaged.in/res/p/8cac7/b/e2218e4/test.js\');}'
+      'function myFunction(){url();url(\'\');url(\'//www.packaged.in/res/p/8cac7/b/e2218e4/test.js\');}',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/p/domain/b/filehash/test.js',
       'www.packaged.in',
-      'function myFunction()
-{alert("Hello\nHow are you?");}'
+      'function myFunction(){alert("Hello\nHow are you?");}',
     ];
 
     $tests[] = [
@@ -123,7 +121,7 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'res/p/domain/b/filehash/test.css',
       'www.packaged.in',
       'body { background: yellow ' .
-      'url(\'//www.packaged.in/res/p/8cac7/b/d41d8cd/x.jpg\'); }'
+      'url(\'//www.packaged.in/res/p/8cac7/b/d41d8cd/x.jpg\'); }',
     ];
 
     $tests[] = [
@@ -131,28 +129,28 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'res/p/domain/b/filehash/tester.css',
       'www.packaged.in',
       'body { background: yellow ' .
-      'url(\'//www.packaged.in/res/p/8cac7/b/d41d8cd/x.jpg?v1\'); }'
+      'url(\'//www.packaged.in/res/p/8cac7/b/d41d8cd/x.jpg?v1\'); }',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/p/domain//filehash/test.css',
       'www.packaged.in',
-      'could not be located'
+      'could not be located',
     ];
 
     $tests[] = [
       array_merge($baseConfig, ['assets_dir' => 'tests/empty']),
       'res/p/domain//filehash/test.css',
       'www.packaged.in',
-      'could not be located'
+      'could not be located',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/v/packaged/config/domain/b/filehash/composer.json',
       'www.packaged.in',
-      'packaged/config'
+      'packaged/config',
     ];
 
     $tests[] = [
@@ -160,7 +158,7 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'res/a/tdir/domain/b/filehash/test.css',
       'www.packaged.in',
       'body { background: yellow ' .
-      'url(\'//www.packaged.in/res/a/tdir/8cac7/b/d41d8cd/x.jpg\'); }'
+      'url(\'//www.packaged.in/res/a/tdir/8cac7/b/d41d8cd/x.jpg\'); }',
     ];
 
     $tests[] = [
@@ -168,7 +166,7 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'res/a/ast2/domain/b/filehash/sub/test.css',
       'www.packaged.in',
       'body { background: yellow ' .
-      'url(\'//www.packaged.in/res/a/ast2/8cac7/b/d41d8cd/x.jpg\'); }'
+      'url(\'//www.packaged.in/res/a/ast2/8cac7/b/d41d8cd/x.jpg\'); }',
     ];
 
     $tests[] = [
@@ -176,7 +174,7 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'res/a/ast2/domain/b/filehash/sub/tester.css',
       'www.packaged.in',
       'body { background: yellow ' .
-      'url(\'//www.packaged.in/res/a/ast2/8cac7/b/d41d8cd/sub2/x.jpg\'); }'
+      'url(\'//www.packaged.in/res/a/ast2/8cac7/b/d41d8cd/sub2/x.jpg\'); }',
     ];
 
     $tests[] = [
@@ -184,21 +182,21 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'res/a/ast2/domain/b/filehash/sub/subsub/tester.css',
       'www.packaged.in',
       'body { background: yellow ' .
-      'url(\'//www.packaged.in/res/a/ast2/8cac7/b/d41d8cd/sub/x.jpg\'); }'
+      'url(\'//www.packaged.in/res/a/ast2/8cac7/b/d41d8cd/sub/x.jpg\'); }',
     ];
 
     $tests[] = [
       array_merge($baseConfig, ['source_dir' => 'vendor/']),
       'res/s/domain/pa456;co456/filehash/composer.json',
       'www.packaged.in',
-      'packaged/config'
+      'packaged/config',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/s/domain/asc04e3/filehash/test.css',
       'www.packaged.in',
-      'background: yellow'
+      'background: yellow',
     ];
 
     //Duplicate test to check cache
@@ -206,28 +204,28 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       array_merge($baseConfig, []),
       'res/s/domain/asc04e3/filehash/test.css',
       'www.packaged.in',
-      'background: yellow'
+      'background: yellow',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/s/domain/asd3a46/filehash/test.css',
       'www.packaged.in',
-      'background: red'
+      'background: red',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/s/domain/asd3b46/filehash/test.css',
       'www.packaged.in',
-      'could not be located'
+      'could not be located',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/a/noalias/domain/b/filehash/test.css',
       'www.packaged.in',
-      'could not be located'
+      'could not be located',
     ];
 
     $tests[] = [
@@ -238,7 +236,7 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'a/tdir/domain/b/filehash/test.css',
       'static.packaged.in',
       'body { background: yellow ' .
-      'url(\'//static.packaged.in/a/tdir/6ea79/b/d41d8cd/x.jpg\'); }'
+      'url(\'//static.packaged.in/a/tdir/6ea79/b/d41d8cd/x.jpg\'); }',
     ];
 
     $tests[] = [
@@ -249,7 +247,7 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'a/tdir/domain/b/filehash/test.css',
       'static.packaged.tld',
       'body { background: yellow ' .
-      'url(\'//static.packaged.tld/a/tdir/71084/b/d41d8cd/x.jpg\'); }'
+      'url(\'//static.packaged.tld/a/tdir/71084/b/d41d8cd/x.jpg\'); }',
     ];
 
     $tests[] = [
@@ -259,7 +257,7 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       ),
       'a/tdir/domain/b/filehash/test.css',
       'static.packaged.tld',
-      'Original'
+      'Original',
     ];
 
     $tests[] = [
@@ -269,11 +267,12 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       ),
       'a/tdir/domain/b/filehash/no-parse-test.css',
       'static.packaged.in',
-      'body { background: yellow url(x.jpg); }'
+      'body { background: yellow url(x.jpg); }',
     ];
 
     /**
      * Do not minify .min.ext files
+     *
      * @link https://github.com/packaged/dispatch/issues/1
      * */
     $tests[] = [
@@ -283,18 +282,19 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'function myFunction()
 {
   alert("Hello\nHow are you?");
-}'
+}',
     ];
 
     $tests[] = [
       array_merge($baseConfig, []),
       'res/p/domain/b/filehash/tests.min.js',
       'www.packaged.in',
-      'function myFunction(){alert("Hello\nHow are you?");}'
+      'function myFunction(){alert("Hello\nHow are you?");}',
     ];
 
     /**
      * Invalid dispatch links should remain as the default
+     *
      * @link https://github.com/packaged/dispatch/issues/5
      * */
     $tests[] = [
@@ -303,7 +303,7 @@ class DispatchTest extends PHPUnit_Framework_TestCase
       'www.packaged.in',
       'function f(){setCss(\'background:url(https://),url(https://),'
       . 'red url(https://)\');return(/(url\s*\(.*?){3}/).'
-      . 'test(mStyle.background);}'
+      . 'test(mStyle.background);}',
     ];
 
     return $tests;

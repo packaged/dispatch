@@ -1,18 +1,18 @@
 <?php
 
-class ResourceGeneratorTest extends PHPUnit_Framework_TestCase
+class ResourceGeneratorTest extends \PHPUnit\Framework\TestCase
 {
   public function testHash()
   {
-    $kernel = $this->getMock(
+    $kernel = $this->createMock(
       '\Symfony\Component\HttpKernel\HttpKernelInterface'
     );
     /**
      * @var $kernel Symfony\Component\HttpKernel\HttpKernelInterface
      */
     $dispatch = new \Packaged\Dispatch\Dispatch($kernel, []);
-    $request  = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
-    $gen      = new \Packaged\Dispatch\ResourceGenerator($dispatch, $request);
+    $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    $gen = new \Packaged\Dispatch\ResourceGenerator($dispatch, $request);
 
     $this->assertEquals('8cac7', $gen->hashDomain('www.packaged.in'));
     $this->assertEquals(
@@ -53,78 +53,78 @@ class ResourceGeneratorTest extends PHPUnit_Framework_TestCase
     $tests = [];
 
     $dispatch = $this->getDispatch();
-    $event    = new \Packaged\Dispatch\DispatchEvent();
+    $event = new \Packaged\Dispatch\DispatchEvent();
     $event->setFilename('test.css');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_SOURCE);
     $event->setPath('asset');
-    $expect  = '//packaged.in/res/s/dfcbf/asc04e3/76d6c18/test.css';
+    $expect = '//packaged.in/res/s/dfcbf/asc04e3/76d6c18/test.css';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch(['run_on' => 'subdomain']);
-    $event    = new \Packaged\Dispatch\DispatchEvent();
+    $event = new \Packaged\Dispatch\DispatchEvent();
     $event->setFilename('test.css');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_SOURCE);
     $event->setPath('asset');
-    $expect  = '//static.packaged.in/s/dfcbf/asc04e3/76d6c18/test.css';
+    $expect = '//static.packaged.in/s/dfcbf/asc04e3/76d6c18/test.css';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
     $request->headers->set('HOST', 'www.packaged.in');
 
     $dispatch = $this->getDispatch(['run_on' => 'subdomain']);
-    $event    = new \Packaged\Dispatch\DispatchEvent();
+    $event = new \Packaged\Dispatch\DispatchEvent();
     $event->setFilename('test.css');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_SOURCE);
     $event->setPath('asset');
-    $expect  = '//static.packaged.in/s/8cac7/asc04e3/76d6c18/test.css';
+    $expect = '//static.packaged.in/s/8cac7/asc04e3/76d6c18/test.css';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch(
       ['run_on' => 'domain', 'run_match' => 'packagedstatic.com']
     );
-    $event    = new \Packaged\Dispatch\DispatchEvent();
+    $event = new \Packaged\Dispatch\DispatchEvent();
     $event->setFilename('test.css');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_SOURCE);
     $event->setPath('asset');
-    $expect  = '//packagedstatic.com/s/8cac7/asc04e3/76d6c18/test.css';
+    $expect = '//packagedstatic.com/s/8cac7/asc04e3/76d6c18/test.css';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch();
-    $event    = new \Packaged\Dispatch\DispatchEvent();
+    $event = new \Packaged\Dispatch\DispatchEvent();
     $event->setFilename('composer.json');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_VENDOR);
     $event->setPath('');
     $event->setLookupParts(['packaged', 'config']);
-    $expect  = '//www.packaged.in/res/v/packaged/' .
+    $expect = '//www.packaged.in/res/v/packaged/' .
       'config/8cac7/b/4568ecc/composer.json';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch();
-    $event    = new \Packaged\Dispatch\DispatchEvent();
+    $event = new \Packaged\Dispatch\DispatchEvent();
     $event->setFilename('missing.composer.json');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_VENDOR);
     $event->setPath('');
     $event->setLookupParts(['packaged', 'config']);
-    $expect  = null;
+    $expect = null;
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch(
       ['aliases' => ['cfger' => 'vendor/packaged/config']]
     );
-    $event    = new \Packaged\Dispatch\DispatchEvent();
+    $event = new \Packaged\Dispatch\DispatchEvent();
     $event->setFilename('composer.json');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_ALIAS);
     $event->setLookupParts(['cfger']);
-    $expect  = '//www.packaged.in/res/a/cfger/8cac7/b/4568ecc/composer.json';
+    $expect = '//www.packaged.in/res/a/cfger/8cac7/b/4568ecc/composer.json';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch(
       ['assets_dir' => 'tests/asset']
     );
-    $event    = new \Packaged\Dispatch\DispatchEvent();
+    $event = new \Packaged\Dispatch\DispatchEvent();
     $event->setFilename('test.css');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_ASSET);
-    $expect  = '//www.packaged.in/res/p/8cac7/b/76d6c18/test.css';
+    $expect = '//www.packaged.in/res/p/8cac7/b/76d6c18/test.css';
     $tests[] = [$event, $dispatch, $request, $expect, 2];
 
     return $tests;
@@ -133,7 +133,7 @@ class ResourceGeneratorTest extends PHPUnit_Framework_TestCase
   public function getDispatch(array $options = [])
   {
     $options = array_merge(['source_dir' => 'tests'], $options);
-    $kernel  = $this->getMock(
+    $kernel = $this->createMock(
       '\Symfony\Component\HttpKernel\HttpKernelInterface'
     );
     /**

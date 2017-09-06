@@ -1,6 +1,6 @@
 <?php
 
-class CssAssetTest extends PHPUnit_Framework_TestCase
+class CssAssetTest extends \PHPUnit\Framework\TestCase
 {
   public function testMinify()
   {

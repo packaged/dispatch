@@ -2,7 +2,7 @@
 
 use Packaged\Helpers\Path;
 
-class AssetManagerTest extends PHPUnit_Framework_TestCase
+class AssetManagerTest extends \PHPUnit\Framework\TestCase
 {
   public function testStaticBuilders()
   {
@@ -59,7 +59,7 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
 
     $this->assertEquals(
       [
-        '//www.packaged.in/res/p/8cac7/b/e2218e4/test.js' => null
+        '//www.packaged.in/res/p/8cac7/b/e2218e4/test.js' => null,
       ],
       \Packaged\Dispatch\AssetManager::getUrisByType('js')
     );
@@ -133,7 +133,7 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
     new \Packaged\Dispatch\AssetManager(
       new \Packaged\Config\Provider\ConfigSection()
     );
-    $this->setExpectedException(
+    $this->expectException(
       '\Exception',
       "You cannot construct an asset manager without specifying " .
       "either a callee or forceType"
@@ -162,7 +162,7 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
       [$vendorCallee, \Packaged\Dispatch\DirectoryMapper::MAP_VENDOR],
       [
         new \Packaged\Config\Provider\ConfigSection(),
-        \Packaged\Dispatch\DirectoryMapper::MAP_VENDOR
+        \Packaged\Dispatch\DirectoryMapper::MAP_VENDOR,
       ],
     ];
   }
@@ -198,7 +198,7 @@ class AssetManagerTest extends PHPUnit_Framework_TestCase
       [
         "v/packaged/dispatch",
         \Packaged\Dispatch\DirectoryMapper::MAP_VENDOR,
-        ['packaged', 'dispatch']
+        ['packaged', 'dispatch'],
       ],
     ];
   }
@@ -216,11 +216,11 @@ class AssetManagerTester extends \Packaged\Dispatch\AssetManager
   protected function ownFile()
   {
     return dirname(__DIR__) . DIRECTORY_SEPARATOR . Path::build(
-      'vendor',
-      'packaged',
-      'dispatch',
-      'src',
-      'AssetManager.php'
-    );
+        'vendor',
+        'packaged',
+        'dispatch',
+        'src',
+        'AssetManager.php'
+      );
   }
 }

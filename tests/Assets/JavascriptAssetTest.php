@@ -1,6 +1,6 @@
 <?php
 
-class JavascriptAssetTest extends PHPUnit_Framework_TestCase
+class JavascriptAssetTest extends \PHPUnit\Framework\TestCase
 {
   public function testMinify()
   {

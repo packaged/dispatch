@@ -1,6 +1,6 @@
 <?php
 
-class DispatchEventTest extends PHPUnit_Framework_TestCase
+class DispatchEventTest extends \PHPUnit\Framework\TestCase
 {
   public function testAccess()
   {

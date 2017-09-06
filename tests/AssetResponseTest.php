@@ -1,6 +1,6 @@
 <?php
 
-class AssetResponseTest extends PHPUnit_Framework_TestCase
+class AssetResponseTest extends \PHPUnit\Framework\TestCase
 {
   public function testClassGeneration()
   {

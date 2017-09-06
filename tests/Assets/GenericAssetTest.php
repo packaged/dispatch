@@ -1,6 +1,6 @@
 <?php
 
-class GenericAssetTest extends PHPUnit_Framework_TestCase
+class GenericAssetTest extends \PHPUnit\Framework\TestCase
 {
   /**
    * @dataProvider assetProvider
