@@ -9,5 +9,7 @@ interface IAsset
 
   public function getContentType();
 
+  public function getHash();
+
   public function setOptions(array $options);
 }

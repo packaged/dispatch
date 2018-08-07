@@ -63,7 +63,7 @@ class AssetResponse
     if(isset(self::$_assetMap[$extension]))
     {
       $class = self::$_assetMap[$extension];
-      return new $class;
+      return new $class();
     }
     return new UnknownAsset();
   }
@@ -83,7 +83,7 @@ class AssetResponse
     $content = $asset->getContent();
 
     //Set the etag to the hash of the request uri, as it is in itself a hash
-    $response->setEtag(md5($content));
+    $response->setEtag($asset->getHash());
     $response->setPublic();
 
     //This resource should last for 30 days in cache

@@ -5,6 +5,7 @@ abstract class AbstractAsset implements IAsset
 {
   protected $_content;
   protected $_options;
+  protected $_hash;
 
   /**
    * Get the content for this asset
@@ -89,4 +90,21 @@ abstract class AbstractAsset implements IAsset
   {
     return isset($this->_options[$key]) ? $this->_options[$key] : $default;
   }
+
+  /**
+   * @param mixed $hash
+   *
+   * @return AbstractAsset
+   */
+  public function setHash($hash)
+  {
+    $this->_hash = $hash;
+    return $this;
+  }
+
+  public function getHash()
+  {
+    return $this->_hash ?: md5($this->getContent());
+  }
+
 }

@@ -6,10 +6,10 @@ use Packaged\Dispatch\Assets\IDispatchableAsset;
 use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
 use Packaged\Helpers\ValueAs;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Dispatch implements HttpKernelInterface
 {
@@ -175,7 +175,7 @@ class Dispatch implements HttpKernelInterface
       //What resources do you expect to find with no path?
       return $this->invalidUrlResponse();
     }
-    
+
     //decode so we can match filename on the filesystem
     $path = urldecode($path);
 
@@ -223,6 +223,7 @@ class Dispatch implements HttpKernelInterface
 
     //Give the asset its file content
     $asset->setContent(file_get_contents($filePath));
+    $asset->setHash(md5_file($filePath));
 
     if($asset instanceof IDispatchableAsset)
     {
