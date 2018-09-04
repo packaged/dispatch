@@ -352,9 +352,10 @@ class AssetManager
    */
   private function isExternalUrl($path)
   {
-    return (strlen($path) > 8) && Strings::startsWithAny(
-        $path,
-        ['http://', 'https://', '//']
+    return strlen($path) > 8 && (
+        Strings::startsWith($path, 'http://', true, 7) ||
+        Strings::startsWith($path, 'https://', true, 8) ||
+        Strings::startsWith($path, '//', true, 2)
       );
   }
 
