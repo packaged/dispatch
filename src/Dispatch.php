@@ -113,9 +113,7 @@ class Dispatch implements HttpKernelInterface
    *
    * @api
    */
-  public function handle(
-    Request $request, $type = self::MASTER_REQUEST, $catch = true
-  )
+  public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
   {
     //Start listening for resource uri generation requests
     $generator = new ResourceGenerator($this, $request);
@@ -129,11 +127,24 @@ class Dispatch implements HttpKernelInterface
 
     if($this->isDispatchRequest($request))
     {
+      $dispatchKey = 'dispatch:' . base64_encode($request->getUri());
+      $success = $response = null;
+      $hasApc = function_exists('apcu_fetch');
+      if($hasApc)
+      {
+        $response = apcu_fetch($dispatchKey, $success);
+      }
+      if(!$success)
+      {
+        $response = $this->getResponseForPath($this->getDispatchablePath($request), $request);
+        if($hasApc)
+        {
+          apcu_add($dispatchKey, $response, 86400);
+        }
+      }
+
       //Process the response for a dispatchable
-      return $this->getResponseForPath(
-        $this->getDispatchablePath($request),
-        $request
-      );
+      return $response;
     }
     else
     {
