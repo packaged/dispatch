@@ -25,6 +25,7 @@ class AssetManager
 
   /**
    * Parts to build the uri with, e.g. vendor,package
+   *
    * @var array
    */
   protected $_lookupParts = [];
@@ -264,13 +265,13 @@ class AssetManager
     $prefix = Strings::commonPrefix($filename, $this->ownFile());
 
     //Account for other packaged repos that may offer resources
-    if(Strings::endsWith($prefix, 'packaged' . DIRECTORY_SEPARATOR))
+    if(Strings::endsWith($prefix, 'packaged' . DIRECTORY_SEPARATOR, true, 9))
     {
       $prefix = substr($prefix, 0, -9);
     }
 
     //Calculate the vendor and package names
-    if(Strings::endsWith($prefix, 'vendor' . DIRECTORY_SEPARATOR))
+    if(Strings::endsWith($prefix, 'vendor' . DIRECTORY_SEPARATOR, true, 7))
     {
       $path = substr($filename, strlen($prefix));
       $this->_lookupParts = array_slice(explode('/', $path, 3), 0, 2);
@@ -281,6 +282,7 @@ class AssetManager
 
   /**
    * Return the configured lookup parts e.g. Vendor,Package
+   *
    * @return array
    */
   public function getLookupParts()
@@ -351,9 +353,9 @@ class AssetManager
   private function isExternalUrl($path)
   {
     return (strlen($path) > 8) && Strings::startsWithAny(
-      $path,
-      ['http://', 'https://', '//']
-    );
+        $path,
+        ['http://', 'https://', '//']
+      );
   }
 
   /**

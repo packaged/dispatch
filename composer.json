@@ -12,7 +12,7 @@
     "bin/dispatch"
   ],
   "require": {
-    "packaged/helpers": "~1.0",
+    "packaged/helpers": "~1.15",
     "packaged/config": "~1.0",
     "symfony/http-kernel": "~3.2",
     "symfony/console": "~3.2",

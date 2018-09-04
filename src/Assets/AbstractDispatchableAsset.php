@@ -94,10 +94,10 @@ abstract class AbstractDispatchableAsset extends AbstractAsset
     list($path, $append) = Strings::explode('?', $uri[1], [$uri[1], null], 2);
 
     //Take a root link as it comes
-    if(!Strings::startsWith($path, '/'))
+    if(!Strings::startsWith($path, '/', true, 1))
     {
       $relPath = $this->_assetManager->getRelativePath();
-      if(Strings::startsWith($path, '../'))
+      if(Strings::startsWith($path, '../', true, 3))
       {
         $max = count($relPath);
         $depth = substr_count($path, '../');
