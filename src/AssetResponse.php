@@ -80,8 +80,6 @@ class AssetResponse
     //Domain specific content will vary on the uri itself
     $response->headers->set("Vary", "Accept-Encoding");
 
-    $content = $asset->getContent();
-
     //Set the etag to the hash of the request uri, as it is in itself a hash
     $response->setEtag($asset->getHash());
     $response->setPublic();
@@ -99,15 +97,7 @@ class AssetResponse
       $date->format('D, d M Y H:i:s') . ' GMT'
     );
 
-    //Check to see if the client already has the content
-    if($request->server->has('HTTP_IF_MODIFIED_SINCE'))
-    {
-      $response->setNotModified();
-    }
-    else
-    {
-      $response->setContent($content);
-    }
+    $response->setContent($asset->getContent());
 
     return $response;
   }

@@ -127,7 +127,7 @@ class Dispatch implements HttpKernelInterface
 
     if($this->isDispatchRequest($request))
     {
-      $dispatchKey = 'dispatch:' . base64_encode($request->getUri());
+      $dispatchKey = 'dsptch:' . base64_encode($request->getUri());
       $success = $response = null;
       $hasApc = function_exists('apcu_fetch');
       if($hasApc)
@@ -137,10 +137,17 @@ class Dispatch implements HttpKernelInterface
       if(!$success)
       {
         $response = $this->getResponseForPath($this->getDispatchablePath($request), $request);
-        if($hasApc)
+        if($hasApc && $response->getStatusCode() === 200)
         {
           apcu_add($dispatchKey, $response, 86400);
         }
+      }
+
+      //Check to see if the client already has the content
+      if($request->server->has('HTTP_IF_MODIFIED_SINCE'))
+      {
+        $response->setNotModified();
+        $response->setContent('');
       }
 
       //Process the response for a dispatchable
@@ -204,10 +211,7 @@ class Dispatch implements HttpKernelInterface
     $asset = $response->assetByExtension($pathInfo['extension']);
 
     //Load the options
-    $options = ValueAs::arr(
-      $this->_config->getItem($pathInfo['extension'] . '_config'),
-      null
-    );
+    $options = ValueAs::arr($this->_config->getItem($pathInfo['extension'] . '_config'), null);
 
     if($options !== null)
     {
