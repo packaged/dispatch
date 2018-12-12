@@ -13,13 +13,4 @@ interface DispatchableResource extends Resource
    * @return DispatchableResource
    */
   public function setManager(ResourceManager $am);
-
-  /**
-   * Set the current working directory for an asset
-   *
-   * @param $directory
-   *
-   * @return DispatchableResource
-   */
-  public function setWorkingDirectory($directory);
 }

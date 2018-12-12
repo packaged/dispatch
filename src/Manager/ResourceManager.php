@@ -59,7 +59,7 @@ class ResourceManager
    * @return string
    * @throws \Exception
    */
-  protected function getFilePath($relativePath)
+  public function getFilePath($relativePath)
   {
     if($this->_type == self::MAP_RESOURCES)
     {
@@ -108,7 +108,7 @@ class ResourceManager
    *
    * @return bool
    */
-  private function isExternalUrl($path)
+  public function isExternalUrl($path)
   {
     return strlen($path) > 8 && (
         Strings::startsWith($path, 'http://', true, 7) ||

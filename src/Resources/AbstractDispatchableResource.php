@@ -11,6 +11,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
    * @var ResourceManager
    */
   protected $_manager;
+  protected $_path;
   protected $_workingDirectory;
   protected $_processedContent = false;
 
@@ -19,8 +20,14 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
     $this->_manager = $am;
   }
 
+  public function setProcessingPath($path)
+  {
+    $this->_path = $path;
+    return $this;
+  }
+
   /**
-   * Set the asset content
+   * Set the resource content
    *
    * @param $content
    *
@@ -44,7 +51,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
       return;
     }
 
-    //Treat as a standard asset if no asset manager has been set.
+    //Treat as a standard resource if no resource manager has been set.
     if(!isset($this->_manager))
     {
       return;
@@ -77,32 +84,14 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
       return $uri[0];
     }
 
-    $prefix = '';
     list($path, $append) = Strings::explode('?', $uri[1], [$uri[1], null], 2);
 
-    //Take a root link as it comes
-    if(!Strings::startsWith($path, '/', true, 1))
+    if(!$this->_manager->isExternalUrl($path))
     {
-      $relPath = $this->_manager->getRelativePath();
-      if(Strings::startsWith($path, '../', true, 3))
-      {
-        $max = count($relPath);
-        $depth = substr_count($path, '../');
-        $path = substr($path, $depth * 3);
-        if($depth > 0 && $depth < $max)
-        {
-          $rel = array_slice($relPath, 0, $depth);
-          $prefix = implode('/', $rel);
-        }
-      }
-      else
-      {
-        $prefix = implode('/', $relPath);
-      }
+      $path = Path::system($this->makeFullPath(dirname($path), dirname($this->_path)), basename($path));
     }
 
-    $path = ltrim($path, '/');
-    $url = $this->_manager->getResourceUri(Path::url($prefix, $path));
+    $url = $this->_manager->getResourceUri($path);
 
     if(empty($url))
     {
@@ -117,7 +106,31 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
   }
 
   /**
-   * Get the content for this asset
+   * Make the relative path
+   *
+   * @param $relativePath
+   * @param $workingDirectory
+   *
+   * @return string
+   */
+  protected function makeFullPath($relativePath, $workingDirectory)
+  {
+    $levelUps = substr_count($relativePath, '../');
+    if($levelUps > 0)
+    {
+      $relativePath = str_replace('../', '', $relativePath);
+      $workingDirectoryParts = explode('/', $workingDirectory);
+      if(count($workingDirectoryParts) <= $levelUps)
+      {
+        return $relativePath;
+      }
+      return implode('/', array_slice($workingDirectoryParts, $levelUps)) . $relativePath;
+    }
+    return $relativePath;
+  }
+
+  /**
+   * Get the content for this resource
    *
    * @return mixed
    */
