@@ -10,6 +10,7 @@ class ResourceManager
   const MAP_VENDOR = 'v';
   const MAP_ALIAS = 'a';
   const MAP_RESOURCES = 'r';
+  const MAP_PUBLIC = 'p';
 
   protected $_type = self::MAP_RESOURCES;
   protected $_mapOptions = [];
@@ -35,6 +36,11 @@ class ResourceManager
   public static function resources()
   {
     return new static(self::MAP_RESOURCES, []);
+  }
+
+  public static function public()
+  {
+    return new static(self::MAP_PUBLIC, []);
   }
 
   /**
@@ -68,6 +74,10 @@ class ResourceManager
     if($this->_type == self::MAP_RESOURCES)
     {
       return Path::system(Dispatch::instance()->getResourcesPath(), $relativePath);
+    }
+    else if($this->_type == self::MAP_PUBLIC)
+    {
+      return Path::system(Dispatch::instance()->getPublicPath(), $relativePath);
     }
     else if($this->_type == self::MAP_VENDOR)
     {
