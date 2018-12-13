@@ -86,9 +86,10 @@ class Dispatch
         $manager = ResourceManager::vendor(array_shift($pathParts), array_shift($pathParts));
         break;
       case ResourceManager::MAP_PUBLIC:
-      default:
         $manager = ResourceManager::public();
         break;
+      default:
+        return Response::create("File Not Found", 404);
     }
 
     //Remove the hash from the URL
@@ -106,8 +107,6 @@ class Dispatch
       $resource->setContent(file_get_contents($fullPath));
     }
     return ResourceFactory::create($resource);
-
-    return Response::create($fullPath);
   }
 
 }
