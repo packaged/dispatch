@@ -46,13 +46,14 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
    */
   protected function _processContent()
   {
-    if(strpos($this->_content, '@' . 'do-not-dispatch') !== false)
+    //Treat as a standard resource if no resource manager has been set.
+    if(!isset($this->_manager))
     {
       return;
     }
 
-    //Treat as a standard resource if no resource manager has been set.
-    if(!isset($this->_manager))
+    //Do not modify file content
+    if(strpos($this->_content, '@' . 'do-not-dispatch') !== false)
     {
       return;
     }
@@ -95,7 +96,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
 
     if(empty($url))
     {
-      return $uri[0];
+      return "url('" . ($path ?? $uri[0]) . "')";
     }
 
     if(!empty($append))
@@ -115,14 +116,19 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
    */
   protected function makeFullPath($relativePath, $workingDirectory)
   {
+    if($relativePath == '.')
+    {
+      return $workingDirectory;
+    }
     $levelUps = substr_count($relativePath, '../');
     if($levelUps > 0)
     {
       $relativePath = str_replace('../', '', $relativePath);
       $workingDirectoryParts = explode('/', $workingDirectory);
-      if(count($workingDirectoryParts) <= $levelUps)
+      if($levelUps > count($workingDirectoryParts))
       {
-        return $relativePath;
+        //Relative to this directory is not allowed
+        return null;
       }
       return implode('/', array_slice($workingDirectoryParts, $levelUps)) . $relativePath;
     }

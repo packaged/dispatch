@@ -1,0 +1,4 @@
+/* @do-not-dispatch */
+body {
+  background: yellow url(../img/x.jpg);
+}

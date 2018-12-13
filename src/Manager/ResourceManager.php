@@ -50,6 +50,10 @@ class ResourceManager
       return $relativeFullPath;
     }
     $hash = $this->getFileHash($this->getFilePath($relativeFullPath));
+    if(!$hash)
+    {
+      return null;
+    }
     return Path::custom('/', array_merge($this->_baseUri, [$hash, $relativeFullPath]));
   }
 
@@ -79,6 +83,10 @@ class ResourceManager
 
   protected function getFileHash($fullPath)
   {
+    if(!file_exists($fullPath))
+    {
+      return null;
+    }
     $key = 'pdspfh-' . md5($fullPath) . '-' . filectime($fullPath);
 
     if(function_exists("apcu_fetch"))

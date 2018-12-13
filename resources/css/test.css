@@ -1,3 +1,32 @@
 body {
   background: yellow url(../img/x.jpg);
 }
+
+body.nofile {
+  background: yellow url();
+}
+
+body.localfile {
+  background: yellow url('css.jpg');
+}
+
+
+body.subfile {
+  background: yellow url('sub/subimg.jpg');
+}
+
+body.externalfile {
+  background: yellow url('http://www.example.com/background.jpg');
+}
+
+body.append {
+  background: yellow url(../img/x.jpg?x=y&request=b);
+}
+
+html {
+  background: yellow url(../img/missing-file.jpg);
+}
+
+#invalid-relative {
+  background: yellow url(../../../img/missing-file.jpg);
+}
