@@ -91,7 +91,8 @@ class Dispatch
    */
   public function handle(Request $request): Response
   {
-    $pathParts = array_filter(explode('/', $request->getPathInfo()));
+    $path = substr($request->getPathInfo(), strlen(Request::create($this->_baseUri)->getPathInfo()));
+    $pathParts = array_filter(explode('/', $path));
     $type = array_shift($pathParts);
     switch($type)
     {
