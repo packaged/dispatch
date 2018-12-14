@@ -60,7 +60,10 @@ class ResourceManager
     {
       return null;
     }
-    return Path::custom('/', array_merge($this->_baseUri, [$hash, $relativeFullPath]));
+    return Path::custom(
+      '/',
+      array_merge([Dispatch::instance()->getBaseUri()], $this->_baseUri, [$hash, $relativeFullPath])
+    );
   }
 
   /**
@@ -133,5 +136,61 @@ class ResourceManager
         Strings::startsWith($path, 'https://', true, 8) ||
         Strings::startsWith($path, '//', true, 2)
       );
+  }
+
+  /**
+   * Add a js file to the store
+   *
+   * @param $filename
+   * @param $options
+   *
+   * @return ResourceManager
+   * @throws \Exception
+   */
+  public function requireJs($filename, $options = null)
+  {
+    Dispatch::instance()->store()->requireJs($this->getResourceUri($filename), $options);
+    return $this;
+  }
+
+  /**
+   * Add a js script to the store
+   *
+   * @param $javascript
+   *
+   * @return ResourceManager
+   */
+  public function requireInlineJs($javascript)
+  {
+    Dispatch::instance()->store()->requireInlineJs($javascript);
+    return $this;
+  }
+
+  /**
+   * Add a css file to the store
+   *
+   * @param $filename
+   * @param $options
+   *
+   * @return ResourceManager
+   * @throws \Exception
+   */
+  public function requireCss($filename, $options = null)
+  {
+    Dispatch::instance()->store()->requireCss($this->getResourceUri($filename), $options);
+    return $this;
+  }
+
+  /**
+   * Add css to the store
+   *
+   * @param $stylesheet
+   *
+   * @return ResourceManager
+   */
+  public function requireInlineCss($stylesheet)
+  {
+    Dispatch::instance()->store()->requireInlineCss($stylesheet);
+    return $this;
   }
 }

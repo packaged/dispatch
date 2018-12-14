@@ -16,6 +16,13 @@ class Dispatch
    */
   private static $_instance;
 
+  /**
+   * @var ResourceStore
+   */
+  protected $_resourceStore;
+
+  protected $_baseUri;
+
   const RESOURCES_DIR = 'resources';
   const VENDOR_DIR = 'vendor';
   const PUBLIC_DIR = 'public';
@@ -39,9 +46,11 @@ class Dispatch
   protected $_aliases = [];
   protected $_projectRoot;
 
-  public function __construct($projectRoot)
+  public function __construct($projectRoot, $baseUri = null)
   {
     $this->_projectRoot = $projectRoot;
+    $this->_resourceStore = new ResourceStore();
+    $this->_baseUri = $baseUri;
   }
 
   public function getResourcesPath()
@@ -70,6 +79,17 @@ class Dispatch
     return $this->_aliases[$alias] ?? null;
   }
 
+  public function getBaseUri()
+  {
+    return $this->_baseUri;
+  }
+
+  /**
+   * @param Request $request
+   *
+   * @return Response
+   * @throws \Exception
+   */
   public function handle(Request $request): Response
   {
     $pathParts = array_filter(explode('/', $request->getPathInfo()));
@@ -107,6 +127,11 @@ class Dispatch
       $resource->setContent(file_get_contents($fullPath));
     }
     return ResourceFactory::create($resource);
+  }
+
+  public function store()
+  {
+    return $this->_resourceStore;
   }
 
 }
