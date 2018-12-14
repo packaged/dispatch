@@ -3,7 +3,7 @@
 namespace Packaged\Dispatch\Tests;
 
 use Packaged\Dispatch\Dispatch;
-use Packaged\Dispatch\Manager\ResourceManager;
+use Packaged\Dispatch\ResourceManager;
 use Packaged\Dispatch\ResourceStore;
 use Packaged\Helpers\Path;
 use Packaged\Http\Request;
@@ -41,21 +41,25 @@ class DispatchTest extends TestCase
     $response = $dispatch->handle($request);
     $this->assertEquals(404, $response->getStatusCode());
 
-    $request = Request::create('/r/randomhash/css/test.css');
+    $request = Request::create('/r/e69b7aXX/css/test.css');
+    $response = $dispatch->handle($request);
+    $this->assertEquals(404, $response->getStatusCode());
+
+    $request = Request::create('/r/e69b7a20/css/test.css');
     $response = $dispatch->handle($request);
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertContains('url(\'r/d41d8cd9/img/x.jpg\')', $response->getContent());
 
-    $request = Request::create('/p/randomhash/css/placeholder.css');
+    $request = Request::create('/p/d5dd9dc7/css/placeholder.css');
     $response = $dispatch->handle($request);
     $this->assertContains('font-size:14px', $response->getContent());
 
     $dispatch->addAlias('abc', 'resources/css');
-    $request = Request::create('/a/abc/randomhash/test.css');
+    $request = Request::create('/a/abc/e69b7a20/test.css');
     $response = $dispatch->handle($request);
     $this->assertContains('url(\'a/abc/d41d8cd9/sub/subimg.jpg\')', $response->getContent());
 
-    $request = Request::create('/v/packaged/dispatch/randomhash/css/vendor.css');
+    $request = Request::create('/v/packaged/dispatch/6673b7e0/css/vendor.css');
     $response = $dispatch->handle($request);
     $this->assertContains('body{background:orange}', $response->getContent());
 
@@ -66,7 +70,7 @@ class DispatchTest extends TestCase
   {
     $dispatch = new Dispatch(Path::system(__DIR__, '_root'), 'http://assets.packaged.in');
     Dispatch::bind($dispatch);
-    $request = Request::create('/r/randomhash/css/test.css');
+    $request = Request::create('/r/e69b7a20/css/test.css');
     $response = $dispatch->handle($request);
     $this->assertContains('url(\'http://assets.packaged.in/r/d41d8cd9/img/x.jpg\')', $response->getContent());
     Dispatch::destroy();

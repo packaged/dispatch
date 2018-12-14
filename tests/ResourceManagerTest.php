@@ -1,9 +1,9 @@
 <?php
 
-namespace Packaged\Dispatch\Tests\Manager;
+namespace Packaged\Dispatch\Tests;
 
 use Packaged\Dispatch\Dispatch;
-use Packaged\Dispatch\Manager\ResourceManager;
+use Packaged\Dispatch\ResourceManager;
 use Packaged\Dispatch\ResourceStore;
 use Packaged\Helpers\Path;
 use PHPUnit\Framework\TestCase;
@@ -41,7 +41,7 @@ class ResourceManagerTest extends TestCase
 
   public function testRequireJs()
   {
-    Dispatch::bind(new Dispatch(Path::system(dirname(__DIR__),'_root')));
+    Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     ResourceManager::resources()->requireJs('js/alert.js');
     $this->assertContains(
       'src="r/ef6402a7/js/alert.js"',
@@ -51,7 +51,7 @@ class ResourceManagerTest extends TestCase
 
   public function testRequireCss()
   {
-    Dispatch::bind(new Dispatch(Path::system(dirname(__DIR__),'_root')));
+    Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     ResourceManager::resources()->requireCss('css/test.css');
     $this->assertContains(
       'href="r/e69b7a20/css/test.css"',
@@ -61,7 +61,7 @@ class ResourceManagerTest extends TestCase
 
   public function testRequireInlineJs()
   {
-    Dispatch::bind(new Dispatch(Path::system(dirname(__DIR__),'_root')));
+    Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     ResourceManager::inline()->requireJs("alert('inline');");
     $this->assertContains(
       'alert(\'inline\');',
@@ -78,16 +78,16 @@ class ResourceManagerTest extends TestCase
 
   public function testGetFilePath()
   {
-    Dispatch::bind(new Dispatch(Path::system(dirname(__DIR__),'_root')));
+    Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     $this->assertEquals(
-      Path::system(dirname(__DIR__),'_root', 'public', 'placeholder.html'),
+      Path::system(__DIR__, '_root', 'public', 'placeholder.html'),
       ResourceManager::public()->getFilePath('placeholder.html')
     );
   }
 
   public function testRequireInlineCss()
   {
-    Dispatch::bind(new Dispatch(Path::system(dirname(__DIR__),'_root')));
+    Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     ResourceManager::inline()->requireCss("body{background:green;}");
     $this->assertContains(
       'body{background:green;}',

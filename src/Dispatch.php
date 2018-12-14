@@ -1,7 +1,6 @@
 <?php
 namespace Packaged\Dispatch;
 
-use Packaged\Dispatch\Manager\ResourceManager;
 use Packaged\Dispatch\Resources\AbstractResource;
 use Packaged\Dispatch\Resources\DispatchableResource;
 use Packaged\Dispatch\Resources\ResourceFactory;
@@ -113,9 +112,13 @@ class Dispatch
     }
 
     //Remove the hash from the URL
-    array_shift($pathParts);
+    $compareHash = array_shift($pathParts);
 
     $fullPath = $manager->getFilePath(Path::custom('/', $pathParts));
+    if($compareHash !== $manager->getFileHash($fullPath))
+    {
+      return Response::create("File Not Found", 404);
+    }
 
     $resource = ResourceFactory::getExtensionResource('css');
     if($resource instanceof DispatchableResource)

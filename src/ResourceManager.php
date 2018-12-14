@@ -1,7 +1,6 @@
 <?php
-namespace Packaged\Dispatch\Manager;
+namespace Packaged\Dispatch;
 
-use Packaged\Dispatch\Dispatch;
 use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
 
@@ -110,7 +109,7 @@ class ResourceManager
     throw new \Exception("invalid map type");
   }
 
-  protected function getFileHash($fullPath)
+  public function getFileHash($fullPath)
   {
     if(!file_exists($fullPath))
     {

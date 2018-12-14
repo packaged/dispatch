@@ -3,7 +3,7 @@
 namespace Packaged\Dispatch\Tests\Resources;
 
 use Packaged\Dispatch\Dispatch;
-use Packaged\Dispatch\Manager\ResourceManager;
+use Packaged\Dispatch\ResourceManager;
 use Packaged\Dispatch\Resources\CssResource;
 use Packaged\Helpers\Path;
 use PHPUnit\Framework\TestCase;

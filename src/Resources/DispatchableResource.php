@@ -1,7 +1,7 @@
 <?php
 namespace Packaged\Dispatch\Resources;
 
-use Packaged\Dispatch\Manager\ResourceManager;
+use Packaged\Dispatch\ResourceManager;
 
 interface DispatchableResource extends Resource
 {
