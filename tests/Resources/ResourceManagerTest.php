@@ -11,23 +11,23 @@ class ResourceManagerTest extends TestCase
 {
   public function testResourceUri()
   {
-    $root = dirname(dirname(__DIR__));
-    Dispatch::bind(new Dispatch($root))->addAlias('root', Path::system($root, Dispatch::RESOURCES_DIR));
+    $root = Path::system(dirname(__DIR__), '_root');
+    Dispatch::bind(new Dispatch($root))->addAlias('root', Dispatch::RESOURCES_DIR);
 
     $path = 'css/test.css';
     $hash = substr(md5_file(Path::system($root, Dispatch::RESOURCES_DIR, $path)), 0, 8);
 
     $this->assertEquals(
-      Path::system(ResourceManager::MAP_RESOURCES, $hash, $path),
+      Path::url(ResourceManager::MAP_RESOURCES, $hash, $path),
       ResourceManager::resources()->getResourceUri($path)
     );
     $this->assertEquals(
-      Path::system(ResourceManager::MAP_RESOURCES, $hash, $path),
+      Path::url(ResourceManager::MAP_RESOURCES, $hash, $path),
       ResourceManager::resources()->getResourceUri($path)
     );
 
     $this->assertEquals(
-      Path::system(ResourceManager::MAP_ALIAS, 'root', $hash, $path),
+      Path::url(ResourceManager::MAP_ALIAS, 'root', $hash, $path),
       ResourceManager::alias('root')->getResourceUri($path)
     );
 
@@ -35,10 +35,10 @@ class ResourceManagerTest extends TestCase
     $this->assertEquals($url, ResourceManager::resources()->getResourceUri($url));
 
     $path = 'README.md';
-    $hash = substr(md5_file(Path::system($root, 'vendor', 'packaged', 'helpers', $path)), 0, 8);
+    $hash = substr(md5_file(Path::system($root, 'vendor', 'packaged', 'dispatch', $path)), 0, 8);
     $this->assertEquals(
-      Path::system(ResourceManager::MAP_VENDOR, 'packaged', 'helpers', $hash, $path),
-      ResourceManager::vendor('packaged', 'helpers')->getResourceUri('README.md')
+      Path::system(ResourceManager::MAP_VENDOR, 'packaged', 'dispatch', $hash, $path),
+      ResourceManager::vendor('packaged', 'dispatch')->getResourceUri('README.md')
     );
 
     $this->expectExceptionMessage("invalid map type");

@@ -7,6 +7,7 @@ use Packaged\Helpers\Strings;
 
 class ResourceManager
 {
+  const MAP_INLINE = 'i';
   const MAP_VENDOR = 'v';
   const MAP_ALIAS = 'a';
   const MAP_RESOURCES = 'r';
@@ -21,6 +22,16 @@ class ResourceManager
     $this->_type = $type;
     $this->_mapOptions = $options;
     $this->_baseUri = array_merge([$type], $options);
+  }
+
+  public function getMapType()
+  {
+    return $this->_type;
+  }
+
+  public function getMapOptions()
+  {
+    return $this->_mapOptions;
   }
 
   public static function vendor($vendor, $package)
@@ -41,6 +52,11 @@ class ResourceManager
   public static function public()
   {
     return new static(self::MAP_PUBLIC, []);
+  }
+
+  public static function inline()
+  {
+    return new static(self::MAP_INLINE, []);
   }
 
   /**
@@ -139,17 +155,21 @@ class ResourceManager
   }
 
   /**
-   * Add a js file to the store
+   * Add js to the store
    *
-   * @param $filename
-   * @param $options
+   * @param string $toRequire filename, or JS if inline manager
+   * @param        $options
    *
    * @return ResourceManager
    * @throws \Exception
    */
-  public function requireJs($filename, $options = null)
+  public function requireJs($toRequire, $options = null)
   {
-    Dispatch::instance()->store()->requireJs($this->getResourceUri($filename), $options);
+    if($this->_type == self::MAP_INLINE)
+    {
+      return $this->requireInlineJs($toRequire);
+    }
+    Dispatch::instance()->store()->requireJs($this->getResourceUri($toRequire), $options);
     return $this;
   }
 
@@ -167,17 +187,21 @@ class ResourceManager
   }
 
   /**
-   * Add a css file to the store
+   * Add css to the store
    *
-   * @param $filename
-   * @param $options
+   * @param string $toRequire filename, or CSS if inline manager
+   * @param        $options
    *
    * @return ResourceManager
    * @throws \Exception
    */
-  public function requireCss($filename, $options = null)
+  public function requireCss($toRequire, $options = null)
   {
-    Dispatch::instance()->store()->requireCss($this->getResourceUri($filename), $options);
+    if($this->_type == self::MAP_INLINE)
+    {
+      return $this->requireInlineCss($toRequire);
+    }
+    Dispatch::instance()->store()->requireCss($this->getResourceUri($toRequire), $options);
     return $this;
   }
 

@@ -76,7 +76,7 @@ class Dispatch
 
   public function getAliasPath($alias)
   {
-    return $this->_aliases[$alias] ?? null;
+    return isset($this->_aliases[$alias]) ? Path::system($this->_projectRoot, $this->_aliases[$alias]) : null;
   }
 
   public function getBaseUri()

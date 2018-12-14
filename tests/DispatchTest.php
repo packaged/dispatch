@@ -29,22 +29,42 @@ class DispatchTest extends TestCase
     $dispatch = new Dispatch(__DIR__);
     $this->assertNull($dispatch->getAliasPath('abc'));
     $dispatch->addAlias('abc', 'a/b/c');
-    $this->assertEquals('a/b/c', $dispatch->getAliasPath('abc'));
+    $this->assertEquals(Path::system(__DIR__, 'a/b/c'), $dispatch->getAliasPath('abc'));
   }
 
   public function testHandle()
   {
-    $dispatch = new Dispatch(dirname(__DIR__));
+    $dispatch = new Dispatch(Path::system(__DIR__, '_root'));
     Dispatch::bind($dispatch);
+
+    $request = Request::create('/placeholder.html');
+    $response = $dispatch->handle($request);
+    $this->assertEquals(404, $response->getStatusCode());
+
     $request = Request::create('/r/randomhash/css/test.css');
     $response = $dispatch->handle($request);
+    $this->assertEquals(200, $response->getStatusCode());
     $this->assertContains('url(\'r/d41d8cd9/img/x.jpg\')', $response->getContent());
+
+    $request = Request::create('/p/randomhash/css/placeholder.css');
+    $response = $dispatch->handle($request);
+    $this->assertContains('font-size:14px', $response->getContent());
+
+    $dispatch->addAlias('abc', 'resources/css');
+    $request = Request::create('/a/abc/randomhash/test.css');
+    $response = $dispatch->handle($request);
+    $this->assertContains('url(\'a/abc/d41d8cd9/sub/subimg.jpg\')', $response->getContent());
+
+    $request = Request::create('/v/packaged/dispatch/randomhash/css/vendor.css');
+    $response = $dispatch->handle($request);
+    $this->assertContains('body{background:orange}', $response->getContent());
+
     Dispatch::destroy();
   }
 
   public function testBaseUri()
   {
-    $dispatch = new Dispatch(dirname(__DIR__), 'http://assets.packaged.in');
+    $dispatch = new Dispatch(Path::system(__DIR__, '_root'), 'http://assets.packaged.in');
     Dispatch::bind($dispatch);
     $request = Request::create('/r/randomhash/css/test.css');
     $response = $dispatch->handle($request);
@@ -54,7 +74,7 @@ class DispatchTest extends TestCase
 
   public function testStore()
   {
-    Dispatch::bind(new Dispatch(dirname(__DIR__), 'http://assets.packaged.in'));
+    Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root'), 'http://assets.packaged.in'));
     ResourceManager::resources()->requireCss('css/test.css');
     ResourceManager::resources()->requireCss('css/do-not-modify.css');
     $response = Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_CSS);

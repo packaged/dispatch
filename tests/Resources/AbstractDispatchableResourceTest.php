@@ -12,7 +12,7 @@ class AbstractDispatchableResourceTest extends TestCase
 {
   public function testProcessesContent()
   {
-    $root = dirname(dirname(__DIR__));
+    $root = Path::system(dirname(__DIR__), '_root');
     Dispatch::bind(new Dispatch($root))->addAlias('root', Path::system($root, Dispatch::RESOURCES_DIR));
     $manager = ResourceManager::resources();
 
