@@ -121,7 +121,7 @@ class Dispatch
       return Response::create("File Not Found", 404);
     }
 
-    $resource = ResourceFactory::getExtensionResource('css');
+    $resource = ResourceFactory::getExtensionResource(pathinfo($fullPath, PATHINFO_EXTENSION));
     if($resource instanceof DispatchableResource)
     {
       $resource->setManager($manager);
