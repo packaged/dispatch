@@ -125,12 +125,13 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
     {
       $relativePath = str_replace('../', '', $relativePath);
       $workingDirectoryParts = explode('/', $workingDirectory);
-      if($levelUps > count($workingDirectoryParts))
+      $moves = count($workingDirectoryParts) - $levelUps;
+      if($moves < 0)
       {
         //Relative to this directory is not allowed
         return null;
       }
-      return implode('/', array_slice($workingDirectoryParts, $levelUps)) . $relativePath;
+      return Path::custom('/', array_merge(array_slice($workingDirectoryParts, 0, $moves), [$relativePath]));
     }
     return $relativePath;
   }

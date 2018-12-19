@@ -1,6 +1,7 @@
 <?php
 namespace Packaged\Dispatch;
 
+use Packaged\Dispatch\Resources\AbstractDispatchableResource;
 use Packaged\Dispatch\Resources\AbstractResource;
 use Packaged\Dispatch\Resources\DispatchableResource;
 use Packaged\Dispatch\Resources\ResourceFactory;
@@ -115,7 +116,8 @@ class Dispatch
     //Remove the hash from the URL
     $compareHash = array_shift($pathParts);
 
-    $fullPath = $manager->getFilePath(Path::custom('/', $pathParts));
+    $requestPath = Path::custom('/', $pathParts);
+    $fullPath = $manager->getFilePath($requestPath);
     if($compareHash !== $manager->getFileHash($fullPath))
     {
       return Response::create("File Not Found", 404);
@@ -125,6 +127,10 @@ class Dispatch
     if($resource instanceof DispatchableResource)
     {
       $resource->setManager($manager);
+    }
+    if($resource instanceof AbstractDispatchableResource)
+    {
+      $resource->setProcessingPath($requestPath);
     }
     if($resource instanceof AbstractResource)
     {
