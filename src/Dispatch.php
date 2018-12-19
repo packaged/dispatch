@@ -128,6 +128,7 @@ class Dispatch
     }
     if($resource instanceof AbstractResource)
     {
+      $resource->setFilePath($fullPath);
       $resource->setContent(file_get_contents($fullPath));
     }
     return ResourceFactory::create($resource);

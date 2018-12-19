@@ -6,9 +6,10 @@ abstract class AbstractResource implements Resource
   protected $_content;
   protected $_options;
   protected $_hash;
+  protected $_filePath;
 
   /**
-   * Get the content for this asset
+   * Get the content for this resource
    *
    * @return mixed
    */
@@ -18,7 +19,7 @@ abstract class AbstractResource implements Resource
   }
 
   /**
-   * Set the asset content
+   * Set the resource content
    *
    * @param $content
    *
@@ -27,6 +28,19 @@ abstract class AbstractResource implements Resource
   public function setContent($content)
   {
     $this->_content = $content;
+    return $this;
+  }
+
+  /**
+   * Set the path this asset was loaded from
+   *
+   * @param $path
+   *
+   * @return $this
+   */
+  public function setFilePath($path)
+  {
+    $this->_filePath = $path;
     return $this;
   }
 
@@ -41,7 +55,7 @@ abstract class AbstractResource implements Resource
   }
 
   /**
-   * Remove all options from the asset
+   * Remove all options from the resource
    *
    * @return $this
    */

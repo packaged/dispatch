@@ -23,6 +23,12 @@ class JavascriptResource extends AbstractDispatchableResource
   public function getContent()
   {
     $data = parent::getContent();
+    $file = basename($this->_filePath);
+
+    if(strpos($file, '.min.') > 0 || strpos($file, '-min.') > 0)
+    {
+      return $data;
+    }
 
     //Return the raw content if minification has been disabled
     if(!ValueAs::bool($this->getOption('minify', true)))
