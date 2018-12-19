@@ -129,17 +129,32 @@ class Dispatch implements HttpKernelInterface
     {
       $dispatchKey = 'dsptch:' . base64_encode($request->getUri());
       $success = $response = null;
-      $hasApc = function_exists('apcu_fetch');
-      if($hasApc)
+      if(function_exists('apcu_fetch'))
       {
-        $response = apcu_fetch($dispatchKey, $success);
+        try
+        {
+          $response = apcu_fetch($dispatchKey, $success);
+        }
+        catch(\Exception $e)
+        {
+          //Catch possible exceptions if the error handler is set to throw
+          $response = null;
+          $success = false;
+        }
       }
       if(!$success)
       {
         $response = $this->getResponseForPath($this->getDispatchablePath($request), $request);
-        if($hasApc && $response->getStatusCode() === 200)
+        if(function_exists('apcu_add') && $response->getStatusCode() === 200)
         {
-          apcu_add($dispatchKey, $response, 86400);
+          try
+          {
+            apcu_add($dispatchKey, $response, 86400);
+          }
+          catch(\Exception $e)
+          {
+            //Catch possible exceptions if the error handler is set to throw
+          }
         }
       }
 
