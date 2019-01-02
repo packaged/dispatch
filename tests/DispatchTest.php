@@ -107,7 +107,10 @@ class DispatchTest extends TestCase
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertContains('body{color:red}', $response->getContent());
 
+    Dispatch::instance()->store()->clearStore(ResourceStore::TYPE_CSS);
+    $this->assertCount(0, Dispatch::instance()->store()->getResources(ResourceStore::TYPE_CSS));
     $resourceComponent = new ResourcedDemoComponent();
+    $this->assertCount(1, Dispatch::instance()->store()->getResources(ResourceStore::TYPE_CSS));
     $manager = ResourceManager::component($resourceComponent);
     $request = Request::create('/' . $manager->getResourceUri('style.css'));
     $response = $dispatch->handle($request);

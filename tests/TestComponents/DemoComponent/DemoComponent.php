@@ -1,9 +1,9 @@
 <?php
 namespace Packaged\Dispatch\Tests\TestComponents\DemoComponent;
 
-use Packaged\Dispatch\Component\DispatchableComponent;
+use Packaged\Dispatch\Component\UiComponent;
 
-class DemoComponent implements DispatchableComponent
+class DemoComponent extends UiComponent
 {
   public function getResourceDirectory()
   {

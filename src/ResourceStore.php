@@ -12,7 +12,7 @@ class ResourceStore
 
   public function getResources($type = null)
   {
-    return $this->_store[$type] ?? null;
+    return $this->_store[$type] ?? [];
   }
 
   public function generateHtmlIncludes($for = self::TYPE_CSS)
