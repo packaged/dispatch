@@ -1,6 +1,7 @@
 <?php
 namespace Packaged\Dispatch;
 
+use Packaged\Dispatch\Component\DispatchableComponent;
 use Packaged\Dispatch\Resources\AbstractDispatchableResource;
 use Packaged\Dispatch\Resources\AbstractResource;
 use Packaged\Dispatch\Resources\DispatchableResource;
@@ -45,6 +46,7 @@ class Dispatch
 
   protected $_aliases = [];
   protected $_projectRoot;
+  protected $_componentsNamespace;
 
   public function __construct($projectRoot, $baseUri = null)
   {
@@ -85,6 +87,25 @@ class Dispatch
   }
 
   /**
+   * @return mixed
+   */
+  public function getComponentsNamespace()
+  {
+    return $this->_componentsNamespace;
+  }
+
+  /**
+   * @param mixed $componentsNs
+   *
+   * @return Dispatch
+   */
+  public function setComponentsNamespace($componentsNs)
+  {
+    $this->_componentsNamespace = $componentsNs;
+    return $this;
+  }
+
+  /**
    * @param Request $request
    *
    * @return Response
@@ -108,6 +129,34 @@ class Dispatch
         break;
       case ResourceManager::MAP_PUBLIC:
         $manager = ResourceManager::public();
+        break;
+      case ResourceManager::MAP_COMPONENT:
+        $len = array_shift($pathParts);
+        $class = '';
+        for($i = 0; $i < $len; $i++)
+        {
+          $part = array_shift($pathParts);
+          if($i == 0 && $part == '_')
+          {
+            $class = $this->getComponentsNamespace();
+          }
+          else
+          {
+            $class .= '\\' . $part;
+          }
+        }
+        if(class_exists($class))
+        {
+          $component = new $class();
+          if($component instanceof DispatchableComponent)
+          {
+            $manager = ResourceManager::component($component);
+          }
+        }
+        if(!isset($manager))
+        {
+          return Response::create("Component Not Found", 404);
+        }
         break;
       default:
         return Response::create("File Not Found", 404);

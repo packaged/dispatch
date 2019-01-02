@@ -5,6 +5,8 @@ namespace Packaged\Dispatch\Tests;
 use Packaged\Dispatch\Dispatch;
 use Packaged\Dispatch\ResourceManager;
 use Packaged\Dispatch\ResourceStore;
+use Packaged\Dispatch\Tests\TestComponents\DemoComponent\DemoComponent;
+use Packaged\Dispatch\Tests\TestComponents\DemoComponent\ResourcedDemoComponent;
 use Packaged\Helpers\Path;
 use Packaged\Http\Request;
 use PHPUnit\Framework\TestCase;
@@ -87,5 +89,34 @@ class DispatchTest extends TestCase
     $response = Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_JS);
     $this->assertContains('src="http://assets.packaged.in/r/ef6402a7/js/alert.js"', $response);
     Dispatch::destroy();
+  }
+
+  public function testComponent()
+  {
+    $dispatch = new Dispatch(Path::system(__DIR__, '_root'));
+    Dispatch::bind($dispatch);
+
+    $component = new DemoComponent();
+    Dispatch::instance()->setComponentsNamespace('\Packaged\Dispatch\Tests\TestComponents');
+    $manager = ResourceManager::component($component);
+    $uri = $manager->getResourceUri('style.css');
+    $this->assertEquals('c/3/_/DemoComponent/DemoComponent/a4197ed8/style.css', $uri);
+
+    $request = Request::create('/' . $uri);
+    $response = $dispatch->handle($request);
+    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertContains('body{color:red}', $response->getContent());
+
+    $resourceComponent = new ResourcedDemoComponent();
+    $manager = ResourceManager::component($resourceComponent);
+    $request = Request::create('/' . $manager->getResourceUri('style.css'));
+    $response = $dispatch->handle($request);
+    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertContains('body{color:orange}', $response->getContent());
+
+    $request = Request::create('/c/3/_/MissingComponent/DemoComponent/a4197ed8/style.css');
+    $response = $dispatch->handle($request);
+    $this->assertEquals(404, $response->getStatusCode());
+    $this->assertContains('Component Not Found', $response->getContent());
   }
 }

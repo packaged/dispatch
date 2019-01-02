@@ -10,6 +10,11 @@ class ResourceStore
 
   protected $_store = [];
 
+  public function getResources($type = null)
+  {
+    return $this->_store[$type] ?? null;
+  }
+
   public function generateHtmlIncludes($for = self::TYPE_CSS)
   {
     if(!isset($this->_store[$for]) || empty($this->_store[$for]))

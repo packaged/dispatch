@@ -1,6 +1,7 @@
 <?php
 namespace Packaged\Dispatch;
 
+use Packaged\Dispatch\Component\DispatchableComponent;
 use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
 
@@ -11,10 +12,13 @@ class ResourceManager
   const MAP_ALIAS = 'a';
   const MAP_RESOURCES = 'r';
   const MAP_PUBLIC = 'p';
+  const MAP_COMPONENT = 'c';
 
   protected $_type = self::MAP_RESOURCES;
   protected $_mapOptions = [];
   protected $_baseUri = [];
+  /** @var DispatchableComponent */
+  protected $_component;
 
   public function __construct($type, array $options = [])
   {
@@ -56,6 +60,22 @@ class ResourceManager
   public static function inline()
   {
     return new static(self::MAP_INLINE, []);
+  }
+
+  public static function component(DispatchableComponent $component)
+  {
+    $dispatch = Dispatch::instance();
+    $class = get_class($component);
+    if($dispatch)
+    {
+      $prefix = Strings::commonPrefix($class, ltrim($dispatch->getComponentsNamespace(), '\\'));
+      $class = str_replace($prefix, '_', $class);
+    }
+    $parts = explode('\\', $class);
+    array_unshift($parts, count($parts));
+    $manager = new static(self::MAP_COMPONENT, $parts);
+    $manager->_component = $component;
+    return $manager;
   }
 
   /**
@@ -106,6 +126,10 @@ class ResourceManager
     {
       return Path::system(Dispatch::instance()->getAliasPath($this->_mapOptions[0]), $relativePath);
     }
+    else if($this->_type == self::MAP_COMPONENT && $this->_component)
+    {
+      return Path::system($this->_component->getResourceDirectory(), $relativePath);
+    }
     throw new \Exception("invalid map type");
   }
 
@@ -131,7 +155,7 @@ class ResourceManager
 
     if($hash && function_exists('apcu_store'))
     {
-      apcu_store($key, $hash, 86400);
+      $res = apcu_store($key, $hash, 86400);
     }
 
     return $hash;

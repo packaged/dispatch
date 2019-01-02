@@ -5,6 +5,7 @@ namespace Packaged\Dispatch\Tests;
 use Packaged\Dispatch\Dispatch;
 use Packaged\Dispatch\ResourceManager;
 use Packaged\Dispatch\ResourceStore;
+use Packaged\Dispatch\Tests\TestComponents\DemoComponent\DemoComponent;
 use Packaged\Helpers\Path;
 use PHPUnit\Framework\TestCase;
 
@@ -39,6 +40,28 @@ class ResourceManagerTest extends TestCase
     $this->assertEquals([], $manager->getMapOptions());
   }
 
+  public function testComponent()
+  {
+    Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
+    $component = new DemoComponent();
+    $manager = ResourceManager::component($component);
+    $this->assertEquals(ResourceManager::MAP_COMPONENT, $manager->getMapType());
+    $this->assertEquals(
+      [6, 'Packaged', 'Dispatch', 'Tests', 'TestComponents', 'DemoComponent', 'DemoComponent'],
+      $manager->getMapOptions()
+    );
+    $this->assertEquals(
+      'c/6/Packaged/Dispatch/Tests/TestComponents/DemoComponent/DemoComponent/a4197ed8/style.css',
+      $manager->getResourceUri('style.css')
+    );
+    Dispatch::instance()->setComponentsNamespace('\Packaged\Dispatch\Tests\TestComponents');
+    $manager = ResourceManager::component($component);
+    $this->assertEquals(
+      'c/3/_/DemoComponent/DemoComponent/a4197ed8/style.css',
+      $manager->getResourceUri('style.css')
+    );
+  }
+
   public function testRequireJs()
   {
     Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
@@ -47,6 +70,17 @@ class ResourceManagerTest extends TestCase
       'src="r/ef6402a7/js/alert.js"',
       Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_JS)
     );
+  }
+
+  public function testUniqueRequire()
+  {
+    Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
+    ResourceManager::resources()->requireJs('js/alert.js');
+    $this->assertCount(1, Dispatch::instance()->store()->getResources(ResourceStore::TYPE_JS));
+    ResourceManager::resources()->requireJs('js/alert.js');
+    $this->assertCount(1, Dispatch::instance()->store()->getResources(ResourceStore::TYPE_JS));
+    ResourceManager::resources()->requireJs('js/misc.js');
+    $this->assertCount(2, Dispatch::instance()->store()->getResources(ResourceStore::TYPE_JS));
   }
 
   public function testRequireCss()
