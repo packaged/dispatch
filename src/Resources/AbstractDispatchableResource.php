@@ -4,6 +4,7 @@ namespace Packaged\Dispatch\Resources;
 use Packaged\Dispatch\ResourceManager;
 use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
+use Packaged\Helpers\ValueAs;
 
 abstract class AbstractDispatchableResource extends AbstractResource implements DispatchableResource
 {
@@ -46,34 +47,28 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
    */
   protected function _processContent()
   {
-    //Treat as a standard resource if no resource manager has been set.
-    if(!isset($this->_manager))
+    if(isset($this->_manager)
+      && strpos($this->_content, '@' . 'do-not-dispatch') === false
+      && ValueAs::bool($this->getOption('dispatch', true)))
     {
-      return;
+      $this->_dispatch();
     }
 
-    //Do not modify file content
-    if(strpos($this->_content, '@' . 'do-not-dispatch') !== false)
+    $file = basename($this->_filePath);
+    $preMinified = (strpos($file, '.min.') > 0 || strpos($file, '-min.') > 0);
+
+    //Return the raw content if minification has been disabled or @do-not-minify is set
+    if(!$preMinified
+      && strpos($this->_content, '@' . 'do-not-minify') === false
+      && ValueAs::bool($this->getOption('minify', true)))
     {
-      return;
+      $this->_minify();
     }
-
-    //Do not modify javascript content
-    if($this instanceof JavascriptResource)
-    {
-      return;
-    }
-
-    //Find all URL(.*) and dispatch their values
-    $this->_content = preg_replace_callback(
-      '~(?<=url\()\s*(["\']?)(.*?)\1\s*(?=\))~',
-      [$this, "_dispatchNestedUrl"],
-      $this->_content
-    );
-
-    //Stop the process from running for every fetch of the content
-    $this->_processedContent = true;
   }
+
+  protected function _minify() { }
+
+  protected function _dispatch() { }
 
   /**
    * Dispatch a nested URL
@@ -149,6 +144,8 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
     if(!$this->_processedContent)
     {
       $this->_processContent();
+      //Stop the process from running for every fetch of the content
+      $this->_processedContent = true;
     }
     return parent::getContent();
   }

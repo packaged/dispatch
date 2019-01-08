@@ -1,8 +1,6 @@
 <?php
 namespace Packaged\Dispatch\Resources;
 
-use Packaged\Helpers\ValueAs;
-
 class CssResource extends AbstractDispatchableResource
 {
   protected $_options = [
@@ -19,38 +17,26 @@ class CssResource extends AbstractDispatchableResource
     return "text/css";
   }
 
-  public function getContent()
+  protected function _dispatch()
   {
-    $data = parent::getContent();
+    $regex = '~(?<=url\()\s*(["\']?)(.*?)\1\s*(?=\))~';
+    //Find all URL(.*) and dispatch their values
+    $this->_content = preg_replace_callback($regex, [$this, "_dispatchNestedUrl"], $this->_content);
+  }
 
-    //Return the raw content if minification has been disabled
-    if(!ValueAs::bool($this->getOption('minify', true)))
-    {
-      return $data;
-    }
-
-    //Do not minify scripts containing the @do-not-minify
-    if(strpos($data, '@' . 'do-not-minify') !== false)
-    {
-      return $data;
-    }
-
+  protected function _minify()
+  {
     // Remove comments.
-    $data = preg_replace('@/\*.*?\*/@s', '', $data);
+    $this->_content = preg_replace('@/\*.*?\*/@s', '', $this->_content);
 
     // Remove whitespace around symbols.
-    $data = preg_replace('@\s*([{}:;,])\s*@', '\1', $data);
+    $this->_content = preg_replace('@\s*([{}:;,])\s*@', '\1', $this->_content);
 
     // Remove unnecessary semicolons.
-    $data = preg_replace('@;}@', '}', $data);
+    $this->_content = preg_replace('@;}@', '}', $this->_content);
 
     // Replace #rrggbb with #rgb when possible.
-    $data = preg_replace(
-      '@#([a-f0-9])\1([a-f0-9])\2([a-f0-9])\3@i',
-      '#\1\2\3',
-      $data
-    );
-
-    return trim($data);
+    $this->_content = preg_replace('@#([a-f0-9])\1([a-f0-9])\2([a-f0-9])\3@i', '#\1\2\3', $this->_content);
+    $this->_content = trim($this->_content);
   }
 }
