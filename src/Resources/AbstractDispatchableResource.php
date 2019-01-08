@@ -58,9 +58,15 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
       return;
     }
 
+    //Do not modify javascript content
+    if($this instanceof JavascriptResource)
+    {
+      return;
+    }
+
     //Find all URL(.*) and dispatch their values
     $this->_content = preg_replace_callback(
-      '~url\(\s*[\'"]?([^\s\'"]*?)[\'"]?\s*\)~',
+      '~(?<=url\()\s*(["\']?)(.*?)\1\s*(?=\))~',
       [$this, "_dispatchNestedUrl"],
       $this->_content
     );
@@ -79,31 +85,28 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
    */
   protected function _dispatchNestedUrl($uri)
   {
-    // if url path is empty, return unchanged
-    if(empty($uri[1]))
-    {
-      return $uri[0];
-    }
+    $quote = $uri[1];
+    $path = $uri[2];
 
-    list($path, $append) = Strings::explode('?', $uri[1], [$uri[1], null], 2);
+    list($path, $append) = Strings::explode('?', $path, [$path, null], 2);
 
     if(!$this->_manager->isExternalUrl($path))
     {
-      $path = Path::system($this->makeFullPath(dirname($path), dirname($this->_path)), basename($path));
+      $path = Path::system($this->_makeFullPath(dirname($path), dirname($this->_path)), basename($path));
     }
 
     $url = $this->_manager->getResourceUri($path);
 
     if(empty($url))
     {
-      return "url('" . ($path ?? $uri[0]) . "')";
+      return $quote . ($path ?? $uri[0]) . $quote;
     }
 
     if(!empty($append))
     {
-      return "url('$url?$append')";
+      return $quote . "$url?$append" . $quote;
     }
-    return "url('$url')";
+    return $quote . "$url" . $quote;
   }
 
   /**
@@ -114,7 +117,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
    *
    * @return string
    */
-  protected function makeFullPath($relativePath, $workingDirectory)
+  protected function _makeFullPath($relativePath, $workingDirectory)
   {
     if($relativePath == '.')
     {

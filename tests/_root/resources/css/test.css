@@ -12,7 +12,7 @@ body.localfile {
 
 
 body.subfile {
-  background: yellow url('sub/subimg.jpg');
+  background: yellow url("sub/subimg.jpg");
 }
 
 body.externalfile {

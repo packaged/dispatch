@@ -47,19 +47,19 @@ class DispatchTest extends TestCase
     $response = $dispatch->handle($request);
     $this->assertEquals(404, $response->getStatusCode());
 
-    $request = Request::create('/r/e69b7a20/css/test.css');
+    $request = Request::create('/r/f643eb32/css/test.css');
     $response = $dispatch->handle($request);
     $this->assertEquals(200, $response->getStatusCode());
-    $this->assertContains('url(\'r/d41d8cd9/img/x.jpg\')', $response->getContent());
+    $this->assertContains('url(r/d41d8cd9/img/x.jpg)', $response->getContent());
 
     $request = Request::create('/p/d5dd9dc7/css/placeholder.css');
     $response = $dispatch->handle($request);
     $this->assertContains('font-size:14px', $response->getContent());
 
     $dispatch->addAlias('abc', 'resources/css');
-    $request = Request::create('/a/abc/e69b7a20/test.css');
+    $request = Request::create('/a/abc/f643eb32/test.css');
     $response = $dispatch->handle($request);
-    $this->assertContains('url(\'a/abc/d41d8cd9/sub/subimg.jpg\')', $response->getContent());
+    $this->assertContains('url("a/abc/d41d8cd9/sub/subimg.jpg")', $response->getContent());
 
     $request = Request::create('/v/packaged/dispatch/6673b7e0/css/vendor.css');
     $response = $dispatch->handle($request);
@@ -72,9 +72,9 @@ class DispatchTest extends TestCase
   {
     $dispatch = new Dispatch(Path::system(__DIR__, '_root'), 'http://assets.packaged.in');
     Dispatch::bind($dispatch);
-    $request = Request::create('/r/e69b7a20/css/test.css');
+    $request = Request::create('/r/f643eb32/css/test.css');
     $response = $dispatch->handle($request);
-    $this->assertContains('url(\'http://assets.packaged.in/r/d41d8cd9/img/x.jpg\')', $response->getContent());
+    $this->assertContains('url(http://assets.packaged.in/r/d41d8cd9/img/x.jpg)', $response->getContent());
     Dispatch::destroy();
   }
 
@@ -84,7 +84,7 @@ class DispatchTest extends TestCase
     ResourceManager::resources()->requireCss('css/test.css');
     ResourceManager::resources()->requireCss('css/do-not-modify.css');
     $response = Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_CSS);
-    $this->assertContains('href="http://assets.packaged.in/r/e69b7a20/css/test.css"', $response);
+    $this->assertContains('href="http://assets.packaged.in/r/f643eb32/css/test.css"', $response);
     ResourceManager::resources()->requireJs('js/alert.js');
     $response = Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_JS);
     $this->assertContains('src="http://assets.packaged.in/r/ef6402a7/js/alert.js"', $response);

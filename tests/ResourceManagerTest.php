@@ -88,7 +88,7 @@ class ResourceManagerTest extends TestCase
     Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     ResourceManager::resources()->requireCss('css/test.css');
     $this->assertContains(
-      'href="r/e69b7a20/css/test.css"',
+      'href="r/f643eb32/css/test.css"',
       Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_CSS)
     );
   }
