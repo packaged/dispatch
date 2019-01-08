@@ -23,6 +23,7 @@ class AbstractDispatchableResourceTest extends TestCase
     $content = $resource->getContent();
     $this->assertContains('url(\'r/d41d8cd9/img/x.jpg\')', $content);
     $this->assertContains('url(\'r/d41d8cd9/css/css.jpg\')', $content);
+    $this->assertContains('url(\'r/d41d8cd9/css/sub/subimg.jpg\')', $content);
     $this->assertContains('url(\'http://www.example.com/background.jpg\')', $content);
     $this->assertContains('url(\'img/missing-file.jpg\')', $content);
 

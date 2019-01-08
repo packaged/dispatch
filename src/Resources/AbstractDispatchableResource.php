@@ -133,7 +133,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
       }
       return Path::custom('/', array_merge(array_slice($workingDirectoryParts, 0, $moves), [$relativePath]));
     }
-    return $relativePath;
+    return $workingDirectory[0] !== '.' ? Path::url($workingDirectory, $relativePath) : $relativePath;
   }
 
   /**
