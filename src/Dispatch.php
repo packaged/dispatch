@@ -46,7 +46,7 @@ class Dispatch
 
   protected $_aliases = [];
   protected $_projectRoot;
-  protected $_componentsNamespace;
+  protected $_componentAliases = [];
 
   public function __construct($projectRoot, $baseUri = null)
   {
@@ -86,23 +86,15 @@ class Dispatch
     return $this->_baseUri;
   }
 
-  /**
-   * @return mixed
-   */
-  public function getComponentsNamespace()
+  public function addComponentAlias($namespace, $alias)
   {
-    return $this->_componentsNamespace;
+    $this->_componentAliases['_' . $alias] = $namespace;
+    return $this;
   }
 
-  /**
-   * @param mixed $componentsNs
-   *
-   * @return Dispatch
-   */
-  public function setComponentsNamespace($componentsNs)
+  public function getComponentAliases()
   {
-    $this->_componentsNamespace = $componentsNs;
-    return $this;
+    return $this->_componentAliases;
   }
 
   /**
@@ -136,9 +128,9 @@ class Dispatch
         for($i = 0; $i < $len; $i++)
         {
           $part = array_shift($pathParts);
-          if($i == 0 && $part == '_')
+          if($i == 0 && isset($this->_componentAliases[$part]))
           {
-            $class = $this->getComponentsNamespace();
+            $class = $this->_componentAliases[$part];
           }
           else
           {

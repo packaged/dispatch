@@ -68,8 +68,17 @@ class ResourceManager
     $class = get_class($component);
     if($dispatch)
     {
-      $prefix = Strings::commonPrefix($class, ltrim($dispatch->getComponentsNamespace(), '\\'));
-      $class = str_replace($prefix, '_', $class);
+      $maxPrefix = $maxAlias = '';
+      foreach($dispatch->getComponentAliases() as $alias => $namespace)
+      {
+        $prefix = Strings::commonPrefix($class, ltrim($namespace, '\\'));
+        if(strlen($prefix) > strlen($maxPrefix))
+        {
+          $maxPrefix = $prefix;
+          $maxAlias = $alias;
+        }
+      }
+      $class = str_replace($maxPrefix, $maxAlias, $class);
     }
     $parts = explode('\\', $class);
     array_unshift($parts, count($parts));

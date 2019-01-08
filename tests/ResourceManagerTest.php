@@ -54,7 +54,7 @@ class ResourceManagerTest extends TestCase
       'c/6/Packaged/Dispatch/Tests/TestComponents/DemoComponent/DemoComponent/a4197ed8/style.css',
       $manager->getResourceUri('style.css')
     );
-    Dispatch::instance()->setComponentsNamespace('\Packaged\Dispatch\Tests\TestComponents');
+    Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents','');
     $manager = ResourceManager::component($component);
     $this->assertEquals(
       'c/3/_/DemoComponent/DemoComponent/a4197ed8/style.css',

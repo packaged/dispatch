@@ -97,7 +97,7 @@ class DispatchTest extends TestCase
     Dispatch::bind($dispatch);
 
     $component = new DemoComponent();
-    Dispatch::instance()->setComponentsNamespace('\Packaged\Dispatch\Tests\TestComponents');
+    Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents', '');
     $manager = ResourceManager::component($component);
     $uri = $manager->getResourceUri('style.css');
     $this->assertEquals('c/3/_/DemoComponent/DemoComponent/a4197ed8/style.css', $uri);
@@ -116,6 +116,11 @@ class DispatchTest extends TestCase
     $response = $dispatch->handle($request);
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertContains('body{color:orange}', $response->getContent());
+
+    Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents\DemoComponent', 'DC');
+    $manager = ResourceManager::component(new DemoComponent());
+    $uri = $manager->getResourceUri('style.css');
+    $this->assertEquals('c/2/_DC/DemoComponent/a4197ed8/style.css', $uri);
 
     $request = Request::create('/c/3/_/MissingComponent/DemoComponent/a4197ed8/style.css');
     $response = $dispatch->handle($request);
