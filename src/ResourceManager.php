@@ -155,7 +155,7 @@ class ResourceManager
 
     if($hash && function_exists('apcu_store'))
     {
-      $res = apcu_store($key, $hash, 86400);
+      apcu_store($key, $hash, 86400);
     }
 
     return $hash;

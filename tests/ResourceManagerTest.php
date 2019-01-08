@@ -119,6 +119,19 @@ class ResourceManagerTest extends TestCase
     );
   }
 
+  public function testGetFileHash()
+  {
+    Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
+    //Test cache code (apcu)
+    for($i = 0; $i < 3; $i++)
+    {
+      $this->assertEquals(
+        "7c20a3fa",
+        ResourceManager::resources()->getFileHash(Path::system(__DIR__, '_root', 'public', 'placeholder.html'))
+      );
+    }
+  }
+
   public function testRequireInlineCss()
   {
     Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));

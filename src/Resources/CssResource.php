@@ -4,7 +4,8 @@ namespace Packaged\Dispatch\Resources;
 class CssResource extends AbstractDispatchableResource
 {
   protected $_options = [
-    'minify' => 'true',
+    'minify'   => true,
+    'dispatch' => true,
   ];
 
   public function getExtension()

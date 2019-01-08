@@ -48,8 +48,8 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
   protected function _processContent()
   {
     if(isset($this->_manager)
-      && strpos($this->_content, '@' . 'do-not-dispatch') === false
-      && ValueAs::bool($this->getOption('dispatch', true)))
+      && ValueAs::bool($this->getOption('dispatch', false))
+      && strpos($this->_content, '@' . 'do-not-dispatch') === false)
     {
       $this->_dispatch();
     }
@@ -59,8 +59,8 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
 
     //Return the raw content if minification has been disabled or @do-not-minify is set
     if(!$preMinified
-      && strpos($this->_content, '@' . 'do-not-minify') === false
-      && ValueAs::bool($this->getOption('minify', true)))
+      && ValueAs::bool($this->getOption('minify', false))
+      && strpos($this->_content, '@' . 'do-not-minify') === false)
     {
       $this->_minify();
     }
