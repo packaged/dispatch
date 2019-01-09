@@ -121,4 +121,12 @@ abstract class AbstractResource implements Resource
     return $this->_hash ?: md5($this->getContent());
   }
 
+  public static function fromFilePath($filePath)
+  {
+    $resource = new static();
+    $resource->setFilePath($filePath);
+    $resource->setContent(file_get_contents($filePath));
+    return $resource;
+  }
+
 }

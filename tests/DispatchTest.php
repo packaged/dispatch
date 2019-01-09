@@ -50,7 +50,7 @@ class DispatchTest extends TestCase
     $request = Request::create('/r/f643eb32/css/test.css');
     $response = $dispatch->handle($request);
     $this->assertEquals(200, $response->getStatusCode());
-    $this->assertContains('url(r/d41d8cd9/img/x.jpg)', $response->getContent());
+    $this->assertContains('url(r/d68e763c/img/x.jpg)', $response->getContent());
 
     $request = Request::create('/p/d5dd9dc7/css/placeholder.css');
     $response = $dispatch->handle($request);
@@ -74,7 +74,7 @@ class DispatchTest extends TestCase
     Dispatch::bind($dispatch);
     $request = Request::create('/r/f643eb32/css/test.css');
     $response = $dispatch->handle($request);
-    $this->assertContains('url(http://assets.packaged.in/r/d41d8cd9/img/x.jpg)', $response->getContent());
+    $this->assertContains('url(http://assets.packaged.in/r/d68e763c/img/x.jpg)', $response->getContent());
     Dispatch::destroy();
   }
 
