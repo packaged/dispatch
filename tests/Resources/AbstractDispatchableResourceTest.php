@@ -26,7 +26,8 @@ class AbstractDispatchableResourceTest extends TestCase
     $this->assertContains('url(\'r/d41d8cd9/css/css.jpg\')', $content);
     $this->assertContains('url("r/d41d8cd9/css/sub/subimg.jpg")', $content);
     $this->assertContains('url(\'http://www.example.com/background.jpg\')', $content);
-    $this->assertContains('url(img/missing-file.jpg)', $content);
+    $this->assertContains('url(../img/missing-file.jpg)', $content);
+    $this->assertContains('url(../../../img/missing-file.jpg)', $content);
 
     $resource->setProcessingPath('css/do-not-modify.css');
     $resource->setContent(file_get_contents(Path::system($root, Dispatch::RESOURCES_DIR, 'css', 'do-not-modify.css')));

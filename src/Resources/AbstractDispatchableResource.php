@@ -71,40 +71,6 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
   protected function _dispatch() { }
 
   /**
-   * Dispatch a nested URL
-   *
-   * @param $uri
-   *
-   * @return string
-   * @throws \Exception
-   */
-  protected function _dispatchNestedUrl($uri)
-  {
-    $quote = $uri[1];
-    $path = $uri[2];
-
-    list($path, $append) = Strings::explode('?', $path, [$path, null], 2);
-
-    if(!$this->_manager->isExternalUrl($path))
-    {
-      $path = Path::system($this->_makeFullPath(dirname($path), dirname($this->_path)), basename($path));
-    }
-
-    $url = $this->_manager->getResourceUri($path);
-
-    if(empty($url))
-    {
-      return $quote . ($path ?? $uri[0]) . $quote;
-    }
-
-    if(!empty($append))
-    {
-      return $quote . "$url?$append" . $quote;
-    }
-    return $quote . "$url" . $quote;
-  }
-
-  /**
    * Make the relative path
    *
    * @param $relativePath
@@ -132,6 +98,33 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
       return Path::custom('/', array_merge(array_slice($workingDirectoryParts, 0, $moves), [$relativePath]));
     }
     return $workingDirectory[0] !== '.' ? Path::url($workingDirectory, $relativePath) : $relativePath;
+  }
+
+  /**
+   * @param $path
+   *
+   * @return string
+   * @throws \Exception
+   */
+  protected function _getDispatchUrl($path): string
+  {
+    list($newPath, $append) = Strings::explode('?', $path, [$path, null], 2);
+
+    if(!$this->_manager->isExternalUrl($newPath))
+    {
+      $newPath = Path::system($this->_makeFullPath(dirname($newPath), dirname($this->_path)), basename($newPath));
+    }
+
+    $url = $this->_manager->getResourceUri($newPath);
+    if(empty($url))
+    {
+      return $path;
+    }
+    if(!empty($append))
+    {
+      $url .= '?' . $append;
+    }
+    return $url;
   }
 
   /**

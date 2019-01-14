@@ -1,6 +1,8 @@
 <?php
 namespace Packaged\Dispatch\Resources;
 
+use Packaged\Helpers\Strings;
+
 class CssResource extends AbstractDispatchableResource
 {
   protected $_options = [
@@ -20,9 +22,25 @@ class CssResource extends AbstractDispatchableResource
 
   protected function _dispatch()
   {
-    $regex = '~(?<=url\()\s*(["\']?)(.*?)\1\s*(?=\))~';
     //Find all URL(.*) and dispatch their values
-    $this->_content = preg_replace_callback($regex, [$this, "_dispatchNestedUrl"], $this->_content);
+    $this->_content = preg_replace_callback(
+      '~(?<=url\()\s*(["\']?)(.*?)\1\s*(?=\))~',
+      [$this, "_dispatchUrlPaths"],
+      $this->_content
+    );
+  }
+
+  /**
+   * Dispatch a nested URL
+   *
+   * @param $uri
+   *
+   * @return string
+   * @throws \Exception
+   */
+  protected function _dispatchUrlPaths($uri)
+  {
+    return Strings::wrap($this->_getDispatchUrl($uri[2]), $uri[1], true);
   }
 
   protected function _minify()
