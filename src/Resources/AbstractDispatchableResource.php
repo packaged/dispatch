@@ -80,24 +80,22 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
    */
   protected function _makeFullPath($relativePath, $workingDirectory)
   {
-    if($relativePath == '.')
+    $isCurrentWorkingDir = $workingDirectory === '.';
+
+    // inline levelUps
+    $relativePath = preg_replace('~[^\/]+\/..\/~', '', Path::url($workingDirectory, $relativePath));
+    // root levelUps
+    $relativePath = preg_replace('~^..\/~', '', $relativePath, -1, $moves);
+    $upLimit = $isCurrentWorkingDir ? 0 : count(explode('/', $workingDirectory));
+    if($moves > $upLimit)
     {
-      return $workingDirectory;
+      return null;
     }
-    $levelUps = substr_count($relativePath, '../');
-    if($levelUps > 0)
-    {
-      $relativePath = str_replace('../', '', $relativePath);
-      $workingDirectoryParts = explode('/', $workingDirectory);
-      $moves = count($workingDirectoryParts) - $levelUps;
-      if($moves < 0)
-      {
-        //Relative to this directory is not allowed
-        return null;
-      }
-      return Path::custom('/', array_merge(array_slice($workingDirectoryParts, 0, $moves), [$relativePath]));
-    }
-    return $workingDirectory[0] !== '.' ? Path::url($workingDirectory, $relativePath) : $relativePath;
+    // currentDir
+    $relativePath = preg_replace('~(?<=\/).\/~', '', $relativePath);
+    // working dir
+    $relativePath = preg_replace('~^.\/~', $isCurrentWorkingDir ? '' : $workingDirectory . '/', $relativePath);
+    return $relativePath;
   }
 
   /**
@@ -108,12 +106,14 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
    */
   protected function _getDispatchUrl($path): string
   {
+    if($this->_manager->isExternalUrl($path))
+    {
+      return $path;
+    }
+
     list($newPath, $append) = Strings::explode('?', $path, [$path, null], 2);
 
-    if(!$this->_manager->isExternalUrl($newPath))
-    {
-      $newPath = Path::system($this->_makeFullPath(dirname($newPath), dirname($this->_path)), basename($newPath));
-    }
+    $newPath = $this->_makeFullPath($newPath, dirname($this->_path));
 
     $url = $this->_manager->getResourceUri($newPath);
     if(empty($url))
@@ -125,6 +125,15 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
       $url .= '?' . $append;
     }
     return $url;
+  }
+
+  protected function _getResolvedPath($path)
+  {
+    if(!$this->_manager->isExternalUrl($path))
+    {
+      $path = Path::system($this->_makeFullPath(dirname($path), dirname($this->_path)), basename($path));
+    }
+    return $path;
   }
 
   /**
