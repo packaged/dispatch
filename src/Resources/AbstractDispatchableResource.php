@@ -80,21 +80,25 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
    */
   protected function _makeFullPath($relativePath, $workingDirectory)
   {
-    $isCurrentWorkingDir = $workingDirectory === '.';
-
-    // inline levelUps
-    $relativePath = preg_replace('~[^\/]+\/..\/~', '', Path::url($workingDirectory, $relativePath));
-    // root levelUps
-    $relativePath = preg_replace('~^..\/~', '', $relativePath, -1, $moves);
-    $upLimit = $isCurrentWorkingDir ? 0 : count(explode('/', $workingDirectory));
-    if($moves > $upLimit)
+    // levelUps
+    $newParts = [];
+    $parts = explode('/', Path::url($workingDirectory, $relativePath));
+    while($part = array_shift($parts))
     {
-      return null;
+      if($part !== '..' && $parts && $parts[0] === '..')
+      {
+        array_shift($parts);
+      }
+      else
+      {
+        $newParts[] = $part;
+      }
     }
+    $relativePath = Path::url(...$newParts);
+
     // currentDir
-    $relativePath = preg_replace('~(?<=\/).\/~', '', $relativePath);
-    // working dir
-    $relativePath = preg_replace('~^.\/~', $isCurrentWorkingDir ? '' : $workingDirectory . '/', $relativePath);
+    $relativePath = preg_replace('~(?<=\/|^).\/~', '', $relativePath);
+
     return $relativePath;
   }
 
