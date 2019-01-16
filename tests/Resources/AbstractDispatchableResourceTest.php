@@ -46,6 +46,9 @@ class AbstractDispatchableResourceTest extends TestCase
     $resource->setFilePath($manager->getFilePath('js/url.min.js'));
     $resource->setContent(file_get_contents(Path::system($root, Dispatch::RESOURCES_DIR, 'js', 'url.min.js')));
     $content = $resource->getContent();
+    $this->assertContains('import test from \'./test\';', $content);
+    $this->assertContains('import {default as alert} from \'r/ef6402a7/js/alert.js\';', $content);
+    $this->assertContains('import misc from \'r/d023f9c3/js/misc.js\';', $content);
     $this->assertContains('"url(" + test(p) + ")"', $content);
   }
 }
