@@ -127,15 +127,6 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
     return $url;
   }
 
-  protected function _getResolvedPath($path)
-  {
-    if(!$this->_manager->isExternalUrl($path))
-    {
-      $path = Path::system($this->_makeFullPath(dirname($path), dirname($this->_path)), basename($path));
-    }
-    return $path;
-  }
-
   /**
    * Get the content for this resource
    *
