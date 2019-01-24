@@ -54,7 +54,7 @@ class ResourceManagerTest extends TestCase
       'c/6/Packaged/Dispatch/Tests/TestComponents/DemoComponent/DemoComponent/a4197ed8/style.css',
       $manager->getResourceUri('style.css')
     );
-    Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents','');
+    Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents', '');
     $manager = ResourceManager::component($component);
     $this->assertEquals(
       'c/3/_/DemoComponent/DemoComponent/a4197ed8/style.css',
@@ -105,6 +105,11 @@ class ResourceManagerTest extends TestCase
 
   public function testIsExternalUrl()
   {
+    $manager = ResourceManager::external();
+    $this->assertTrue($manager->isExternalUrl('http://www.google.com'));
+    $this->assertFalse($manager->isExternalUrl('abhttp://www.google.com'));
+
+    //Check external still work on other resource types
     $manager = ResourceManager::public();
     $this->assertTrue($manager->isExternalUrl('http://www.google.com'));
     $this->assertFalse($manager->isExternalUrl('abhttp://www.google.com'));

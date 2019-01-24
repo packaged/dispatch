@@ -13,6 +13,7 @@ class ResourceManager
   const MAP_RESOURCES = 'r';
   const MAP_PUBLIC = 'p';
   const MAP_COMPONENT = 'c';
+  const MAP_EXTERNAL = 'e';
 
   protected $_type = self::MAP_RESOURCES;
   protected $_mapOptions = [];
@@ -62,6 +63,11 @@ class ResourceManager
     return new static(self::MAP_INLINE, []);
   }
 
+  public static function external()
+  {
+    return new static(self::MAP_EXTERNAL, []);
+  }
+
   public static function component(DispatchableComponent $component)
   {
     $dispatch = Dispatch::instance();
@@ -95,7 +101,7 @@ class ResourceManager
    */
   public function getResourceUri($relativeFullPath): ?string
   {
-    if($this->isExternalUrl($relativeFullPath))
+    if($this->_type == self::MAP_EXTERNAL || $this->isExternalUrl($relativeFullPath))
     {
       return $relativeFullPath;
     }
