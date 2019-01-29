@@ -75,13 +75,15 @@ class ResourceManager
     if($dispatch)
     {
       $maxPrefix = $maxAlias = '';
+      $prefixLen = 0;
       foreach($dispatch->getComponentAliases() as $alias => $namespace)
       {
         $trimNs = ltrim($namespace, '\\');
-        $prefix = Strings::commonPrefix($class, $trimNs);
-        if(substr($prefix, 0, strlen($trimNs)) === $trimNs && strlen($prefix) > strlen($maxPrefix))
+        $len = strlen($trimNs);
+        if(Strings::startsWith($class, $trimNs) && $len > $prefixLen)
         {
-          $maxPrefix = $prefix;
+          $maxPrefix = $trimNs;
+          $prefixLen = $len;
           $maxAlias = $alias;
         }
       }
