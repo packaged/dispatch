@@ -117,6 +117,8 @@ class DispatchTest extends TestCase
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertContains('body{color:orange}', $response->getContent());
 
+    //Required for testing correct namespace validation
+    Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents\DemoComponents', 'DCRC');
     Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents\DemoComponent', 'DC');
     $manager = ResourceManager::component(new DemoComponent());
     $uri = $manager->getResourceUri('style.css');
