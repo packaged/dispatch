@@ -2,6 +2,7 @@
 namespace Packaged\Dispatch;
 
 use Packaged\Dispatch\Component\DispatchableComponent;
+use Packaged\Dispatch\Component\FixedClassComponent;
 use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
 
@@ -71,7 +72,14 @@ class ResourceManager
   public static function component(DispatchableComponent $component)
   {
     $dispatch = Dispatch::instance();
-    $class = get_class($component);
+    if($component instanceof FixedClassComponent)
+    {
+      $class = $component->getComponentClass();
+    }
+    else
+    {
+      $class = get_class($component);
+    }
     if($dispatch)
     {
       $maxPrefix = $maxAlias = '';
