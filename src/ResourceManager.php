@@ -216,7 +216,7 @@ class ResourceManager
   {
     if($this->_type == self::MAP_INLINE)
     {
-      return $this->requireInlineJs($toRequire);
+      return $this->_requireInlineJs($toRequire);
     }
     Dispatch::instance()->store()->requireJs($this->getResourceUri($toRequire), $options);
     return $this;
@@ -229,7 +229,7 @@ class ResourceManager
    *
    * @return ResourceManager
    */
-  public function requireInlineJs($javascript)
+  protected function _requireInlineJs($javascript)
   {
     Dispatch::instance()->store()->requireInlineJs($javascript);
     return $this;
@@ -248,7 +248,7 @@ class ResourceManager
   {
     if($this->_type == self::MAP_INLINE)
     {
-      return $this->requireInlineCss($toRequire);
+      return $this->_requireInlineCss($toRequire);
     }
     Dispatch::instance()->store()->requireCss($this->getResourceUri($toRequire), $options);
     return $this;
@@ -261,7 +261,7 @@ class ResourceManager
    *
    * @return ResourceManager
    */
-  public function requireInlineCss($stylesheet)
+  protected function _requireInlineCss($stylesheet)
   {
     Dispatch::instance()->store()->requireInlineCss($stylesheet);
     return $this;
