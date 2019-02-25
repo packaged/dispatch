@@ -41,29 +41,29 @@ class DispatchTest extends TestCase
     Dispatch::bind($dispatch);
 
     $request = Request::create('/placeholder.html');
-    $response = $dispatch->handle($request);
+    $response = $dispatch->handleRequest($request);
     $this->assertEquals(404, $response->getStatusCode());
 
     $request = Request::create('/r/e69b7aXX/css/test.css');
-    $response = $dispatch->handle($request);
+    $response = $dispatch->handleRequest($request);
     $this->assertEquals(404, $response->getStatusCode());
 
     $request = Request::create('/r/f643eb32/css/test.css');
-    $response = $dispatch->handle($request);
+    $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertContains('url(r/d68e763c/img/x.jpg)', $response->getContent());
 
     $request = Request::create('/p/d5dd9dc7/css/placeholder.css');
-    $response = $dispatch->handle($request);
+    $response = $dispatch->handleRequest($request);
     $this->assertContains('font-size:14px', $response->getContent());
 
     $dispatch->addAlias('abc', 'resources/css');
     $request = Request::create('/a/abc/f643eb32/test.css');
-    $response = $dispatch->handle($request);
+    $response = $dispatch->handleRequest($request);
     $this->assertContains('url("a/abc/d41d8cd9/sub/subimg.jpg")', $response->getContent());
 
     $request = Request::create('/v/packaged/dispatch/6673b7e0/css/vendor.css');
-    $response = $dispatch->handle($request);
+    $response = $dispatch->handleRequest($request);
     $this->assertContains('body{background:orange}', $response->getContent());
 
     Dispatch::destroy();
@@ -74,7 +74,7 @@ class DispatchTest extends TestCase
     $dispatch = new Dispatch(Path::system(__DIR__, '_root'), 'http://assets.packaged.in');
     Dispatch::bind($dispatch);
     $request = Request::create('/r/f643eb32/css/test.css');
-    $response = $dispatch->handle($request);
+    $response = $dispatch->handleRequest($request);
     $this->assertContains('url(http://assets.packaged.in/r/d68e763c/img/x.jpg)', $response->getContent());
     Dispatch::destroy();
   }
@@ -104,7 +104,7 @@ class DispatchTest extends TestCase
     $this->assertEquals('c/3/_/DemoComponent/DemoComponent/a4197ed8/style.css', $uri);
 
     $request = Request::create('/' . $uri);
-    $response = $dispatch->handle($request);
+    $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertContains('body{color:red}', $response->getContent());
 
@@ -114,7 +114,7 @@ class DispatchTest extends TestCase
     $this->assertCount(1, Dispatch::instance()->store()->getResources(ResourceStore::TYPE_CSS));
     $manager = ResourceManager::component($resourceComponent);
     $request = Request::create('/' . $manager->getResourceUri('style.css'));
-    $response = $dispatch->handle($request);
+    $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertContains('body{color:orange}', $response->getContent());
 
@@ -126,7 +126,7 @@ class DispatchTest extends TestCase
     $this->assertEquals('c/2/_DC/DemoComponent/a4197ed8/style.css', $uri);
 
     $request = Request::create('/c/3/_/MissingComponent/DemoComponent/a4197ed8/style.css');
-    $response = $dispatch->handle($request);
+    $response = $dispatch->handleRequest($request);
     $this->assertEquals(404, $response->getStatusCode());
     $this->assertContains('Component Not Found', $response->getContent());
 

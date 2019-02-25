@@ -103,7 +103,7 @@ class Dispatch
    * @return Response
    * @throws \Exception
    */
-  public function handle(Request $request): Response
+  public function handleRequest(Request $request): Response
   {
     $path = substr($request->getPathInfo(), strlen(Request::create($this->_baseUri)->getPathInfo()));
     $pathParts = array_filter(explode('/', $path));
