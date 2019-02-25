@@ -78,6 +78,7 @@ class ResourceManagerTest extends TestCase
     Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     ResourceManager::resources()->requireJs('js/alert.js');
     $this->assertCount(1, Dispatch::instance()->store()->getResources(ResourceStore::TYPE_JS));
+    ResourceManager::resources()->includeJs('js/alert.js');
     ResourceManager::resources()->requireJs('js/alert.js');
     $this->assertCount(1, Dispatch::instance()->store()->getResources(ResourceStore::TYPE_JS));
     ResourceManager::resources()->requireJs('js/misc.js');
@@ -87,6 +88,7 @@ class ResourceManagerTest extends TestCase
   public function testRequireCss()
   {
     Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
+    ResourceManager::resources()->includeCss('css/test.css');
     ResourceManager::resources()->requireCss('css/test.css');
     $this->assertContains(
       'href="r/f643eb32/css/test.css"',
@@ -130,8 +132,11 @@ class ResourceManagerTest extends TestCase
     Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     $component = new DemoComponent();
     $manager = ResourceManager::component($component);
+    $manager->setOption(ResourceManager::OPT_THROW_ON_FILE_NOT_FOUND, false);
     $this->assertNull($manager->getResourceUri('style.missing.css'));
     $manager->setOption(ResourceManager::OPT_THROW_ON_FILE_NOT_FOUND, true);
+    $manager->includeCss('style.missing.css');
+    $manager->includeJs('script.missing.js');
     $this->expectExceptionCode(404);
     $this->expectException(RuntimeException::class);
     $manager->getResourceUri('style.missing.css');

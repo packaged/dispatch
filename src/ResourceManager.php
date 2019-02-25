@@ -1,6 +1,7 @@
 <?php
 namespace Packaged\Dispatch;
 
+use Exception;
 use Packaged\Dispatch\Component\DispatchableComponent;
 use Packaged\Dispatch\Component\FixedClassComponent;
 use Packaged\Helpers\Path;
@@ -179,7 +180,7 @@ class ResourceManager
   {
     if(!file_exists($fullPath))
     {
-      if($this->getOption(self::OPT_THROW_ON_FILE_NOT_FOUND, false))
+      if($this->getOption(self::OPT_THROW_ON_FILE_NOT_FOUND, true))
       {
         throw new RuntimeException("Unable to find dispatch file '$fullPath'", 404);
       }
@@ -221,6 +222,26 @@ class ResourceManager
         Strings::startsWith($path, 'https://', true, 8) ||
         Strings::startsWith($path, '//', true, 2)
       );
+  }
+
+  /**
+   * Add js to the store, ignoring exceptions
+   *
+   * @param string $toRequire filename, or JS if inline manager
+   * @param        $options
+   *
+   * @return ResourceManager
+   */
+  public function includeJs($toRequire, $options = null)
+  {
+    try
+    {
+      return $this->requireJs($toRequire, $options);
+    }
+    catch(Exception $e)
+    {
+      return $this;
+    }
   }
 
   /**
@@ -272,6 +293,26 @@ class ResourceManager
     }
     Dispatch::instance()->store()->requireCss($this->getResourceUri($toRequire), $options);
     return $this;
+  }
+
+  /**
+   * Add css to the store, ignoring exceptions
+   *
+   * @param string $toRequire filename, or CSS if inline manager
+   * @param        $options
+   *
+   * @return ResourceManager
+   */
+  public function includeCss($toRequire, $options = null)
+  {
+    try
+    {
+      return $this->requireCss($toRequire, $options = null);
+    }
+    catch(Exception $e)
+    {
+      return $this;
+    }
   }
 
   /**

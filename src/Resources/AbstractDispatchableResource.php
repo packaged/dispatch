@@ -119,7 +119,14 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
 
     $newPath = $this->_makeFullPath($newPath, dirname($this->_path));
 
-    $url = $this->_manager->getResourceUri($newPath);
+    try
+    {
+      $url = $this->_manager->getResourceUri($newPath);
+    }
+    catch(\RuntimeException $e)
+    {
+      $url = null;
+    }
     if(empty($url))
     {
       return $path;
