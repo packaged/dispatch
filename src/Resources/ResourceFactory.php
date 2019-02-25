@@ -119,4 +119,15 @@ class ResourceFactory
     $response->setContent($resource->getContent());
     return $response;
   }
+
+  public static function fromFile($fullPath)
+  {
+    $resource = self::getExtensionResource(pathinfo($fullPath, PATHINFO_EXTENSION));
+    if($resource instanceof AbstractResource)
+    {
+      $resource->setFilePath($fullPath);
+      $resource->setContent(file_get_contents($fullPath));
+    }
+    return self::create($resource);
+  }
 }
