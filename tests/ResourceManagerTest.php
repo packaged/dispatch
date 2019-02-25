@@ -8,6 +8,7 @@ use Packaged\Dispatch\ResourceStore;
 use Packaged\Dispatch\Tests\TestComponents\DemoComponent\DemoComponent;
 use Packaged\Helpers\Path;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class ResourceManagerTest extends TestCase
 {
@@ -122,6 +123,18 @@ class ResourceManagerTest extends TestCase
       Path::system(__DIR__, '_root', 'public', 'placeholder.html'),
       ResourceManager::public()->getFilePath('placeholder.html')
     );
+  }
+
+  public function testMissingFile()
+  {
+    Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
+    $component = new DemoComponent();
+    $manager = ResourceManager::component($component);
+    $this->assertNull($manager->getResourceUri('style.missing.css'));
+    $manager->setOption(ResourceManager::OPT_THROW_ON_FILE_NOT_FOUND, true);
+    $this->expectExceptionCode(404);
+    $this->expectException(RuntimeException::class);
+    $manager->getResourceUri('style.missing.css');
   }
 
   public function testGetFileHash()

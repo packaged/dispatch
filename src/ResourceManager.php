@@ -5,6 +5,7 @@ use Packaged\Dispatch\Component\DispatchableComponent;
 use Packaged\Dispatch\Component\FixedClassComponent;
 use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
+use RuntimeException;
 
 class ResourceManager
 {
@@ -16,17 +17,32 @@ class ResourceManager
   const MAP_COMPONENT = 'c';
   const MAP_EXTERNAL = 'e';
 
+  const OPT_THROW_ON_FILE_NOT_FOUND = 'throw.file.not.found';
+
   protected $_type = self::MAP_RESOURCES;
   protected $_mapOptions = [];
   protected $_baseUri = [];
   /** @var DispatchableComponent */
   protected $_component;
+  protected $_options = [];
 
-  public function __construct($type, array $options = [])
+  public function __construct($type, array $mapOptions = [], array $options = [])
   {
     $this->_type = $type;
-    $this->_mapOptions = $options;
-    $this->_baseUri = array_merge([$type], $options);
+    $this->_mapOptions = $mapOptions;
+    $this->_options = $options;
+    $this->_baseUri = array_merge([$type], $mapOptions);
+  }
+
+  public function setOption($option, $value)
+  {
+    $this->_options[$option] = $value;
+    return $this;
+  }
+
+  public function getOption($option, $default = null)
+  {
+    return $this->_options[$option] ?? $default;
   }
 
   public function getMapType()
@@ -163,6 +179,10 @@ class ResourceManager
   {
     if(!file_exists($fullPath))
     {
+      if($this->getOption(self::OPT_THROW_ON_FILE_NOT_FOUND, false))
+      {
+        throw new RuntimeException("Unable to find dispatch file '$fullPath'", 404);
+      }
       return null;
     }
     $key = 'pdspfh-' . md5($fullPath) . '-' . filectime($fullPath);
