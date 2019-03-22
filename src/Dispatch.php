@@ -1,13 +1,13 @@
 <?php
 namespace Packaged\Dispatch;
 
-use Packaged\Dispatch\Component\DispatchableComponent;
+use Composer\Autoload\ClassLoader;
 use Packaged\Dispatch\Resources\AbstractDispatchableResource;
 use Packaged\Dispatch\Resources\AbstractResource;
 use Packaged\Dispatch\Resources\DispatchableResource;
 use Packaged\Dispatch\Resources\ResourceFactory;
 use Packaged\Helpers\Path;
-use ReflectionClass;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -48,12 +48,17 @@ class Dispatch
   protected $_aliases = [];
   protected $_projectRoot;
   protected $_componentAliases = [];
+  /**
+   * @var ClassLoader
+   */
+  protected $_classLoader;
 
-  public function __construct($projectRoot, $baseUri = null)
+  public function __construct($projectRoot, $baseUri = null, ClassLoader $loader = null)
   {
     $this->_projectRoot = $projectRoot;
     $this->_resourceStore = new ResourceStore();
     $this->_baseUri = $baseUri;
+    $this->_classLoader = $loader;
   }
 
   public function getResourcesPath()
@@ -124,6 +129,7 @@ class Dispatch
         $manager = ResourceManager::public();
         break;
       case ResourceManager::MAP_COMPONENT:
+
         $len = array_shift($pathParts);
         $class = '';
         for($i = 0; $i < $len; $i++)
@@ -138,18 +144,19 @@ class Dispatch
             $class .= '\\' . $part;
           }
         }
-        if(class_exists($class))
+
+        if(!empty($class))
         {
-          $reflected = new ReflectionClass($class);
-          if($reflected->implementsInterface(DispatchableComponent::class))
+          try
           {
-            $component = $reflected->newInstanceWithoutConstructor();
-            if($component instanceof DispatchableComponent)
-            {
-              $manager = ResourceManager::component($component);
-            }
+            $manager = ResourceManager::componentPath($this->componentClassResourcePath($class));
+          }
+          catch(RuntimeException $e)
+          {
+            //Class Loader not available
           }
         }
+
         if(!isset($manager))
         {
           return Response::create("Component Not Found", 404);
@@ -184,6 +191,37 @@ class Dispatch
       $resource->setContent(file_get_contents($fullPath));
     }
     return ResourceFactory::create($resource);
+  }
+
+  public function componentClassResourcePath($class)
+  {
+    $loader = $this->_getClassLoader();
+    if($loader instanceof ClassLoader)
+    {
+      $file = $loader->findFile(ltrim($class, '\\'));
+      if(!$file)
+      {
+        throw new RuntimeException("Unable to load class");
+      }
+      return Path::system(dirname(realpath($file)), '_resources');
+    }
+    throw new RuntimeException("No Class Loader Defined");
+  }
+
+  protected function _getClassLoader()
+  {
+    if($this->_classLoader === null)
+    {
+      foreach(spl_autoload_functions() as list($loader))
+      {
+        if($loader instanceof ClassLoader)
+        {
+          $this->_classLoader = $loader;
+          break;
+        }
+      }
+    }
+    return $this->_classLoader;
   }
 
   public function store()

@@ -25,6 +25,7 @@ class ResourceManager
   protected $_baseUri = [];
   /** @var DispatchableComponent */
   protected $_component;
+  protected $_componentPath;
   protected $_options = [];
 
   public function __construct($type, array $mapOptions = [], array $options = [])
@@ -86,17 +87,25 @@ class ResourceManager
     return new static(self::MAP_EXTERNAL, []);
   }
 
+  public static function componentPath($path)
+  {
+    $manager = new static(self::MAP_COMPONENT);
+    $manager->_componentPath = $path;
+    return $manager;
+  }
+
   public static function component(DispatchableComponent $component)
   {
     $dispatch = Dispatch::instance();
     if($component instanceof FixedClassComponent)
     {
-      $class = $component->getComponentClass();
+      $fullClass = $component->getComponentClass();
     }
     else
     {
-      $class = get_class($component);
+      $fullClass = get_class($component);
     }
+    $class = $fullClass;
     if($dispatch)
     {
       $maxPrefix = $maxAlias = '';
@@ -118,6 +127,7 @@ class ResourceManager
     array_unshift($parts, count($parts));
     $manager = new static(self::MAP_COMPONENT, $parts);
     $manager->_component = $component;
+    $manager->_componentPath = $dispatch->componentClassResourcePath($fullClass);
     return $manager;
   }
 
@@ -169,9 +179,9 @@ class ResourceManager
     {
       return Path::system(Dispatch::instance()->getAliasPath($this->_mapOptions[0]), $relativePath);
     }
-    else if($this->_type == self::MAP_COMPONENT && $this->_component)
+    else if($this->_type == self::MAP_COMPONENT)
     {
-      return Path::system($this->_component->getResourceDirectory(), $relativePath);
+      return Path::system($this->_componentPath, $relativePath);
     }
     throw new \Exception("invalid map type");
   }

@@ -5,7 +5,7 @@ namespace Packaged\Dispatch\Tests;
 use Packaged\Dispatch\Dispatch;
 use Packaged\Dispatch\ResourceManager;
 use Packaged\Dispatch\ResourceStore;
-use Packaged\Dispatch\Tests\TestComponents\DemoComponent\ChildComponent;
+use Packaged\Dispatch\Tests\TestComponents\DemoComponent\Child\ChildComponent;
 use Packaged\Dispatch\Tests\TestComponents\DemoComponent\DemoComponent;
 use Packaged\Dispatch\Tests\TestComponents\DemoComponent\ResourcedDemoComponent;
 use Packaged\Helpers\Path;
@@ -92,6 +92,9 @@ class DispatchTest extends TestCase
     Dispatch::destroy();
   }
 
+  /**
+   * @throws \Exception
+   */
   public function testComponent()
   {
     $dispatch = new Dispatch(Path::system(__DIR__, '_root'));
@@ -116,7 +119,7 @@ class DispatchTest extends TestCase
     $request = Request::create('/' . $manager->getResourceUri('style.css'));
     $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
-    $this->assertContains('body{color:orange}', $response->getContent());
+    $this->assertContains('body{color:red}', $response->getContent());
 
     //Required for testing correct namespace validation
     Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents\DemoComponent', 'DC');
@@ -132,6 +135,6 @@ class DispatchTest extends TestCase
 
     $manager = ResourceManager::component(new ChildComponent());
     $uri = $manager->getResourceUri('style.css');
-    $this->assertEquals('c/2/_/AbstractComponent/a4197ed8/style.css', $uri);
+    $this->assertEquals('c/2/_/AbstractComponent/b1451a76/style.css', $uri);
   }
 }

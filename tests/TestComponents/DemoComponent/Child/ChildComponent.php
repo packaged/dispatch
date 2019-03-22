@@ -1,5 +1,5 @@
 <?php
-namespace Packaged\Dispatch\Tests\TestComponents\DemoComponent;
+namespace Packaged\Dispatch\Tests\TestComponents\DemoComponent\Child;
 
 use Packaged\Dispatch\Tests\TestComponents\AbstractComponent;
 
