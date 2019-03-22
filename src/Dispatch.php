@@ -7,6 +7,7 @@ use Packaged\Dispatch\Resources\AbstractResource;
 use Packaged\Dispatch\Resources\DispatchableResource;
 use Packaged\Dispatch\Resources\ResourceFactory;
 use Packaged\Helpers\Path;
+use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -139,10 +140,14 @@ class Dispatch
         }
         if(class_exists($class))
         {
-          $component = new $class();
-          if($component instanceof DispatchableComponent)
+          $reflected = new ReflectionClass($class);
+          if($reflected->implementsInterface(DispatchableComponent::class))
           {
-            $manager = ResourceManager::component($component);
+            $component = $reflected->newInstanceWithoutConstructor();
+            if($component instanceof DispatchableComponent)
+            {
+              $manager = ResourceManager::component($component);
+            }
           }
         }
         if(!isset($manager))
