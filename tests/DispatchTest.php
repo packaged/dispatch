@@ -135,6 +135,14 @@ class DispatchTest extends TestCase
 
     $manager = ResourceManager::component(new ChildComponent());
     $uri = $manager->getResourceUri('style.css');
-    $this->assertEquals('c/2/_/AbstractComponent/b1451a76/style.css', $uri);
+    $this->assertEquals('c/2/_/AbstractComponent/66bfc1bd/style.css', $uri);
+
+    $request = Request::create('/' . $uri);
+    $response = $dispatch->handleRequest($request);
+    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertContains(
+      'body{color:blue;background:url("c/2/_/AbstractComponent/d68e763c/img/x.jpg")}',
+      $response->getContent()
+    );
   }
 }
