@@ -149,7 +149,7 @@ class Dispatch
         {
           try
           {
-            $manager = ResourceManager::componentPath($this->componentClassResourcePath($class));
+            $manager = ResourceManager::componentClass($class);
           }
           catch(RuntimeException $e)
           {

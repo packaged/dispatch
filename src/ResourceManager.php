@@ -23,8 +23,6 @@ class ResourceManager
   protected $_type = self::MAP_RESOURCES;
   protected $_mapOptions = [];
   protected $_baseUri = [];
-  /** @var DispatchableComponent */
-  protected $_component;
   protected $_componentPath;
   protected $_options = [];
 
@@ -87,25 +85,20 @@ class ResourceManager
     return new static(self::MAP_EXTERNAL, []);
   }
 
-  public static function componentPath($path)
-  {
-    $manager = new static(self::MAP_COMPONENT);
-    $manager->_componentPath = $path;
-    return $manager;
-  }
-
   public static function component(DispatchableComponent $component)
   {
-    $dispatch = Dispatch::instance();
-    if($component instanceof FixedClassComponent)
-    {
-      $fullClass = $component->getComponentClass();
-    }
-    else
-    {
-      $fullClass = get_class($component);
-    }
-    $class = $fullClass;
+    $fullClass = $component instanceof FixedClassComponent ? $component->getComponentClass() : get_class($component);
+    return static::_componentManager($fullClass, Dispatch::instance());
+  }
+
+  public static function componentClass(string $componentClassName)
+  {
+    return static::_componentManager($componentClassName, Dispatch::instance());
+  }
+
+  protected static function _componentManager($fullClass, Dispatch $dispatch = null): ResourceManager
+  {
+    $class = ltrim($fullClass, '\\');
     if($dispatch)
     {
       $maxPrefix = $maxAlias = '';
@@ -125,8 +118,8 @@ class ResourceManager
     }
     $parts = explode('\\', $class);
     array_unshift($parts, count($parts));
+
     $manager = new static(self::MAP_COMPONENT, $parts);
-    $manager->_component = $component;
     $manager->_componentPath = $dispatch->componentClassResourcePath($fullClass);
     return $manager;
   }
