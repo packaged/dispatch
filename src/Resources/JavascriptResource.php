@@ -24,7 +24,7 @@ class JavascriptResource extends AbstractDispatchableResource
   protected function _dispatch()
   {
     $this->_content = preg_replace_callback(
-      '~(import\s+.+?\s+from\s+)(["\']?)(.+?)\2(.*?)~',
+      '~(import(?:\s+.+?\s+from)?\s*)(["\']?)(.+?)\2(.*?)~',
       [$this, "_dispatchImportUrls"],
       $this->_content
     );

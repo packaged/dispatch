@@ -145,4 +145,23 @@ class DispatchTest extends TestCase
       $response->getContent()
     );
   }
+
+  public function testImport()
+  {
+    $dispatch = new Dispatch(Path::system(__DIR__, '_root'));
+    Dispatch::bind($dispatch);
+
+    Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents\AbstractComponent', '');
+    $manager = ResourceManager::component(new ChildComponent());
+    $uri = $manager->getResourceUri('import.js');
+    $this->assertEquals('c/1/_/e60f9588/import.js', $uri);
+
+    $request = Request::create($uri);
+    $response = $dispatch->handleRequest($request);
+    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertEquals(
+      'import"c/1/_/d41d8cd9/dependency.css";import"c/1/_/d41d8cd9/dependency.js";import"c/1/_/d41d8cd9/dependency.js";',
+      $response->getContent()
+    );
+  }
 }
