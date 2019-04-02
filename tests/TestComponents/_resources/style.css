@@ -1,3 +1,5 @@
+@import "dependency.css";
+
 body {
   color: blue;
   background: url("img/x.jpg");

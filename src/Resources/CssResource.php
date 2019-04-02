@@ -22,9 +22,15 @@ class CssResource extends AbstractDispatchableResource
 
   protected function _dispatch()
   {
-    //Find all URL(.*) and dispatch their values
+    // find all URL(.*) and dispatch their values
     $this->_content = preg_replace_callback(
-      '~(?<=url\()\s*(["\']?)(.*?)\1\s*(?=\))~',
+      '~(url\(\s*)(["\']?)(.*?)\2(\s*\))~',
+      [$this, "_dispatchUrlPaths"],
+      $this->_content
+    );
+    // find all @import
+    $this->_content = preg_replace_callback(
+      '~(@import\s*)(["\']?)(.*?)\2(\s*;)?~',
       [$this, "_dispatchUrlPaths"],
       $this->_content
     );
@@ -40,7 +46,7 @@ class CssResource extends AbstractDispatchableResource
    */
   protected function _dispatchUrlPaths($uri)
   {
-    return Strings::wrap($this->_getDispatchUrl($uri[2]), $uri[1], true);
+    return $uri[1] . Strings::wrap($this->_getDispatchUrl($uri[3]), $uri[2], true) . $uri[4];
   }
 
   protected function _minify()
