@@ -52,13 +52,13 @@ class ResourceManagerTest extends TestCase
       $manager->getMapOptions()
     );
     $this->assertEquals(
-      'c/6/Packaged/Dispatch/Tests/TestComponents/DemoComponent/DemoComponent/a4197ed8/style.css',
+      'c/6/Packaged/Dispatch/Tests/TestComponents/DemoComponent/DemoComponent/1a9ffb74839e/style.css',
       $manager->getResourceUri('style.css')
     );
     Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents', '');
     $manager = ResourceManager::component($component);
     $this->assertEquals(
-      'c/3/_/DemoComponent/DemoComponent/a4197ed8/style.css',
+      'c/3/_/DemoComponent/DemoComponent/1a9ffb74839e/style.css',
       $manager->getResourceUri('style.css')
     );
   }
@@ -68,7 +68,7 @@ class ResourceManagerTest extends TestCase
     Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     ResourceManager::resources()->requireJs('js/alert.js');
     $this->assertContains(
-      'src="r/ef6402a7/js/alert.js"',
+      'src="r/f417133e49d9/js/alert.js"',
       Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_JS)
     );
   }
@@ -91,7 +91,7 @@ class ResourceManagerTest extends TestCase
     ResourceManager::resources()->includeCss('css/test.css');
     ResourceManager::resources()->requireCss('css/test.css');
     $this->assertContains(
-      'href="r/f643eb32/css/test.css"',
+      'href="r/bd04a611ed6d/css/test.css"',
       Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_CSS)
     );
   }
@@ -149,7 +149,7 @@ class ResourceManagerTest extends TestCase
     for($i = 0; $i < 3; $i++)
     {
       $this->assertEquals(
-        "7c20a3fa",
+        "d91424cc",
         ResourceManager::resources()->getFileHash(Path::system(__DIR__, '_root', 'public', 'placeholder.html'))
       );
     }

@@ -55,48 +55,48 @@ class ResourceManager
     return $this->_mapOptions;
   }
 
-  public static function vendor($vendor, $package)
+  public static function vendor($vendor, $package, $options = [])
   {
-    return new static(self::MAP_VENDOR, [$vendor, $package]);
+    return new static(self::MAP_VENDOR, [$vendor, $package], $options);
   }
 
-  public static function alias($alias)
+  public static function alias($alias, $options = [])
   {
-    return new static(self::MAP_ALIAS, [$alias]);
+    return new static(self::MAP_ALIAS, [$alias], $options);
   }
 
-  public static function resources()
+  public static function resources($options = [])
   {
-    return new static(self::MAP_RESOURCES, []);
+    return new static(self::MAP_RESOURCES, [], $options);
   }
 
-  public static function public()
+  public static function public($options = [])
   {
-    return new static(self::MAP_PUBLIC, []);
+    return new static(self::MAP_PUBLIC, [], $options);
   }
 
-  public static function inline()
+  public static function inline($options = [])
   {
-    return new static(self::MAP_INLINE, []);
+    return new static(self::MAP_INLINE, [], $options);
   }
 
-  public static function external()
+  public static function external($options = [])
   {
-    return new static(self::MAP_EXTERNAL, []);
+    return new static(self::MAP_EXTERNAL, [], $options);
   }
 
-  public static function component(DispatchableComponent $component)
+  public static function component(DispatchableComponent $component, $options = [])
   {
     $fullClass = $component instanceof FixedClassComponent ? $component->getComponentClass() : get_class($component);
-    return static::_componentManager($fullClass, Dispatch::instance());
+    return static::_componentManager($fullClass, Dispatch::instance(), $options);
   }
 
-  public static function componentClass(string $componentClassName)
+  public static function componentClass(string $componentClassName, $options = [])
   {
-    return static::_componentManager($componentClassName, Dispatch::instance());
+    return static::_componentManager($componentClassName, Dispatch::instance(), $options);
   }
 
-  protected static function _componentManager($fullClass, Dispatch $dispatch = null): ResourceManager
+  protected static function _componentManager($fullClass, Dispatch $dispatch = null, $options = []): ResourceManager
   {
     $class = ltrim($fullClass, '\\');
     if($dispatch)
@@ -119,7 +119,7 @@ class ResourceManager
     $parts = explode('\\', $class);
     array_unshift($parts, count($parts));
 
-    $manager = new static(self::MAP_COMPONENT, $parts);
+    $manager = new static(self::MAP_COMPONENT, $parts, $options);
     $manager->_componentPath = $dispatch->componentClassResourcePath($fullClass);
     return $manager;
   }
@@ -136,15 +136,23 @@ class ResourceManager
     {
       return $relativeFullPath;
     }
-    $hash = $this->getFileHash($this->getFilePath($relativeFullPath));
+
+    $filePath = $this->getFilePath($relativeFullPath);
+    $relHash = $this->getRelativeHash($filePath);
+    $hash = $this->getFileHash($filePath);
     if(!$hash)
     {
       return null;
     }
     return Path::custom(
       '/',
-      array_merge([Dispatch::instance()->getBaseUri()], $this->_baseUri, [$hash, $relativeFullPath])
+      array_merge([Dispatch::instance()->getBaseUri()], $this->_baseUri, [$hash . $relHash, $relativeFullPath])
     );
+  }
+
+  public function getRelativeHash($filePath)
+  {
+    return Dispatch::instance()->generateHash($filePath, 4);
   }
 
   /**
@@ -201,8 +209,7 @@ class ResourceManager
       }
     }
 
-    $hash = substr(md5_file($fullPath), 0, 8);
-
+    $hash = Dispatch::instance()->generateHash(md5_file($fullPath), 8);
     if($hash && function_exists('apcu_store'))
     {
       apcu_store($key, $hash, 86400);
@@ -310,7 +317,7 @@ class ResourceManager
   {
     try
     {
-      return $this->requireCss($toRequire, $options = null);
+      return $this->requireCss($toRequire, $options);
     }
     catch(Exception $e)
     {

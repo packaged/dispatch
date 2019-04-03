@@ -48,21 +48,27 @@ class DispatchTest extends TestCase
     $response = $dispatch->handleRequest($request);
     $this->assertEquals(404, $response->getStatusCode());
 
-    $request = Request::create('/r/f643eb32/css/test.css');
+    $request = Request::create('/r/e69b7aabcde/css/test.css');
+    $response = $dispatch->handleRequest($request);
+    $this->assertEquals(404, $response->getStatusCode());
+
+    $request = Request::create('/r/bd04a611ed6d/css/test.css');
     $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
-    $this->assertContains('url(r/d68e763c/img/x.jpg)', $response->getContent());
+    $this->assertContains('url(r/395d1a0e1a36/img/x.jpg)', $response->getContent());
 
-    $request = Request::create('/p/d5dd9dc7/css/placeholder.css');
+    $uri = ResourceManager::public()->getResourceUri('css/placeholder.css');
+    $request = Request::create($uri);
     $response = $dispatch->handleRequest($request);
     $this->assertContains('font-size:14px', $response->getContent());
 
     $dispatch->addAlias('abc', 'resources/css');
-    $request = Request::create('/a/abc/f643eb32/test.css');
+    $request = Request::create('/a/abc/bd04a611ed6d/test.css');
     $response = $dispatch->handleRequest($request);
-    $this->assertContains('url("a/abc/d41d8cd9/sub/subimg.jpg")', $response->getContent());
+    $this->assertContains('url("a/abc/942e325be1fb/sub/subimg.jpg")', $response->getContent());
 
-    $request = Request::create('/v/packaged/dispatch/6673b7e0/css/vendor.css');
+    $uri = ResourceManager::vendor('packaged', 'dispatch')->getResourceUri('css/vendor.css');
+    $request = Request::create($uri);
     $response = $dispatch->handleRequest($request);
     $this->assertContains('body{background:orange}', $response->getContent());
 
@@ -73,9 +79,9 @@ class DispatchTest extends TestCase
   {
     $dispatch = new Dispatch(Path::system(__DIR__, '_root'), 'http://assets.packaged.in');
     Dispatch::bind($dispatch);
-    $request = Request::create('/r/f643eb32/css/test.css');
+    $request = Request::create('/r/bd04a611ed6d/css/test.css');
     $response = $dispatch->handleRequest($request);
-    $this->assertContains('url(http://assets.packaged.in/r/d68e763c/img/x.jpg)', $response->getContent());
+    $this->assertContains('url(http://assets.packaged.in/r/395d1a0e1a36/img/x.jpg)', $response->getContent());
     Dispatch::destroy();
   }
 
@@ -85,10 +91,10 @@ class DispatchTest extends TestCase
     ResourceManager::resources()->requireCss('css/test.css');
     ResourceManager::resources()->requireCss('css/do-not-modify.css');
     $response = Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_CSS);
-    $this->assertContains('href="http://assets.packaged.in/r/f643eb32/css/test.css"', $response);
+    $this->assertContains('href="http://assets.packaged.in/r/bd04a611ed6d/css/test.css"', $response);
     ResourceManager::resources()->requireJs('js/alert.js');
     $response = Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_JS);
-    $this->assertContains('src="http://assets.packaged.in/r/ef6402a7/js/alert.js"', $response);
+    $this->assertContains('src="http://assets.packaged.in/r/f417133e49d9/js/alert.js"', $response);
     Dispatch::destroy();
   }
 
@@ -104,7 +110,7 @@ class DispatchTest extends TestCase
     Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents', '');
     $manager = ResourceManager::component($component);
     $uri = $manager->getResourceUri('style.css');
-    $this->assertEquals('c/3/_/DemoComponent/DemoComponent/a4197ed8/style.css', $uri);
+    $this->assertEquals('c/3/_/DemoComponent/DemoComponent/1a9ffb74839e/style.css', $uri);
 
     $request = Request::create('/' . $uri);
     $response = $dispatch->handleRequest($request);
@@ -126,7 +132,7 @@ class DispatchTest extends TestCase
     Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents\DemoComponents', 'DCRC');
     $manager = ResourceManager::component(new DemoComponent());
     $uri = $manager->getResourceUri('style.css');
-    $this->assertEquals('c/2/_DC/DemoComponent/a4197ed8/style.css', $uri);
+    $this->assertEquals('c/2/_DC/DemoComponent/1a9ffb74839e/style.css', $uri);
 
     $request = Request::create('/c/3/_/MissingComponent/DemoComponent/a4197ed8/style.css');
     $response = $dispatch->handleRequest($request);
@@ -135,13 +141,13 @@ class DispatchTest extends TestCase
 
     $manager = ResourceManager::component(new ChildComponent());
     $uri = $manager->getResourceUri('style.css');
-    $this->assertEquals('c/2/_/AbstractComponent/d456522a/style.css', $uri);
+    $this->assertEquals('c/2/_/AbstractComponent/162fe246a4b7/style.css', $uri);
 
     $request = Request::create('/' . $uri);
     $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertEquals(
-      '@import "c/2/_/AbstractComponent/d41d8cd9/dependency.css";body{color:blue;background:url("c/2/_/AbstractComponent/d68e763c/img/x.jpg")}',
+      '@import "c/2/_/AbstractComponent/942e325bd433/dependency.css";body{color:blue;background:url("c/2/_/AbstractComponent/395d1a0eef92/img/x.jpg")}',
       $response->getContent()
     );
   }
@@ -154,14 +160,24 @@ class DispatchTest extends TestCase
     Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents\AbstractComponent', '');
     $manager = ResourceManager::component(new ChildComponent());
     $uri = $manager->getResourceUri('import.js');
-    $this->assertEquals('c/1/_/e60f9588/import.js', $uri);
+    $this->assertEquals('c/1/_/831aff3198a1/import.js', $uri);
 
     $request = Request::create($uri);
     $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertEquals(
-      'import"c/1/_/d41d8cd9/dependency.css";import"c/1/_/d41d8cd9/dependency.js";import"c/1/_/d41d8cd9/dependency.js";',
+      'import"c/1/_/942e325bd433/dependency.css";import"c/1/_/942e325b0845/dependency.js";import"c/1/_/942e325b0845/dependency.js";',
       $response->getContent()
     );
+  }
+
+  public function testHashing()
+  {
+    $dispatch = new Dispatch(Path::system(__DIR__, '_root'));
+    Dispatch::bind($dispatch);
+    $uri = ResourceManager::public()->getResourceUri('css/placeholder.css');
+    $this->assertEquals($uri, ResourceManager::public()->getResourceUri('css/placeholder.css'));
+    $dispatch->setHashSalt('abc');
+    $this->assertNotEquals($uri, ResourceManager::public()->getResourceUri('css/placeholder.css'));
   }
 }
