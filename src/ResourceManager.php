@@ -152,7 +152,7 @@ class ResourceManager
 
   public function getRelativeHash($filePath)
   {
-    return Dispatch::instance()->generateHash($filePath, 4);
+    return Dispatch::instance()->generateHash(Dispatch::instance()->calculateRelativePath($filePath), 4);
   }
 
   /**

@@ -16,7 +16,7 @@ class ResourceManagerTest extends TestCase
 
     $path = 'css/test.css';
     $hash = Dispatch::instance()->generateHash(md5_file(Path::system($root, Dispatch::RESOURCES_DIR, $path)), 8);
-    $hash .= Dispatch::instance()->generateHash(Path::system($root, Dispatch::RESOURCES_DIR, $path), 4);
+    $hash .= Dispatch::instance()->generateHash(Path::system(Dispatch::RESOURCES_DIR, $path), 4);
 
     $this->assertEquals(
       Path::url(ResourceManager::MAP_RESOURCES, $hash, $path),
@@ -40,7 +40,7 @@ class ResourceManagerTest extends TestCase
       md5_file(Path::system($root, 'vendor', 'packaged', 'dispatch', $path)),
       8
     );
-    $hash .= Dispatch::instance()->generateHash(Path::system($root, 'vendor', 'packaged', 'dispatch', $path), 4);
+    $hash .= Dispatch::instance()->generateHash(Path::system('vendor', 'packaged', 'dispatch', $path), 4);
     $this->assertEquals(
       Path::system(ResourceManager::MAP_VENDOR, 'packaged', 'dispatch', $hash, $path),
       ResourceManager::vendor('packaged', 'dispatch')->getResourceUri('README.md')

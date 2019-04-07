@@ -276,4 +276,9 @@ class Dispatch
     return $this->_resourceStore;
   }
 
+  public function calculateRelativePath($filePath)
+  {
+    return ltrim(str_replace($this->_projectRoot, '', $filePath), '/\\');
+  }
+
 }
