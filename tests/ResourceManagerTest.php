@@ -52,13 +52,13 @@ class ResourceManagerTest extends TestCase
       $manager->getMapOptions()
     );
     $this->assertEquals(
-      'c/6/Packaged/Dispatch/Tests/TestComponents/DemoComponent/DemoComponent/1a9ffb74d727/style.css',
+      'c/6/Packaged/Dispatch/Tests/TestComponents/DemoComponent/DemoComponent/1a9ffb748d31/style.css',
       $manager->getResourceUri('style.css')
     );
     Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents', '');
     $manager = ResourceManager::component($component);
     $this->assertEquals(
-      'c/3/_/DemoComponent/DemoComponent/1a9ffb74d727/style.css',
+      'c/3/_/DemoComponent/DemoComponent/1a9ffb748d31/style.css',
       $manager->getResourceUri('style.css')
     );
   }

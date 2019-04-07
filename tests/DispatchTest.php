@@ -110,7 +110,7 @@ class DispatchTest extends TestCase
     Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents', '');
     $manager = ResourceManager::component($component);
     $uri = $manager->getResourceUri('style.css');
-    $this->assertEquals('c/3/_/DemoComponent/DemoComponent/1a9ffb74d727/style.css', $uri);
+    $this->assertEquals('c/3/_/DemoComponent/DemoComponent/1a9ffb748d31/style.css', $uri);
 
     $request = Request::create('/' . $uri);
     $response = $dispatch->handleRequest($request);
@@ -132,7 +132,7 @@ class DispatchTest extends TestCase
     Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents\DemoComponents', 'DCRC');
     $manager = ResourceManager::component(new DemoComponent());
     $uri = $manager->getResourceUri('style.css');
-    $this->assertEquals('c/2/_DC/DemoComponent/1a9ffb74d727/style.css', $uri);
+    $this->assertEquals('c/2/_DC/DemoComponent/1a9ffb748d31/style.css', $uri);
 
     $request = Request::create('/c/3/_/MissingComponent/DemoComponent/a4197ed8/style.css');
     $response = $dispatch->handleRequest($request);
@@ -141,13 +141,13 @@ class DispatchTest extends TestCase
 
     $manager = ResourceManager::component(new ChildComponent());
     $uri = $manager->getResourceUri('style.css');
-    $this->assertEquals('c/2/_/AbstractComponent/162fe246c915/style.css', $uri);
+    $this->assertEquals('c/2/_/AbstractComponent/162fe246c68b/style.css', $uri);
 
     $request = Request::create('/' . $uri);
     $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertEquals(
-      '@import "c/2/_/AbstractComponent/942e325bd878/dependency.css";body{color:blue;background:url("c/2/_/AbstractComponent/395d1a0ed182/img/x.jpg")}',
+      '@import "c/2/_/AbstractComponent/942e325b3dcc/dependency.css";body{color:blue;background:url("c/2/_/AbstractComponent/395d1a0e845f/img/x.jpg")}',
       $response->getContent()
     );
   }
@@ -160,13 +160,13 @@ class DispatchTest extends TestCase
     Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents\AbstractComponent', '');
     $manager = ResourceManager::component(new ChildComponent());
     $uri = $manager->getResourceUri('import.js');
-    $this->assertEquals('c/1/_/831aff314520/import.js', $uri);
+    $this->assertEquals('c/1/_/831aff315092/import.js', $uri);
 
     $request = Request::create($uri);
     $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertEquals(
-      'import"c/1/_/942e325bd878/dependency.css";import"c/1/_/942e325b1922/dependency.js";import"c/1/_/942e325b1922/dependency.js";',
+      'import"c/1/_/942e325b3dcc/dependency.css";import"c/1/_/942e325b4521/dependency.js";import"c/1/_/942e325b4521/dependency.js";',
       $response->getContent()
     );
   }
