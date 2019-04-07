@@ -164,4 +164,18 @@ class ResourceManagerTest extends TestCase
       Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_CSS)
     );
   }
+
+  public function testRelativeHash()
+  {
+    Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
+    $pathHash = Dispatch::instance()->generateHash('resources/css/test.css', 4);
+    $manager = ResourceManager::resources();
+    $resourceHash = $manager->getRelativeHash($manager->getFilePath('css/test.css'));
+    $this->assertEquals($pathHash, $resourceHash);
+
+    $pathHash = Dispatch::instance()->generateHash('public/favicon.ico', 4);
+    $manager = ResourceManager::public();
+    $resourceHash = $manager->getRelativeHash($manager->getFilePath('favicon.ico'));
+    $this->assertEquals($pathHash, $resourceHash);
+  }
 }
