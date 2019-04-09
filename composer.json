@@ -28,6 +28,7 @@
   },
   "autoload-dev": {
     "psr-4": {
+      "Packaged\\Dispatch\\Tests\\TestComponents\\": "tests/_root/src/TestComponents",
       "Packaged\\Dispatch\\Tests\\": "tests"
     }
   }

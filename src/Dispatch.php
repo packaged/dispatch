@@ -24,6 +24,7 @@ class Dispatch
   protected $_resourceStore;
 
   protected $_baseUri;
+  protected $_requireFileHash = false;
 
   const RESOURCES_DIR = 'resources';
   const VENDOR_DIR = 'vendor';
@@ -52,6 +53,7 @@ class Dispatch
    * @var ClassLoader
    */
   protected $_classLoader;
+  protected $_hashSalt = 'dispatch';
 
   public function __construct($projectRoot, $baseUri = null, ClassLoader $loader = null)
   {
@@ -59,6 +61,37 @@ class Dispatch
     $this->_resourceStore = new ResourceStore();
     $this->_baseUri = $baseUri;
     $this->_classLoader = $loader;
+  }
+
+  /**
+   * Add salt to dispatch hashes, for additional resource security
+   *
+   * @param string $hashSalt
+   *
+   * @return $this
+   */
+  public function setHashSalt(string $hashSalt)
+  {
+    $this->_hashSalt = $hashSalt;
+    return $this;
+  }
+
+  /**
+   * Generate a hash against specific content, for a desired length
+   *
+   * @param      $content
+   * @param null $length
+   *
+   * @return string
+   */
+  public function generateHash($content, $length = null)
+  {
+    $hash = md5($content . $this->_hashSalt);
+    if($length !== null)
+    {
+      return substr($hash, 0, $length);
+    }
+    return $hash;
   }
 
   public function getResourcesPath()
@@ -171,7 +204,21 @@ class Dispatch
 
     $requestPath = Path::custom('/', $pathParts);
     $fullPath = $manager->getFilePath($requestPath);
-    if($compareHash !== $manager->getFileHash($fullPath))
+
+    [$fileHash, $relativeHash] = str_split($compareHash . ' ', 8);
+    $relativeHash = trim($relativeHash);
+    $failedHash = true;
+    if(!$this->_requireFileHash && $relativeHash && $relativeHash === $manager->getRelativeHash($fullPath))
+    {
+      $failedHash = false;
+    }
+
+    if((!$relativeHash || $failedHash) && $fileHash === $manager->getFileHash($fullPath))
+    {
+      $failedHash = false;
+    }
+
+    if($failedHash)
     {
       return Response::create("File Not Found", 404);
     }
@@ -227,6 +274,11 @@ class Dispatch
   public function store()
   {
     return $this->_resourceStore;
+  }
+
+  public function calculateRelativePath($filePath)
+  {
+    return ltrim(str_replace($this->_projectRoot, '', $filePath), '/\\');
   }
 
 }

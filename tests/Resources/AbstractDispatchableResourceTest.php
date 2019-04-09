@@ -22,9 +22,9 @@ class AbstractDispatchableResourceTest extends TestCase
     $resource->setProcessingPath('css/test.css');
     $resource->setContent(file_get_contents(Path::system($root, Dispatch::RESOURCES_DIR, 'css', 'test.css')));
     $content = $resource->getContent();
-    $this->assertContains('url(r/d68e763c/img/x.jpg)', $content);
-    $this->assertContains('url(\'r/d41d8cd9/css/css.jpg\')', $content);
-    $this->assertContains('url("r/d41d8cd9/css/sub/subimg.jpg")', $content);
+    $this->assertContains('url(r/395d1a0e8999/img/x.jpg)', $content);
+    $this->assertContains('url(\'r/942e325b86c0/css/css.jpg\')', $content);
+    $this->assertContains('url("r/942e325be95f/css/sub/subimg.jpg")', $content);
     $this->assertContains('url(\'http://www.example.com/background.jpg\')', $content);
     $this->assertContains('url(../img/missing-file.jpg)', $content);
     $this->assertContains('url(../../../img/missing-file.jpg)', $content);
@@ -47,8 +47,8 @@ class AbstractDispatchableResourceTest extends TestCase
     $resource->setContent(file_get_contents(Path::system($root, Dispatch::RESOURCES_DIR, 'js', 'url.min.js')));
     $content = $resource->getContent();
     $this->assertContains('import test from \'./test\';', $content);
-    $this->assertContains('import {default as alert} from \'r/ef6402a7/js/alert.js\';', $content);
-    $this->assertContains('import misc from \'r/d023f9c3/js/misc.js\';', $content);
+    $this->assertContains('import {default as alert} from \'r/f417133ec50f/js/alert.js\';', $content);
+    $this->assertContains('import misc from \'r/b6ccf604ae88/js/misc.js\';', $content);
     $this->assertContains('"url(" + test(p) + ")"', $content);
   }
 }
