@@ -107,10 +107,10 @@ class ResourceFactory
     $response->setEtag($resource->getHash());
     $response->setPublic();
 
-    //This resource should last for 30 days in cache
-    $response->setMaxAge(2592000);
-    $response->setSharedMaxAge(2592000);
-    $response->setExpires((new \DateTime())->add(new \DateInterval('P30D')));
+    //This resource should last for 1 year in cache
+    $response->setMaxAge(31536000);
+    $response->setSharedMaxAge(31536000);
+    $response->setExpires((new \DateTime())->add(new \DateInterval('P365D')));
 
     //Set the last modified date to now
     $date = new \DateTime();
