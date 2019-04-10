@@ -246,13 +246,15 @@ class ResourceManager
    * @param string $toRequire filename, or JS if inline manager
    * @param        $options
    *
+   * @param int    $priority
+   *
    * @return ResourceManager
    */
-  public function includeJs($toRequire, $options = null)
+  public function includeJs($toRequire, $options = null, int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
     try
     {
-      return $this->requireJs($toRequire, $options);
+      return $this->requireJs($toRequire, $options, $priority);
     }
     catch(Exception $e)
     {
@@ -266,29 +268,33 @@ class ResourceManager
    * @param string $toRequire filename, or JS if inline manager
    * @param        $options
    *
+   * @param int    $priority
+   *
    * @return ResourceManager
-   * @throws \Exception
+   * @throws Exception
    */
-  public function requireJs($toRequire, $options = null)
+  public function requireJs($toRequire, $options = null, int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
     if($this->_type == self::MAP_INLINE)
     {
       return $this->_requireInlineJs($toRequire);
     }
-    Dispatch::instance()->store()->requireJs($this->getResourceUri($toRequire), $options);
+    Dispatch::instance()->store()->requireJs($this->getResourceUri($toRequire), $options, $priority);
     return $this;
   }
 
   /**
    * Add a js script to the store
    *
-   * @param $javascript
+   * @param     $javascript
+   *
+   * @param int $priority
    *
    * @return ResourceManager
    */
-  protected function _requireInlineJs($javascript)
+  protected function _requireInlineJs($javascript, int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
-    Dispatch::instance()->store()->requireInlineJs($javascript);
+    Dispatch::instance()->store()->requireInlineJs($javascript, $priority);
     return $this;
   }
 
@@ -298,16 +304,18 @@ class ResourceManager
    * @param string $toRequire filename, or CSS if inline manager
    * @param        $options
    *
+   * @param int    $priority
+   *
    * @return ResourceManager
-   * @throws \Exception
+   * @throws Exception
    */
-  public function requireCss($toRequire, $options = null)
+  public function requireCss($toRequire, $options = null, int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
     if($this->_type == self::MAP_INLINE)
     {
       return $this->_requireInlineCss($toRequire);
     }
-    Dispatch::instance()->store()->requireCss($this->getResourceUri($toRequire), $options);
+    Dispatch::instance()->store()->requireCss($this->getResourceUri($toRequire), $options, $priority);
     return $this;
   }
 
@@ -317,13 +325,15 @@ class ResourceManager
    * @param string $toRequire filename, or CSS if inline manager
    * @param        $options
    *
+   * @param int    $priority
+   *
    * @return ResourceManager
    */
-  public function includeCss($toRequire, $options = null)
+  public function includeCss($toRequire, $options = null, int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
     try
     {
-      return $this->requireCss($toRequire, $options);
+      return $this->requireCss($toRequire, $options, $priority);
     }
     catch(Exception $e)
     {
@@ -334,13 +344,15 @@ class ResourceManager
   /**
    * Add css to the store
    *
-   * @param $stylesheet
+   * @param     $stylesheet
+   *
+   * @param int $priority
    *
    * @return ResourceManager
    */
-  protected function _requireInlineCss($stylesheet)
+  protected function _requireInlineCss($stylesheet, int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
-    Dispatch::instance()->store()->requireInlineCss($stylesheet);
+    Dispatch::instance()->store()->requireInlineCss($stylesheet, $priority);
     return $this;
   }
 }

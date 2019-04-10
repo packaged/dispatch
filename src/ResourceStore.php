@@ -108,7 +108,7 @@ class ResourceStore
    * @param     $options
    * @param int $priority
    */
-  protected function _addToStore($type, $uri, $options = null, int $priority = self::PRIORITY_DEFAULT)
+  public function addResource(string $type, string $uri, $options = null, int $priority = self::PRIORITY_DEFAULT)
   {
     if(!empty($uri))
     {
@@ -154,7 +154,7 @@ class ResourceStore
     $filenames = (array)$filename;
     foreach($filenames as $filename)
     {
-      $this->_addToStore(self::TYPE_JS, $filename, $options, $priority);
+      $this->addResource(self::TYPE_JS, $filename, $options, $priority);
     }
   }
 
@@ -166,7 +166,7 @@ class ResourceStore
    */
   public function requireInlineJs($javascript, int $priority = self::PRIORITY_DEFAULT)
   {
-    $this->_addToStore(self::TYPE_JS, md5($javascript), $javascript, $priority);
+    $this->addResource(self::TYPE_JS, md5($javascript), $javascript, $priority);
   }
 
   /**
@@ -181,7 +181,7 @@ class ResourceStore
     $filenames = (array)$filename;
     foreach($filenames as $filename)
     {
-      $this->_addToStore(self::TYPE_CSS, $filename, $options, $priority);
+      $this->addResource(self::TYPE_CSS, $filename, $options, $priority);
     }
   }
 
@@ -193,6 +193,6 @@ class ResourceStore
    */
   public function requireInlineCss($stylesheet, int $priority = self::PRIORITY_DEFAULT)
   {
-    $this->_addToStore(self::TYPE_CSS, md5($stylesheet), $stylesheet, $priority);
+    $this->addResource(self::TYPE_CSS, md5($stylesheet), $stylesheet, $priority);
   }
 }
