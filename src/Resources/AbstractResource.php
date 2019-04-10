@@ -1,7 +1,7 @@
 <?php
 namespace Packaged\Dispatch\Resources;
 
-abstract class AbstractResource implements Resource
+abstract class AbstractResource implements DispatchResource
 {
   protected $_content;
   protected $_options;
@@ -23,7 +23,7 @@ abstract class AbstractResource implements Resource
    *
    * @param $content
    *
-   * @return Resource
+   * @return AbstractResource
    */
   public function setContent($content)
   {

@@ -32,7 +32,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
    *
    * @param $content
    *
-   * @return Resource
+   * @return DispatchResource
    */
   public function setContent($content)
   {

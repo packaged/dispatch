@@ -80,11 +80,11 @@ class Dispatch
    * Generate a hash against specific content, for a desired length
    *
    * @param      $content
-   * @param null $length
+   * @param int  $length
    *
    * @return string
    */
-  public function generateHash($content, $length = null)
+  public function generateHash($content, int $length = null)
   {
     $hash = md5($content . $this->_hashSalt);
     if($length !== null)

@@ -1,7 +1,7 @@
 <?php
 namespace Packaged\Dispatch\Resources;
 
-interface Resource
+interface DispatchResource
 {
   public function getExtension();
 

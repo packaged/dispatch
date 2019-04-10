@@ -3,7 +3,7 @@ namespace Packaged\Dispatch\Resources;
 
 use Packaged\Dispatch\ResourceManager;
 
-interface DispatchableResource extends Resource
+interface DispatchableResource extends DispatchResource
 {
   /**
    * Set the asset manager to process sub dispatchables through

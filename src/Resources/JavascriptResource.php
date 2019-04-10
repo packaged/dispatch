@@ -65,6 +65,7 @@ class JavascriptResource extends AbstractDispatchableResource
     }
     catch(\Exception $e)
     {
+      //If minification doesnt work, return the original content
     }
   }
 }

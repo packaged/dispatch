@@ -2,7 +2,7 @@
 namespace Packaged\Dispatch\Tests\Resources;
 
 use Packaged\Dispatch\Resources\AbstractResource;
-use Packaged\Dispatch\Resources\Resource;
+use Packaged\Dispatch\Resources\DispatchResource;
 use Packaged\Dispatch\Resources\ResourceFactory;
 use Packaged\Dispatch\Resources\UnknownResource;
 use PHPUnit\Framework\TestCase;
@@ -13,9 +13,9 @@ class GenericResourceTest extends TestCase
    * @dataProvider resourceProvider
    *
    * @param          $ext
-   * @param Resource $class
+   * @param DispatchResource $class
    */
-  public function testResource($ext, Resource $class)
+  public function testResource($ext, DispatchResource $class)
   {
     $extType = [
       "ico"   => "image/x-icon",

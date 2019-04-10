@@ -73,9 +73,9 @@ class ResourceFactory
   /**
    * @param $extension
    *
-   * @return Resource
+   * @return DispatchResource
    */
-  public static function getExtensionResource($extension): Resource
+  public static function getExtensionResource($extension): DispatchResource
   {
     $extension = strtolower($extension);
     if(isset(self::$_resourceMap[$extension]))
@@ -86,12 +86,12 @@ class ResourceFactory
   }
 
   /**
-   * @param Resource $resource
+   * @param DispatchResource $resource
    *
    * @return Response
    * @throws \Exception
    */
-  public static function create(Resource $resource)
+  public static function create(DispatchResource $resource)
   {
     $response = new Response();
 
