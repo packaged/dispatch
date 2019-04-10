@@ -7,6 +7,10 @@ class ResourceStore
 {
   const TYPE_CSS = 'css';
   const TYPE_JS = 'js';
+  const TYPE_PRE_CSS = 'pre.css';
+  const TYPE_PRE_JS = 'pre.js';
+  const TYPE_POST_CSS = 'post.css';
+  const TYPE_POST_JS = 'post.js';
 
   protected $_store = [];
 
