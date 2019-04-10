@@ -12,11 +12,36 @@ class ResourceStore
   const TYPE_POST_CSS = 'post.css';
   const TYPE_POST_JS = 'post.js';
 
+  const PRIORITY_HIGH = 10;
+  const PRIORITY_DEFAULT = 500;
+  const PRIORITY_LOW = 1000;
+
+  // [type][priority][uri] = options
   protected $_store = [];
 
-  public function getResources($type = null)
+  public function getResources($type = null, int $priority = null)
   {
-    return $this->_store[$type] ?? [];
+    if(isset($this->_store[$type][$priority]))
+    {
+      return $this->_store[$type][$priority];
+    }
+
+    if($priority === null && isset($this->_store[$type]))
+    {
+      $return = [];
+      //Sort based on store priority
+      ksort($this->_store[$type]);
+      foreach($this->_store[$type] as $resources)
+      {
+        foreach($resources as $uri => $options)
+        {
+          $return[$uri] = $options;
+        }
+      }
+      return $return;
+    }
+
+    return [];
   }
 
   public function generateHtmlIncludes($for = self::TYPE_CSS)
@@ -37,7 +62,7 @@ class ResourceStore
     }
     $return = '';
 
-    foreach($this->_store[$for] as $uri => $options)
+    foreach($this->getResources($for) as $uri => $options)
     {
       if(strlen($uri) == 32 && !stristr($uri, '/'))
       {
@@ -78,19 +103,24 @@ class ResourceStore
   /**
    * Add a resource to the store, along with its type
    *
-   * @param $type
-   * @param $uri
-   * @param $options
+   * @param     $type
+   * @param     $uri
+   * @param     $options
+   * @param int $priority
    */
-  protected function _addToStore($type, $uri, $options = null)
+  protected function _addToStore($type, $uri, $options = null, int $priority = self::PRIORITY_DEFAULT)
   {
     if(!empty($uri))
     {
       if(!isset($this->_store[$type]))
       {
-        $this->_store[$type] = [];
+        $this->_store[$type] = [$priority => []];
       }
-      $this->_store[$type][$uri] = $options;
+      else if(!isset($this->_store[$type][$priority]))
+      {
+        $this->_store[$type][$priority] = [];
+      }
+      $this->_store[$type][$priority][$uri] = $options;
     }
   }
 
@@ -115,50 +145,54 @@ class ResourceStore
   /**
    * Add a js file to the store
    *
-   * @param $filename
-   * @param $options
+   * @param     $filename
+   * @param     $options
+   * @param int $priority
    */
-  public function requireJs($filename, $options = null)
+  public function requireJs($filename, $options = null, int $priority = self::PRIORITY_DEFAULT)
   {
     $filenames = (array)$filename;
     foreach($filenames as $filename)
     {
-      static::_addToStore(self::TYPE_JS, $filename, $options);
+      static::_addToStore(self::TYPE_JS, $filename, $options, $priority);
     }
   }
 
   /**
    * Add a js script to the store
    *
-   * @param $javascript
+   * @param     $javascript
+   * @param int $priority
    */
-  public function requireInlineJs($javascript)
+  public function requireInlineJs($javascript, int $priority = self::PRIORITY_DEFAULT)
   {
-    static::_addToStore(self::TYPE_JS, md5($javascript), $javascript);
+    static::_addToStore(self::TYPE_JS, md5($javascript), $javascript, $priority);
   }
 
   /**
    * Add a css file to the store
    *
-   * @param $filename
-   * @param $options
+   * @param     $filename
+   * @param     $options
+   * @param int $priority
    */
-  public function requireCss($filename, $options = null)
+  public function requireCss($filename, $options = null, int $priority = self::PRIORITY_DEFAULT)
   {
     $filenames = (array)$filename;
     foreach($filenames as $filename)
     {
-      static::_addToStore(self::TYPE_CSS, $filename, $options);
+      static::_addToStore(self::TYPE_CSS, $filename, $options, $priority);
     }
   }
 
   /**
    * Add css to the store
    *
-   * @param $stylesheet
+   * @param     $stylesheet
+   * @param int $priority
    */
-  public function requireInlineCss($stylesheet)
+  public function requireInlineCss($stylesheet, int $priority = self::PRIORITY_DEFAULT)
   {
-    static::_addToStore(self::TYPE_CSS, md5($stylesheet), $stylesheet);
+    static::_addToStore(self::TYPE_CSS, md5($stylesheet), $stylesheet, $priority);
   }
 }
