@@ -128,9 +128,9 @@ class ResourceStore
    * Clear the entire resource store with a type of null, or all items stored
    * by a type if supplied
    *
-   * @param null $type
+   * @param string $type Store Type e.g. ResourceStore::TYPE_CSS
    */
-  public function clearStore($type = null)
+  public function clearStore(string $type = null)
   {
     if($type === null)
     {

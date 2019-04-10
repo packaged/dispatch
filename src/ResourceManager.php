@@ -99,23 +99,29 @@ class ResourceManager
   protected static function _componentManager($fullClass, Dispatch $dispatch = null, $options = []): ResourceManager
   {
     $class = ltrim($fullClass, '\\');
-    if($dispatch)
+    if(!$dispatch)
     {
-      $maxPrefix = $maxAlias = '';
-      $prefixLen = 0;
-      foreach($dispatch->getComponentAliases() as $alias => $namespace)
+      $dispatch = Dispatch::instance();
+      if($dispatch === null)
       {
-        $trimNs = ltrim($namespace, '\\');
-        $len = strlen($trimNs);
-        if(Strings::startsWith($class, $trimNs) && $len > $prefixLen)
-        {
-          $maxPrefix = $trimNs;
-          $prefixLen = $len;
-          $maxAlias = $alias;
-        }
+        throw new RuntimeException("Dispatch must be available to use the component manager");
       }
-      $class = str_replace($maxPrefix, $maxAlias, $class);
     }
+
+    $maxPrefix = $maxAlias = '';
+    $prefixLen = 0;
+    foreach($dispatch->getComponentAliases() as $alias => $namespace)
+    {
+      $trimNs = ltrim($namespace, '\\');
+      $len = strlen($trimNs);
+      if(Strings::startsWith($class, $trimNs) && $len > $prefixLen)
+      {
+        $maxPrefix = $trimNs;
+        $prefixLen = $len;
+        $maxAlias = $alias;
+      }
+    }
+    $class = str_replace($maxPrefix, $maxAlias, $class);
     $parts = explode('\\', $class);
     array_unshift($parts, count($parts));
 
@@ -153,7 +159,7 @@ class ResourceManager
   public function getRelativeHash($filePath)
   {
     return Dispatch::instance()->generateHash(Dispatch::instance()->calculateRelativePath($filePath), 4);
-}
+  }
 
   /**
    * @param $relativePath

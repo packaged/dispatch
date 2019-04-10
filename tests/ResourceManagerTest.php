@@ -61,6 +61,9 @@ class ResourceManagerTest extends TestCase
       'c/3/_/DemoComponent/DemoComponent/1a9ffb748d31/style.css',
       $manager->getResourceUri('style.css')
     );
+    Dispatch::destroy();
+    $this->expectException(RuntimeException::class);
+    ResourceManager::component($component);
   }
 
   public function testRequireJs()
