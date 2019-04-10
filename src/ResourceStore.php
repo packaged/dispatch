@@ -154,7 +154,7 @@ class ResourceStore
     $filenames = (array)$filename;
     foreach($filenames as $filename)
     {
-      static::_addToStore(self::TYPE_JS, $filename, $options, $priority);
+      $this->_addToStore(self::TYPE_JS, $filename, $options, $priority);
     }
   }
 
@@ -166,7 +166,7 @@ class ResourceStore
    */
   public function requireInlineJs($javascript, int $priority = self::PRIORITY_DEFAULT)
   {
-    static::_addToStore(self::TYPE_JS, md5($javascript), $javascript, $priority);
+    $this->_addToStore(self::TYPE_JS, md5($javascript), $javascript, $priority);
   }
 
   /**
@@ -181,7 +181,7 @@ class ResourceStore
     $filenames = (array)$filename;
     foreach($filenames as $filename)
     {
-      static::_addToStore(self::TYPE_CSS, $filename, $options, $priority);
+      $this->_addToStore(self::TYPE_CSS, $filename, $options, $priority);
     }
   }
 
@@ -193,6 +193,6 @@ class ResourceStore
    */
   public function requireInlineCss($stylesheet, int $priority = self::PRIORITY_DEFAULT)
   {
-    static::_addToStore(self::TYPE_CSS, md5($stylesheet), $stylesheet, $priority);
+    $this->_addToStore(self::TYPE_CSS, md5($stylesheet), $stylesheet, $priority);
   }
 }
