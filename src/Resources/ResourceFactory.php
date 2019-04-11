@@ -122,7 +122,7 @@ class ResourceFactory
 
   public static function fromFile($fullPath)
   {
-    if(file_exists($fullPath))
+    if(!file_exists($fullPath))
     {
       return Response::create('File Not Found', 404);
     }
