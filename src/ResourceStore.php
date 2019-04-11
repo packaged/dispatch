@@ -19,7 +19,7 @@ class ResourceStore
   // [type][priority][uri] = options
   protected $_store = [];
 
-  public function getResources($type = null, int $priority = null)
+  public function getResources($type, int $priority = null)
   {
     if(isset($this->_store[$type][$priority]))
     {
