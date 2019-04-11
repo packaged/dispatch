@@ -6,6 +6,7 @@ use Packaged\Dispatch\Component\DispatchableComponent;
 use Packaged\Dispatch\Component\FixedClassComponent;
 use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
+use ReflectionClass;
 use RuntimeException;
 
 class ResourceManager
@@ -25,6 +26,15 @@ class ResourceManager
   protected $_baseUri = [];
   protected $_componentPath;
   protected $_options = [];
+
+  /**
+   * @var Dispatch|null Dispatch in use for components to calculate paths
+   */
+  private $_dispatch;
+  /**
+   * @var DispatchableComponent
+   */
+  private $_component;
 
   public function __construct($type, array $mapOptions = [], array $options = [])
   {
@@ -88,7 +98,9 @@ class ResourceManager
   public static function component(DispatchableComponent $component, $options = [])
   {
     $fullClass = $component instanceof FixedClassComponent ? $component->getComponentClass() : get_class($component);
-    return static::_componentManager($fullClass, Dispatch::instance(), $options);
+    $manager = static::_componentManager($fullClass, Dispatch::instance(), $options);
+    $manager->_component = $component;
+    return $manager;
   }
 
   public static function componentClass(string $componentClassName, $options = [])
@@ -127,16 +139,19 @@ class ResourceManager
 
     $manager = new static(self::MAP_COMPONENT, $parts, $options);
     $manager->_componentPath = $dispatch->componentClassResourcePath($fullClass);
+    $manager->_dispatch = $dispatch;
     return $manager;
   }
 
   /**
-   * @param $relativeFullPath
+   * @param      $relativeFullPath
+   *
+   * @param bool $allowComponentBubble If the resource does not exist in a component, attempt to load from its parent
    *
    * @return string|null
-   * @throws \Exception
+   * @throws Exception
    */
-  public function getResourceUri($relativeFullPath): ?string
+  public function getResourceUri($relativeFullPath, bool $allowComponentBubble = true): ?string
   {
     if($this->_type == self::MAP_EXTERNAL || $this->isExternalUrl($relativeFullPath))
     {
@@ -144,6 +159,20 @@ class ResourceManager
     }
 
     $filePath = $this->getFilePath($relativeFullPath);
+    //Do not allow bubbling if the component is a fixed class component
+    if($allowComponentBubble && $this->_component && $this->_component instanceof FixedClassComponent)
+    {
+      $allowComponentBubble = false;
+    }
+    if($allowComponentBubble && $this->_type == self::MAP_COMPONENT && $this->_component && !file_exists($filePath))
+    {
+      $parent = (new ReflectionClass($this->_component))->getParentClass();
+      if($parent && !$parent->isAbstract() && $parent->implementsInterface(DispatchableComponent::class))
+      {
+        return self::componentClass($parent->getName(), $this->_options)
+          ->getResourceUri($relativeFullPath, $allowComponentBubble);
+      }
+    }
     $relHash = $this->getRelativeHash($filePath);
     $hash = $this->getFileHash($filePath);
     if(!$hash)
@@ -162,10 +191,10 @@ class ResourceManager
   }
 
   /**
-   * @param $relativePath
+   * @param      $relativePath
    *
    * @return string
-   * @throws \Exception
+   * @throws Exception
    */
   public function getFilePath($relativePath)
   {
@@ -279,7 +308,7 @@ class ResourceManager
     {
       return $this->_requireInlineJs($toRequire);
     }
-    Dispatch::instance()->store()->requireJs($this->getResourceUri($toRequire), $options, $priority);
+    Dispatch::instance()->store()->requireJs($this->getResourceUri($toRequire, false), $options, $priority);
     return $this;
   }
 
@@ -315,7 +344,7 @@ class ResourceManager
     {
       return $this->_requireInlineCss($toRequire);
     }
-    Dispatch::instance()->store()->requireCss($this->getResourceUri($toRequire), $options, $priority);
+    Dispatch::instance()->store()->requireCss($this->getResourceUri($toRequire, false), $options, $priority);
     return $this;
   }
 
