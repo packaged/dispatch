@@ -122,6 +122,11 @@ class ResourceFactory
 
   public static function fromFile($fullPath)
   {
+    if(file_exists($fullPath))
+    {
+      return Response::create('File Not Found', 404);
+    }
+
     $resource = self::getExtensionResource(pathinfo($fullPath, PATHINFO_EXTENSION));
     if($resource instanceof AbstractResource)
     {
