@@ -90,6 +90,12 @@ class ComponentTest extends TestCase
 
     $response = $dispatch->handleRequest(Request::create('/' . $childComponent->getParentFile()));
     $this->assertStringStartsWith("Parent Only", $response->getContent());
+
+    $response = $dispatch->handleRequest(Request::create('/' . $demoComponent->getOverrideFile()));
+    $this->assertStringStartsWith("Parent Override", $response->getContent());
+
+    $response = $dispatch->handleRequest(Request::create('/' . $childComponent->getOverrideFile()));
+    $this->assertStringStartsWith("Parent Override", $response->getContent());
   }
 
   public function testFixedResourceExtensionException()

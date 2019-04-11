@@ -16,8 +16,8 @@ class DemoComponent extends UiComponent
     return ResourceManager::component($this)->getResourceUri('parent.txt', $allowBubbling);
   }
 
-  public function getChildFile($allowBubbling = true)
+  public function getOverrideFile($allowBubbling = true)
   {
-    return ResourceManager::component($this)->getResourceUri('child.txt', $allowBubbling);
+    return ResourceManager::componentClass(self::class)->getResourceUri('override.txt', $allowBubbling);
   }
 }
