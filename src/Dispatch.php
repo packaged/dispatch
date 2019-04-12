@@ -2,6 +2,7 @@
 namespace Packaged\Dispatch;
 
 use Composer\Autoload\ClassLoader;
+use Packaged\Config\Provider\ConfigProvider;
 use Packaged\Dispatch\Resources\AbstractDispatchableResource;
 use Packaged\Dispatch\Resources\AbstractResource;
 use Packaged\Dispatch\Resources\DispatchableResource;
@@ -13,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Dispatch
 {
+
   /**
    * @var Dispatch
    */
@@ -25,6 +27,10 @@ class Dispatch
 
   protected $_baseUri;
   protected $_requireFileHash = false;
+  /**
+   * @var ConfigProvider
+   */
+  protected $_config;
 
   const RESOURCES_DIR = 'resources';
   const VENDOR_DIR = 'vendor';
@@ -58,6 +64,7 @@ class Dispatch
   public function __construct($projectRoot, $baseUri = null, ClassLoader $loader = null)
   {
     $this->_projectRoot = $projectRoot;
+    $this->_config = new ConfigProvider();
     $this->_resourceStore = new ResourceStore();
     $this->_baseUri = $baseUri;
     $this->_classLoader = $loader;
@@ -223,7 +230,8 @@ class Dispatch
       return Response::create("File Not Found", 404);
     }
 
-    $resource = ResourceFactory::getExtensionResource(pathinfo($fullPath, PATHINFO_EXTENSION));
+    $ext = pathinfo($fullPath, PATHINFO_EXTENSION);
+    $resource = ResourceFactory::getExtensionResource($ext);
     if($resource instanceof DispatchableResource)
     {
       $resource->setManager($manager);
@@ -236,6 +244,11 @@ class Dispatch
     {
       $resource->setFilePath($fullPath);
       $resource->setContent(file_get_contents($fullPath));
+
+      if($this->config()->has('ext.' . $ext))
+      {
+        $resource->setOptions($this->config()->getSection('ext.' . $ext)->getItems());
+      }
     }
     return ResourceFactory::create($resource);
   }
@@ -274,6 +287,11 @@ class Dispatch
   public function store()
   {
     return $this->_resourceStore;
+  }
+
+  public function config()
+  {
+    return $this->_config;
   }
 
   public function calculateRelativePath($filePath)

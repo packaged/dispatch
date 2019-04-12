@@ -12,6 +12,7 @@
     "php": ">=7.1",
     "packaged/helpers": "^1.0||^2.0",
     "packaged/http": "~1.1",
+    "packaged/config": "~1.4",
     "tedivm/jshrink": "~1.3"
   },
   "suggest": {

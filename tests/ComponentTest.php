@@ -65,7 +65,7 @@ class ComponentTest extends TestCase
     $request = Request::create('/' . $uri);
     $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
-    $this->assertEquals(
+    $this->assertStringStartsWith(
       '@import "c/2/_/AbstractComponent/942e325b3dcc/dependency.css";body{color:blue;background:url("c/2/_/AbstractComponent/395d1a0e845f/img/x.jpg")}',
       $response->getContent()
     );

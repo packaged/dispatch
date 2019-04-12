@@ -22,14 +22,14 @@ class CssResourceTest extends TestCase
     $resource = new CssResource();
 
     $resource->setContent($original);
-    $this->assertEquals('body{background:red}', $resource->getContent());
+    $this->assertStringStartsWith('body{background:red}', $resource->getContent());
 
     $resource->setContent($nominify);
-    $this->assertEquals($nominify, $resource->getContent());
+    $this->assertStringStartsWith($nominify, $resource->getContent());
 
     $resource->setContent($original);
     $resource->setOptions(['minify' => 'false']);
-    $this->assertEquals($original, $resource->getContent());
+    $this->assertStringStartsWith($original, $resource->getContent());
   }
 
   public function testResource()
