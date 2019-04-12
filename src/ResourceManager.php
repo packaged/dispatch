@@ -240,7 +240,9 @@ class ResourceManager
       $hash = apcu_fetch($key, $exists);
       if($exists && $hash)
       {
+        // @codeCoverageIgnoreStart
         return $hash;
+        // @codeCoverageIgnoreEnd
       }
     }
 

@@ -265,7 +265,9 @@ class Dispatch
       }
       return Path::system(dirname(realpath($file)), '_resources');
     }
+    // @codeCoverageIgnoreStart
     throw new RuntimeException("No Class Loader Defined");
+    // @codeCoverageIgnoreEnd
   }
 
   protected function _getClassLoader()

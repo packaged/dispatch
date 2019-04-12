@@ -51,4 +51,11 @@ class ResourceFactoryTest extends TestCase
     $this->assertEquals($full, $fromFile);
     $this->assertEquals('"40ed4027e1e5f15c19a2fb287bcc3724"', $fromFile->getEtag());
   }
+
+  public function testMissingFile()
+  {
+    $fromFile = ResourceFactory::fromFile('invalidfile');
+    $this->assertInstanceOf(Response::class, $fromFile);
+    $this->assertEquals(404, $fromFile->getStatusCode());
+  }
 }
