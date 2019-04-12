@@ -6,9 +6,8 @@ use Packaged\Helpers\Strings;
 class CssResource extends AbstractDispatchableResource
 {
   protected $_options = [
-    'minify'    => true,
-    'dispatch'  => true,
-    'sourcemap' => false,
+    'minify'   => true,
+    'dispatch' => true,
   ];
 
   public function getExtension()
@@ -64,21 +63,6 @@ class CssResource extends AbstractDispatchableResource
     // Replace #rrggbb with #rgb when possible.
     $this->_content = preg_replace('@#([a-f0-9])\1([a-f0-9])\2([a-f0-9])\3@i', '#\1\2\3', $this->_content);
     $this->_content = trim($this->_content);
-  }
-
-  protected function _processContent()
-  {
-    parent::_processContent();
-    if($this->getOption('sourcemap', false))
-    {
-      $map = $this->_filePath . '.map';
-      if(file_exists($map))
-      {
-        $this->_content .= '/*# //@ sourceMappingURL=data:application/json;charset=utf-8;base64,'
-          . base64_encode(file_get_contents($map))
-          . ' /*';
-      }
-    }
   }
 
 }

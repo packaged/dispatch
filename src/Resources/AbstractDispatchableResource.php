@@ -64,6 +64,17 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
     {
       $this->_minify();
     }
+
+    if($this->getOption('sourcemap', false))
+    {
+      $map = $this->_filePath . '.map';
+      if(file_exists($map))
+      {
+        $this->_content .= '/*# sourceMappingURL=data:application/json;charset=utf8;base64,'
+          . base64_encode(file_get_contents($map))
+          . '*/';
+      }
+    }
   }
 
   protected function _minify() { }
