@@ -126,7 +126,7 @@ class ResourceManager
     {
       $trimNs = ltrim($namespace, '\\');
       $len = strlen($trimNs);
-      if(Strings::startsWith($class, $trimNs) && $len > $prefixLen)
+      if(Strings::startsWith($class, $trimNs, true, $len) && $len > $prefixLen)
       {
         $maxPrefix = $trimNs;
         $prefixLen = $len;
