@@ -103,12 +103,12 @@ class Dispatch
 
   public function getResourcesPath()
   {
-    return Path::system($this->_projectRoot, self::RESOURCES_DIR);
+    return $this->_projectRoot . DIRECTORY_SEPARATOR . self::RESOURCES_DIR;
   }
 
   public function getPublicPath()
   {
-    return Path::system($this->_projectRoot, self::PUBLIC_DIR);
+    return $this->_projectRoot . DIRECTORY_SEPARATOR . self::PUBLIC_DIR;
   }
 
   public function getVendorPath($vendor, $package)
@@ -263,7 +263,7 @@ class Dispatch
       {
         throw new RuntimeException("Unable to load class");
       }
-      return Path::system(dirname(realpath($file)), '_resources');
+      return dirname(realpath($file)) . DIRECTORY_SEPARATOR . '_resources';
     }
     // @codeCoverageIgnoreStart
     throw new RuntimeException("No Class Loader Defined");
