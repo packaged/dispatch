@@ -135,7 +135,7 @@ class ResourceManager
     }
     $class = str_replace($maxPrefix, $maxAlias, $class);
     $parts = explode('\\', $class);
-    array_unshift($parts, count($parts));
+    array_unshift($parts, (string)count($parts));
 
     $manager = new static(self::MAP_COMPONENT, $parts, $options);
     $manager->_componentPath = $dispatch->componentClassResourcePath($fullClass);
