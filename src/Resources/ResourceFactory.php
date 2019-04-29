@@ -23,6 +23,14 @@ use Packaged\Dispatch\Resources\Video\MpegResource;
 use Packaged\Dispatch\Resources\Video\QuicktimeResource;
 use Packaged\Dispatch\Resources\Video\WebmResource;
 use Symfony\Component\HttpFoundation\Response;
+use function array_keys;
+use function file_exists;
+use function file_get_contents;
+use function get_class;
+use function is_object;
+use function pathinfo;
+use function strtolower;
+use const PATHINFO_EXTENSION;
 
 class ResourceFactory
 {
@@ -68,6 +76,22 @@ class ResourceFactory
       $classname = get_class($classname);
     }
     self::$_resourceMap[$ext] = $classname;
+  }
+
+  public static function fromFile($fullPath)
+  {
+    if(!file_exists($fullPath))
+    {
+      return Response::create('File Not Found', 404);
+    }
+
+    $resource = self::getExtensionResource(pathinfo($fullPath, PATHINFO_EXTENSION));
+    if($resource instanceof AbstractResource)
+    {
+      $resource->setFilePath($fullPath);
+      $resource->setContent(file_get_contents($fullPath));
+    }
+    return self::create($resource);
   }
 
   /**
@@ -118,21 +142,5 @@ class ResourceFactory
     $response->headers->set('Last-Modified', $date->format('D, d M Y H:i:s') . ' GMT');
     $response->setContent($resource->getContent());
     return $response;
-  }
-
-  public static function fromFile($fullPath)
-  {
-    if(!file_exists($fullPath))
-    {
-      return Response::create('File Not Found', 404);
-    }
-
-    $resource = self::getExtensionResource(pathinfo($fullPath, PATHINFO_EXTENSION));
-    if($resource instanceof AbstractResource)
-    {
-      $resource->setFilePath($fullPath);
-      $resource->setContent(file_get_contents($fullPath));
-    }
-    return self::create($resource);
   }
 }

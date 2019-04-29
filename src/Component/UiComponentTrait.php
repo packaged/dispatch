@@ -9,11 +9,16 @@ trait UiComponentTrait
 
   protected function _initDispatchableComponent(DispatchableComponent $component)
   {
-    if(!isset(self::$_initComponents[static::class]))
+    if(!isset(self::$_initComponents[$this->_getComponentClassName()]))
     {
       $this->_requireResources(ResourceManager::component($component));
-      self::$_initComponents[static::class] = true;
+      self::$_initComponents[$this->_getComponentClassName()] = true;
     }
+  }
+
+  protected function _getComponentClassName()
+  {
+    return static::class;
   }
 
   protected function _requireResources(ResourceManager $manager)

@@ -11,47 +11,44 @@ use Packaged\Helpers\Path;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use function array_filter;
+use function array_shift;
+use function dirname;
+use function explode;
+use function file_get_contents;
+use function ltrim;
+use function md5;
+use function pathinfo;
+use function realpath;
+use function spl_autoload_functions;
+use function str_replace;
+use function str_split;
+use function strlen;
+use function substr;
+use function trim;
+use const DIRECTORY_SEPARATOR;
+use const PATHINFO_EXTENSION;
 
 class Dispatch
 {
 
+  const RESOURCES_DIR = 'resources';
+  const VENDOR_DIR = 'vendor';
+  const PUBLIC_DIR = 'public';
   /**
    * @var Dispatch
    */
   private static $_instance;
-
   /**
    * @var ResourceStore
    */
   protected $_resourceStore;
-
   protected $_baseUri;
   protected $_requireFileHash = false;
   /**
    * @var ConfigProvider
    */
   protected $_config;
-
-  const RESOURCES_DIR = 'resources';
-  const VENDOR_DIR = 'vendor';
-  const PUBLIC_DIR = 'public';
-
-  public static function bind(Dispatch $instance)
-  {
-    self::$_instance = $instance;
-    return $instance;
-  }
-
-  public static function instance()
-  {
-    return self::$_instance;
-  }
-
-  public static function destroy()
-  {
-    self::$_instance = null;
-  }
-
   protected $_aliases = [];
   protected $_projectRoot;
   protected $_componentAliases = [];
@@ -68,6 +65,22 @@ class Dispatch
     $this->_resourceStore = new ResourceStore();
     $this->_baseUri = $baseUri;
     $this->_classLoader = $loader;
+  }
+
+  public static function bind(Dispatch $instance)
+  {
+    self::$_instance = $instance;
+    return $instance;
+  }
+
+  public static function instance()
+  {
+    return self::$_instance;
+  }
+
+  public static function destroy()
+  {
+    self::$_instance = null;
   }
 
   /**
@@ -253,6 +266,11 @@ class Dispatch
     return ResourceFactory::create($resource);
   }
 
+  public function config()
+  {
+    return $this->_config;
+  }
+
   public function componentClassResourcePath($class)
   {
     $loader = $this->_getClassLoader();
@@ -289,11 +307,6 @@ class Dispatch
   public function store()
   {
     return $this->_resourceStore;
-  }
-
-  public function config()
-  {
-    return $this->_config;
   }
 
   public function calculateRelativePath($filePath)

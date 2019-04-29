@@ -5,6 +5,15 @@ use Packaged\Dispatch\ResourceManager;
 use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
 use Packaged\Helpers\ValueAs;
+use function array_shift;
+use function base64_encode;
+use function basename;
+use function dirname;
+use function explode;
+use function file_exists;
+use function file_get_contents;
+use function preg_replace;
+use function strpos;
 
 abstract class AbstractDispatchableResource extends AbstractResource implements DispatchableResource
 {
@@ -38,6 +47,22 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
   {
     $this->_processedContent = false;
     return parent::setContent($content);
+  }
+
+  /**
+   * Get the content for this resource
+   *
+   * @return mixed
+   */
+  public function getContent()
+  {
+    if(!$this->_processedContent)
+    {
+      $this->_processContent();
+      //Stop the process from running for every fetch of the content
+      $this->_processedContent = true;
+    }
+    return parent::getContent();
   }
 
   /**
@@ -77,41 +102,9 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
     }
   }
 
-  protected function _minify() { }
-
   protected function _dispatch() { }
 
-  /**
-   * Make the relative path
-   *
-   * @param $relativePath
-   * @param $workingDirectory
-   *
-   * @return string
-   */
-  protected function _makeFullPath($relativePath, $workingDirectory)
-  {
-    // levelUps
-    $newParts = [];
-    $parts = explode('/', Path::url($workingDirectory, $relativePath));
-    while($part = array_shift($parts))
-    {
-      if($part !== '..' && $parts && $parts[0] === '..')
-      {
-        array_shift($parts);
-      }
-      else
-      {
-        $newParts[] = $part;
-      }
-    }
-    $relativePath = Path::url(...$newParts);
-
-    // currentDir
-    $relativePath = preg_replace('~(?<=\/|^).\/~', '', $relativePath);
-
-    return $relativePath;
-  }
+  protected function _minify() { }
 
   /**
    * @param $path
@@ -150,18 +143,34 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
   }
 
   /**
-   * Get the content for this resource
+   * Make the relative path
    *
-   * @return mixed
+   * @param $relativePath
+   * @param $workingDirectory
+   *
+   * @return string
    */
-  public function getContent()
+  protected function _makeFullPath($relativePath, $workingDirectory)
   {
-    if(!$this->_processedContent)
+    // levelUps
+    $newParts = [];
+    $parts = explode('/', Path::url($workingDirectory, $relativePath));
+    while($part = array_shift($parts))
     {
-      $this->_processContent();
-      //Stop the process from running for every fetch of the content
-      $this->_processedContent = true;
+      if($part !== '..' && $parts && $parts[0] === '..')
+      {
+        array_shift($parts);
+      }
+      else
+      {
+        $newParts[] = $part;
+      }
     }
-    return parent::getContent();
+    $relativePath = Path::url(...$newParts);
+
+    // currentDir
+    $relativePath = preg_replace('~(?<=\/|^).\/~', '', $relativePath);
+
+    return $relativePath;
   }
 }

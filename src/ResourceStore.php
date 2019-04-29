@@ -2,6 +2,12 @@
 namespace Packaged\Dispatch;
 
 use Packaged\Helpers\ValueAs;
+use function is_array;
+use function ksort;
+use function md5;
+use function sprintf;
+use function stristr;
+use function strlen;
 
 class ResourceStore
 {
@@ -18,31 +24,6 @@ class ResourceStore
 
   // [type][priority][uri] = options
   protected $_store = [];
-
-  public function getResources($type, int $priority = null)
-  {
-    if(isset($this->_store[$type][$priority]))
-    {
-      return $this->_store[$type][$priority];
-    }
-
-    if($priority === null && isset($this->_store[$type]))
-    {
-      $return = [];
-      //Sort based on store priority
-      ksort($this->_store[$type]);
-      foreach($this->_store[$type] as $resources)
-      {
-        foreach($resources as $uri => $options)
-        {
-          $return[$uri] = $options;
-        }
-      }
-      return $return;
-    }
-
-    return [];
-  }
 
   public function generateHtmlIncludes($for = self::TYPE_CSS)
   {
@@ -100,28 +81,29 @@ class ResourceStore
     return $return;
   }
 
-  /**
-   * Add a resource to the store, along with its type
-   *
-   * @param     $type
-   * @param     $uri
-   * @param     $options
-   * @param int $priority
-   */
-  public function addResource(string $type, string $uri, $options = null, int $priority = self::PRIORITY_DEFAULT)
+  public function getResources($type, int $priority = null)
   {
-    if(!empty($uri))
+    if(isset($this->_store[$type][$priority]))
     {
-      if(!isset($this->_store[$type]))
-      {
-        $this->_store[$type] = [$priority => []];
-      }
-      else if(!isset($this->_store[$type][$priority]))
-      {
-        $this->_store[$type][$priority] = [];
-      }
-      $this->_store[$type][$priority][$uri] = $options;
+      return $this->_store[$type][$priority];
     }
+
+    if($priority === null && isset($this->_store[$type]))
+    {
+      $return = [];
+      //Sort based on store priority
+      ksort($this->_store[$type]);
+      foreach($this->_store[$type] as $resources)
+      {
+        foreach($resources as $uri => $options)
+        {
+          $return[$uri] = $options;
+        }
+      }
+      return $return;
+    }
+
+    return [];
   }
 
   /**
@@ -155,6 +137,30 @@ class ResourceStore
     foreach($filenames as $filename)
     {
       $this->addResource(self::TYPE_JS, $filename, $options, $priority);
+    }
+  }
+
+  /**
+   * Add a resource to the store, along with its type
+   *
+   * @param     $type
+   * @param     $uri
+   * @param     $options
+   * @param int $priority
+   */
+  public function addResource(string $type, string $uri, $options = null, int $priority = self::PRIORITY_DEFAULT)
+  {
+    if(!empty($uri))
+    {
+      if(!isset($this->_store[$type]))
+      {
+        $this->_store[$type] = [$priority => []];
+      }
+      else if(!isset($this->_store[$type][$priority]))
+      {
+        $this->_store[$type][$priority] = [];
+      }
+      $this->_store[$type][$priority][$uri] = $options;
     }
   }
 

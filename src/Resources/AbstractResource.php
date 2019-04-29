@@ -1,6 +1,10 @@
 <?php
 namespace Packaged\Dispatch\Resources;
 
+use function array_merge;
+use function file_get_contents;
+use function md5;
+
 abstract class AbstractResource implements DispatchResource
 {
   protected $_content;
@@ -8,27 +12,12 @@ abstract class AbstractResource implements DispatchResource
   protected $_hash;
   protected $_filePath;
 
-  /**
-   * Get the content for this resource
-   *
-   * @return mixed
-   */
-  public function getContent()
+  public static function fromFilePath($filePath)
   {
-    return $this->_content;
-  }
-
-  /**
-   * Set the resource content
-   *
-   * @param $content
-   *
-   * @return AbstractResource
-   */
-  public function setContent($content)
-  {
-    $this->_content = $content;
-    return $this;
+    $resource = new static();
+    $resource->setFilePath($filePath);
+    $resource->setContent(file_get_contents($filePath));
+    return $resource;
   }
 
   /**
@@ -55,17 +44,6 @@ abstract class AbstractResource implements DispatchResource
   }
 
   /**
-   * Remove all options from the resource
-   *
-   * @return $this
-   */
-  public function clearOptions()
-  {
-    $this->_options = [];
-    return $this;
-  }
-
-  /**
    * Append an options array onto the default options
    *
    * @param array $options
@@ -75,6 +53,17 @@ abstract class AbstractResource implements DispatchResource
   public function setOptions(array $options)
   {
     $this->_options = array_merge($this->_options, $options);
+    return $this;
+  }
+
+  /**
+   * Remove all options from the resource
+   *
+   * @return $this
+   */
+  public function clearOptions()
+  {
+    $this->_options = [];
     return $this;
   }
 
@@ -105,6 +94,11 @@ abstract class AbstractResource implements DispatchResource
     return isset($this->_options[$key]) ? $this->_options[$key] : $default;
   }
 
+  public function getHash()
+  {
+    return $this->_hash ?: md5($this->getContent());
+  }
+
   /**
    * @param mixed $hash
    *
@@ -116,17 +110,27 @@ abstract class AbstractResource implements DispatchResource
     return $this;
   }
 
-  public function getHash()
+  /**
+   * Get the content for this resource
+   *
+   * @return mixed
+   */
+  public function getContent()
   {
-    return $this->_hash ?: md5($this->getContent());
+    return $this->_content;
   }
 
-  public static function fromFilePath($filePath)
+  /**
+   * Set the resource content
+   *
+   * @param $content
+   *
+   * @return AbstractResource
+   */
+  public function setContent($content)
   {
-    $resource = new static();
-    $resource->setFilePath($filePath);
-    $resource->setContent(file_get_contents($filePath));
-    return $resource;
+    $this->_content = $content;
+    return $this;
   }
 
 }

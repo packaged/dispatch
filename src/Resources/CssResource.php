@@ -2,6 +2,9 @@
 namespace Packaged\Dispatch\Resources;
 
 use Packaged\Helpers\Strings;
+use function preg_replace;
+use function preg_replace_callback;
+use function trim;
 
 class CssResource extends AbstractDispatchableResource
 {

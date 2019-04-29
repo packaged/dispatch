@@ -3,6 +3,10 @@ namespace Packaged\Dispatch\Resources;
 
 use JShrink\Minifier;
 use Packaged\Helpers\Strings;
+use function file_exists;
+use function pathinfo;
+use function preg_replace_callback;
+use const PATHINFO_EXTENSION;
 
 class JavascriptResource extends AbstractDispatchableResource
 {

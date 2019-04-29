@@ -8,6 +8,21 @@ use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
 use ReflectionClass;
 use RuntimeException;
+use function apcu_fetch;
+use function apcu_store;
+use function array_merge;
+use function array_unshift;
+use function count;
+use function explode;
+use function file_exists;
+use function filectime;
+use function function_exists;
+use function get_class;
+use function ltrim;
+use function md5;
+use function md5_file;
+use function str_replace;
+use function strlen;
 
 class ResourceManager
 {
@@ -42,27 +57,6 @@ class ResourceManager
     $this->_mapOptions = $mapOptions;
     $this->_options = $options;
     $this->_baseUri = array_merge([$type], $mapOptions);
-  }
-
-  public function setOption($option, $value)
-  {
-    $this->_options[$option] = $value;
-    return $this;
-  }
-
-  public function getOption($option, $default = null)
-  {
-    return $this->_options[$option] ?? $default;
-  }
-
-  public function getMapType()
-  {
-    return $this->_type;
-  }
-
-  public function getMapOptions()
-  {
-    return $this->_mapOptions;
   }
 
   public static function vendor($vendor, $package, $options = [])
@@ -103,11 +97,6 @@ class ResourceManager
     return $manager;
   }
 
-  public static function componentClass(string $componentClassName, $options = [])
-  {
-    return static::_componentManager($componentClassName, Dispatch::instance(), $options);
-  }
-
   protected static function _componentManager($fullClass, Dispatch $dispatch = null, $options = []): ResourceManager
   {
     $class = ltrim($fullClass, '\\');
@@ -143,132 +132,20 @@ class ResourceManager
     return $manager;
   }
 
-  /**
-   * @param      $relativeFullPath
-   *
-   * @param bool $allowComponentBubble If the resource does not exist in a component, attempt to load from its parent
-   *
-   * @return string|null
-   * @throws Exception
-   */
-  public function getResourceUri($relativeFullPath, bool $allowComponentBubble = true): ?string
+  public function setOption($option, $value)
   {
-    if($this->_type == self::MAP_EXTERNAL || $this->isExternalUrl($relativeFullPath))
-    {
-      return $relativeFullPath;
-    }
-
-    $filePath = $this->getFilePath($relativeFullPath);
-    //Do not allow bubbling if the component is a fixed class component
-    if($allowComponentBubble && $this->_component && $this->_component instanceof FixedClassComponent)
-    {
-      $allowComponentBubble = false;
-    }
-    if($allowComponentBubble && $this->_type == self::MAP_COMPONENT && $this->_component && !file_exists($filePath))
-    {
-      $parent = (new ReflectionClass($this->_component))->getParentClass();
-      if($parent && !$parent->isAbstract() && $parent->implementsInterface(DispatchableComponent::class))
-      {
-        return self::componentClass($parent->getName(), $this->_options)
-          ->getResourceUri($relativeFullPath, $allowComponentBubble);
-      }
-    }
-    $relHash = $this->getRelativeHash($filePath);
-    $hash = $this->getFileHash($filePath);
-    if(!$hash)
-    {
-      return null;
-    }
-    return Path::custom(
-      '/',
-      array_merge([Dispatch::instance()->getBaseUri()], $this->_baseUri, [$hash . $relHash, $relativeFullPath])
-    );
+    $this->_options[$option] = $value;
+    return $this;
   }
 
-  public function getRelativeHash($filePath)
+  public function getMapType()
   {
-    return Dispatch::instance()->generateHash(Dispatch::instance()->calculateRelativePath($filePath), 4);
+    return $this->_type;
   }
 
-  /**
-   * @param      $relativePath
-   *
-   * @return string
-   * @throws Exception
-   */
-  public function getFilePath($relativePath)
+  public function getMapOptions()
   {
-    if($this->_type == self::MAP_RESOURCES)
-    {
-      return Path::system(Dispatch::instance()->getResourcesPath(), $relativePath);
-    }
-    else if($this->_type == self::MAP_PUBLIC)
-    {
-      return Path::system(Dispatch::instance()->getPublicPath(), $relativePath);
-    }
-    else if($this->_type == self::MAP_VENDOR)
-    {
-      [$vendor, $package] = $this->_mapOptions;
-      return Path::system(Dispatch::instance()->getVendorPath($vendor, $package), $relativePath);
-    }
-    else if($this->_type == self::MAP_ALIAS)
-    {
-      return Path::system(Dispatch::instance()->getAliasPath($this->_mapOptions[0]), $relativePath);
-    }
-    else if($this->_type == self::MAP_COMPONENT)
-    {
-      return Path::system($this->_componentPath, $relativePath);
-    }
-    throw new \Exception("invalid map type");
-  }
-
-  public function getFileHash($fullPath)
-  {
-    if(!file_exists($fullPath))
-    {
-      if($this->getOption(self::OPT_THROW_ON_FILE_NOT_FOUND, true))
-      {
-        throw new RuntimeException("Unable to find dispatch file '$fullPath'", 404);
-      }
-      return null;
-    }
-    $key = 'pdspfh-' . md5($fullPath) . '-' . filectime($fullPath);
-
-    if(function_exists("apcu_fetch"))
-    {
-      $exists = null;
-      $hash = apcu_fetch($key, $exists);
-      if($exists && $hash)
-      {
-        // @codeCoverageIgnoreStart
-        return $hash;
-        // @codeCoverageIgnoreEnd
-      }
-    }
-
-    $hash = Dispatch::instance()->generateHash(md5_file($fullPath), 8);
-    if($hash && function_exists('apcu_store'))
-    {
-      apcu_store($key, $hash, 86400);
-    }
-
-    return $hash;
-  }
-
-  /**
-   * Detect if URL has a protocol
-   *
-   * @param string $path
-   *
-   * @return bool
-   */
-  public function isExternalUrl($path)
-  {
-    return strlen($path) > 8 && (
-        Strings::startsWith($path, 'http://', true, 7) ||
-        Strings::startsWith($path, 'https://', true, 8) ||
-        Strings::startsWith($path, '//', true, 2)
-      );
+    return $this->_mapOptions;
   }
 
   /**
@@ -330,24 +207,141 @@ class ResourceManager
   }
 
   /**
-   * Add css to the store
+   * @param      $relativeFullPath
    *
-   * @param string $toRequire filename, or CSS if inline manager
-   * @param        $options
+   * @param bool $allowComponentBubble If the resource does not exist in a component, attempt to load from its parent
    *
-   * @param int    $priority
-   *
-   * @return ResourceManager
+   * @return string|null
    * @throws Exception
    */
-  public function requireCss($toRequire, $options = null, int $priority = ResourceStore::PRIORITY_DEFAULT)
+  public function getResourceUri($relativeFullPath, bool $allowComponentBubble = true): ?string
   {
-    if($this->_type == self::MAP_INLINE)
+    if($this->_type == self::MAP_EXTERNAL || $this->isExternalUrl($relativeFullPath))
     {
-      return $this->_requireInlineCss($toRequire);
+      return $relativeFullPath;
     }
-    Dispatch::instance()->store()->requireCss($this->getResourceUri($toRequire, false), $options, $priority);
-    return $this;
+
+    $filePath = $this->getFilePath($relativeFullPath);
+    //Do not allow bubbling if the component is a fixed class component
+    if($allowComponentBubble && $this->_component && $this->_component instanceof FixedClassComponent)
+    {
+      $allowComponentBubble = false;
+    }
+    if($allowComponentBubble && $this->_type == self::MAP_COMPONENT && $this->_component && !file_exists($filePath))
+    {
+      $parent = (new ReflectionClass($this->_component))->getParentClass();
+      if($parent && !$parent->isAbstract() && $parent->implementsInterface(DispatchableComponent::class))
+      {
+        return self::componentClass($parent->getName(), $this->_options)
+          ->getResourceUri($relativeFullPath, $allowComponentBubble);
+      }
+    }
+    $relHash = $this->getRelativeHash($filePath);
+    $hash = $this->getFileHash($filePath);
+    if(!$hash)
+    {
+      return null;
+    }
+    return Path::custom(
+      '/',
+      array_merge([Dispatch::instance()->getBaseUri()], $this->_baseUri, [$hash . $relHash, $relativeFullPath])
+    );
+  }
+
+  /**
+   * Detect if URL has a protocol
+   *
+   * @param string $path
+   *
+   * @return bool
+   */
+  public function isExternalUrl($path)
+  {
+    return strlen($path) > 8 && (
+        Strings::startsWith($path, 'http://', true, 7) ||
+        Strings::startsWith($path, 'https://', true, 8) ||
+        Strings::startsWith($path, '//', true, 2)
+      );
+  }
+
+  /**
+   * @param      $relativePath
+   *
+   * @return string
+   * @throws Exception
+   */
+  public function getFilePath($relativePath)
+  {
+    if($this->_type == self::MAP_RESOURCES)
+    {
+      return Path::system(Dispatch::instance()->getResourcesPath(), $relativePath);
+    }
+    else if($this->_type == self::MAP_PUBLIC)
+    {
+      return Path::system(Dispatch::instance()->getPublicPath(), $relativePath);
+    }
+    else if($this->_type == self::MAP_VENDOR)
+    {
+      [$vendor, $package] = $this->_mapOptions;
+      return Path::system(Dispatch::instance()->getVendorPath($vendor, $package), $relativePath);
+    }
+    else if($this->_type == self::MAP_ALIAS)
+    {
+      return Path::system(Dispatch::instance()->getAliasPath($this->_mapOptions[0]), $relativePath);
+    }
+    else if($this->_type == self::MAP_COMPONENT)
+    {
+      return Path::system($this->_componentPath, $relativePath);
+    }
+    throw new \Exception("invalid map type");
+  }
+
+  public static function componentClass(string $componentClassName, $options = [])
+  {
+    return static::_componentManager($componentClassName, Dispatch::instance(), $options);
+  }
+
+  public function getRelativeHash($filePath)
+  {
+    return Dispatch::instance()->generateHash(Dispatch::instance()->calculateRelativePath($filePath), 4);
+  }
+
+  public function getFileHash($fullPath)
+  {
+    if(!file_exists($fullPath))
+    {
+      if($this->getOption(self::OPT_THROW_ON_FILE_NOT_FOUND, true))
+      {
+        throw new RuntimeException("Unable to find dispatch file '$fullPath'", 404);
+      }
+      return null;
+    }
+    $key = 'pdspfh-' . md5($fullPath) . '-' . filectime($fullPath);
+
+    if(function_exists("apcu_fetch"))
+    {
+      $exists = null;
+      $hash = apcu_fetch($key, $exists);
+      if($exists && $hash)
+      {
+        // @codeCoverageIgnoreStart
+        return $hash;
+        // @codeCoverageIgnoreEnd
+      }
+    }
+
+    $hash = Dispatch::instance()->generateHash(md5_file($fullPath), 8);
+    if($hash && function_exists('apcu_store'))
+    {
+      apcu_store($key, $hash, 86400);
+    }
+
+    return $hash;
+  }
+
+  public function getOption($option, $default = null)
+  {
+    return $this->_options[$option] ?? $default;
   }
 
   /**
@@ -370,6 +364,27 @@ class ResourceManager
     {
       return $this;
     }
+  }
+
+  /**
+   * Add css to the store
+   *
+   * @param string $toRequire filename, or CSS if inline manager
+   * @param        $options
+   *
+   * @param int    $priority
+   *
+   * @return ResourceManager
+   * @throws Exception
+   */
+  public function requireCss($toRequire, $options = null, int $priority = ResourceStore::PRIORITY_DEFAULT)
+  {
+    if($this->_type == self::MAP_INLINE)
+    {
+      return $this->_requireInlineCss($toRequire);
+    }
+    Dispatch::instance()->store()->requireCss($this->getResourceUri($toRequire, false), $options, $priority);
+    return $this;
   }
 
   /**
