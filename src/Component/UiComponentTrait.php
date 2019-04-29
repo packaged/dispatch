@@ -7,18 +7,20 @@ trait UiComponentTrait
 {
   private static $_initComponents = [];
 
-  protected function _initDispatchableComponent(DispatchableComponent $component)
+  protected function _initDispatchableComponent(DispatchableComponent $component = null)
   {
-    if(!isset(self::$_initComponents[$this->_getComponentClassName()]))
+    if(!isset(self::$_initComponents[static::class]))
     {
-      $this->_requireResources(ResourceManager::component($component));
-      self::$_initComponents[$this->_getComponentClassName()] = true;
+      if($component !== null)
+      {
+        $this->_requireResources(ResourceManager::component($component));
+      }
+      else
+      {
+        $this->_requireResources(ResourceManager::componentClass(static::class));
+      }
+      self::$_initComponents[static::class] = true;
     }
-  }
-
-  protected function _getComponentClassName()
-  {
-    return static::class;
   }
 
   protected function _requireResources(ResourceManager $manager)
