@@ -50,6 +50,10 @@ class ResourceManager
    * @var DispatchableComponent
    */
   private $_component;
+  /**
+   * @var ResourceStore
+   */
+  protected $_store;
 
   public function __construct($type, array $mapOptions = [], array $options = [])
   {
@@ -57,6 +61,30 @@ class ResourceManager
     $this->_mapOptions = $mapOptions;
     $this->_options = $options;
     $this->_baseUri = array_merge([$type], $mapOptions);
+  }
+
+  /**
+   * @return ResourceStore
+   */
+  public function getResourceStore(): ResourceStore
+  {
+    return $this->_store ?: Dispatch::instance()->store();
+  }
+
+  public function hasResourceStore(): bool
+  {
+    return $this->_store !== null;
+  }
+
+  /**
+   * @param ResourceStore $store
+   *
+   * @return $this
+   */
+  public function setResourceStore(ResourceStore $store)
+  {
+    $this->_store = $store;
+    return $this;
   }
 
   public static function vendor($vendor, $package, $options = [])
@@ -187,7 +215,7 @@ class ResourceManager
     {
       return $this->_requireInlineJs($toRequire);
     }
-    Dispatch::instance()->store()->requireJs($this->getResourceUri($toRequire, false), $options, $priority);
+    $this->getResourceStore()->requireJs($this->getResourceUri($toRequire, false), $options, $priority);
     return $this;
   }
 
@@ -202,7 +230,7 @@ class ResourceManager
    */
   protected function _requireInlineJs($javascript, int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
-    Dispatch::instance()->store()->requireInlineJs($javascript, $priority);
+    $this->getResourceStore()->requireInlineJs($javascript, $priority);
     return $this;
   }
 
@@ -383,7 +411,7 @@ class ResourceManager
     {
       return $this->_requireInlineCss($toRequire);
     }
-    Dispatch::instance()->store()->requireCss($this->getResourceUri($toRequire, false), $options, $priority);
+    $this->getResourceStore()->requireCss($this->getResourceUri($toRequire, false), $options, $priority);
     return $this;
   }
 
@@ -398,7 +426,7 @@ class ResourceManager
    */
   protected function _requireInlineCss($stylesheet, int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
-    Dispatch::instance()->store()->requireInlineCss($stylesheet, $priority);
+    $this->getResourceStore()->requireInlineCss($stylesheet, $priority);
     return $this;
   }
 }

@@ -181,4 +181,24 @@ class ResourceManagerTest extends TestCase
     $resourceHash = $manager->getRelativeHash($manager->getFilePath('favicon.ico'));
     $this->assertEquals($pathHash, $resourceHash);
   }
+
+  public function testSetResourceStore()
+  {
+    $store1 = new ResourceStore();
+    $store2 = new ResourceStore();
+
+    $manager = ResourceManager::resources();
+    $this->assertFalse(ResourceManager::resources()->hasResourceStore());
+    $this->assertFalse($manager->hasResourceStore());
+
+    $manager->setResourceStore($store1);
+    $this->assertSame($store1, $manager->getResourceStore());
+    $this->assertNotSame($store2, $manager->getResourceStore());
+
+    $this->assertTrue($manager->hasResourceStore());
+
+    $manager = ResourceManager::resources()->setResourceStore($store2);
+    $this->assertSame($store2, $manager->getResourceStore());
+    $this->assertNotSame($store1, $manager->getResourceStore());
+  }
 }
