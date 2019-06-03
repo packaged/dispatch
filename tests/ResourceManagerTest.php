@@ -201,4 +201,22 @@ class ResourceManagerTest extends TestCase
     $this->assertSame($store2, $manager->getResourceStore());
     $this->assertNotSame($store1, $manager->getResourceStore());
   }
+
+  public function testSetResourceStoreConfig()
+  {
+    $store1 = new ResourceStore();
+    $store2 = new ResourceStore();
+
+    $this->assertFalse(ResourceManager::resources()->hasResourceStore());
+
+    $manager = ResourceManager::resources([ResourceManager::OPT_RESOURCE_STORE => $store1]);
+    $this->assertTrue($manager->hasResourceStore());
+
+    $manager->useGlobalResourceStore();
+    $this->assertFalse($manager->hasResourceStore());
+
+    $manager->setOption(ResourceManager::OPT_RESOURCE_STORE, $store1);
+    $this->assertSame($store1, $manager->getResourceStore());
+    $this->assertNotSame($store2, $manager->getResourceStore());
+  }
 }

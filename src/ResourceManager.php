@@ -35,6 +35,7 @@ class ResourceManager
   const MAP_EXTERNAL = 'e';
 
   const OPT_THROW_ON_FILE_NOT_FOUND = 'throw.file.not.found';
+  const OPT_RESOURCE_STORE = 'resource.store';
 
   protected $_type = self::MAP_RESOURCES;
   protected $_mapOptions = [];
@@ -59,6 +60,10 @@ class ResourceManager
   {
     $this->_type = $type;
     $this->_mapOptions = $mapOptions;
+    foreach($options as $option => $optionValue)
+    {
+      $this->setOption($option, $optionValue);
+    }
     $this->_options = $options;
     $this->_baseUri = array_merge([$type], $mapOptions);
   }
@@ -74,6 +79,17 @@ class ResourceManager
   public function hasResourceStore(): bool
   {
     return $this->_store !== null;
+  }
+
+  /**
+   * Remove any custom resource store set, and write to the global store
+   *
+   * @return $this
+   */
+  public function useGlobalResourceStore()
+  {
+    $this->_store = null;
+    return $this;
   }
 
   /**
@@ -162,6 +178,10 @@ class ResourceManager
 
   public function setOption($option, $value)
   {
+    if($option === self::OPT_RESOURCE_STORE && $value instanceof ResourceStore)
+    {
+      $this->setResourceStore($value);
+    }
     $this->_options[$option] = $value;
     return $this;
   }
