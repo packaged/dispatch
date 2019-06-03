@@ -133,4 +133,20 @@ class DispatchTest extends TestCase
     $this->assertNotEquals($uri, ResourceManager::public()->getResourceUri('css/placeholder.css'));
     $this->assertEquals(substr($dispatch->generateHash('abc'), 0, 8), $dispatch->generateHash('abc', 8));
   }
+
+  public function testSetResourceStore()
+  {
+    $store1 = new ResourceStore();
+    $store2 = new ResourceStore();
+
+    $dispatch = new Dispatch(__DIR__);
+
+    $dispatch->setResourceStore($store1);
+    $this->assertSame($store1, $dispatch->store());
+    $this->assertNotSame($store2, $dispatch->store());
+
+    $dispatch->setResourceStore($store2);
+    $this->assertSame($store2, $dispatch->store());
+    $this->assertNotSame($store1, $dispatch->store());
+  }
 }
