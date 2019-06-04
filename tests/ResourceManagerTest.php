@@ -103,8 +103,13 @@ class ResourceManagerTest extends TestCase
   {
     Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     ResourceManager::inline()->requireJs("alert('inline');");
-    $this->assertContains(
-      'alert(\'inline\');',
+    $this->assertEquals(
+      '<script>alert(\'inline\');</script>',
+      Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_JS)
+    );
+    ResourceManager::inline()->requireJs("alert('priority');", null, ResourceStore::PRIORITY_HIGH);
+    $this->assertEquals(
+      '<script>alert(\'priority\');</script><script>alert(\'inline\');</script>',
       Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_JS)
     );
   }
@@ -162,8 +167,13 @@ class ResourceManagerTest extends TestCase
   {
     Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     ResourceManager::inline()->requireCss("body{background:green;}");
-    $this->assertContains(
-      'body{background:green;}',
+    $this->assertEquals(
+      '<style>body{background:green;}</style>',
+      Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_CSS)
+    );
+    ResourceManager::inline()->requireCss("body{background:red;}", null, ResourceStore::PRIORITY_HIGH);
+    $this->assertEquals(
+      '<style>body{background:red;}</style><style>body{background:green;}</style>',
       Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_CSS)
     );
   }
