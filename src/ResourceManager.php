@@ -233,7 +233,7 @@ class ResourceManager
   {
     if($this->_type == self::MAP_INLINE)
     {
-      return $this->_requireInlineJs($toRequire);
+      return $this->_requireInlineJs($toRequire, $priority);
     }
     $this->getResourceStore()->requireJs($this->getResourceUri($toRequire, false), $options, $priority);
     return $this;
@@ -429,7 +429,7 @@ class ResourceManager
   {
     if($this->_type == self::MAP_INLINE)
     {
-      return $this->_requireInlineCss($toRequire);
+      return $this->_requireInlineCss($toRequire, $priority);
     }
     $this->getResourceStore()->requireCss($this->getResourceUri($toRequire, false), $options, $priority);
     return $this;
