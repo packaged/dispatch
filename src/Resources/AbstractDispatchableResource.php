@@ -119,7 +119,31 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
       return $path;
     }
 
-    list($newPath, $append) = Strings::explode('?', $path, [$path, null], 2);
+    $queryPos = strpos($path, '?');
+    $fragPos = strpos($path, '#');
+
+    if($queryPos + $fragPos > 0)
+    {
+      if($fragPos === false)
+      {
+        $appendChar = '?';
+      }
+      else if($queryPos === false)
+      {
+        $appendChar = '#';
+      }
+      else
+      {
+        $appendChar = min($queryPos, $fragPos) == $queryPos ? '?' : '#';
+      }
+      list($newPath, $append) = Strings::explode($appendChar, $path, [$path, null], 2);
+      $append = $append ? $appendChar . $append : null;
+    }
+    else
+    {
+      $append = '';
+      $newPath = $path;
+    }
 
     $newPath = $this->_makeFullPath($newPath, dirname($this->_path));
 
@@ -137,7 +161,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
     }
     if(!empty($append))
     {
-      $url .= '?' . $append;
+      $url .= $append;
     }
     return $url;
   }

@@ -60,6 +60,7 @@ class DispatchTest extends TestCase
     $request = Request::create($uri);
     $response = $dispatch->handleRequest($request);
     $this->assertContains('font-size:14px', $response->getContent());
+    $this->assertContains('background:url(p/942e325b1780/img/test.svg#test)', $response->getContent());
 
     $dispatch->addAlias('abc', 'resources/css');
     $request = Request::create('/a/abc/bd04a611ed6d/test.css');
