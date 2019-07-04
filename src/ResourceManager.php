@@ -6,6 +6,7 @@ use Packaged\Dispatch\Component\DispatchableComponent;
 use Packaged\Dispatch\Component\FixedClassComponent;
 use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
+use Packaged\Helpers\ValueAs;
 use ReflectionClass;
 use RuntimeException;
 use function apcu_fetch;
@@ -269,7 +270,7 @@ class ResourceManager
       return $relativeFullPath;
     }
 
-    $filePath = $this->getFilePath($relativeFullPath);
+    [$filePath, $relativeFullPath] = $this->_optimisePath($this->getFilePath($relativeFullPath), $relativeFullPath);
     //Do not allow bubbling if the component is a fixed class component
     if($allowComponentBubble && $this->_component && $this->_component instanceof FixedClassComponent)
     {
@@ -294,6 +295,19 @@ class ResourceManager
       '/',
       array_merge([Dispatch::instance()->getBaseUri()], $this->_baseUri, [$hash . $relHash, $relativeFullPath])
     );
+  }
+
+  protected function _optimisePath($path, $relativeFullPath)
+  {
+    $optimise = ValueAs::bool(Dispatch::instance()->config()->getItem('optimisation', 'webp', false));
+    if($optimise)
+    {
+      if(file_exists($path . '.webp'))
+      {
+        return [$path . '.webp', $relativeFullPath . '.webp'];
+      }
+    }
+    return [$path, $relativeFullPath];
   }
 
   /**

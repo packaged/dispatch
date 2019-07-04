@@ -150,4 +150,34 @@ class DispatchTest extends TestCase
     $this->assertSame($store2, $dispatch->store());
     $this->assertNotSame($store1, $dispatch->store());
   }
+
+  public function testWebpReplacements()
+  {
+    $dispatch = new Dispatch(Path::system(__DIR__, '_root'), 'http://assets.packaged.in');
+    Dispatch::bind($dispatch);
+    $request = Request::create(ResourceManager::resources()->getResourceUri('css/webptest.css'));
+    $response = $dispatch->handleRequest($request);
+    $this->assertContains('url(http://assets.packaged.in/r/30c60da9f504/img/test-sample.png)', $response->getContent());
+    $this->assertNotContains(
+      'url(http://assets.packaged.in/r/30c60da9f504/img/test-sample.png.webp)',
+      $response->getContent()
+    );
+
+    //Enable WebP
+    Dispatch::instance()->config()->addItem('optimisation', 'webp', true);
+    $request = Request::create(ResourceManager::resources()->getResourceUri('css/webptest.css'));
+    $response = $dispatch->handleRequest($request);
+
+    $this->assertNotContains(
+      'url(http://assets.packaged.in/r/30c60da9f504/img/test-sample.png)',
+      $response->getContent()
+    );
+    $this->assertContains(
+      'url(http://assets.packaged.in/r/d6e2937fee66/img/test-sample.png.webp)',
+      $response->getContent()
+    );
+
+    Dispatch::destroy();
+  }
+
 }

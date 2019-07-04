@@ -86,6 +86,7 @@ class Dispatch
   /**
    * Add salt to dispatch hashes, for additional resource security
    *
+   *
    * @param string $hashSalt
    *
    * @return $this
