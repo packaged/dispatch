@@ -173,11 +173,11 @@ class DispatchTest extends TestCase
     $response = $dispatch->handleRequest($request);
 
     $this->assertNotContains(
-      'url(http://assets.packaged.in/r/30c60da9f5041/img/test-sample.png)',
+      'url(http://assets.packaged.in/r/30c60da9f504-1/img/test-sample.png)',
       $response->getContent()
     );
     $this->assertContains(
-      'url(http://assets.packaged.in/r/d6e2937fee661/img/test-sample.png.webp)',
+      'url(http://assets.packaged.in/r/d6e2937fee66-1/img/test-sample.png.webp)',
       $response->getContent()
     );
 

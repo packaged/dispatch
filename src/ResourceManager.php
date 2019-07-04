@@ -300,7 +300,7 @@ class ResourceManager
       array_merge(
         [Dispatch::instance()->getBaseUri()],
         $this->_baseUri,
-        [$hash . $relHash . ($bits > 0 ? base_convert($bits, 10, 36) : ''), $relativeFullPath]
+        [$hash . $relHash . ($bits > 0 ? '-' . base_convert($bits, 10, 36) : ''), $relativeFullPath]
       )
     );
   }

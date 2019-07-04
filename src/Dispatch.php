@@ -230,7 +230,7 @@ class Dispatch
 
     //Remove the hash from the URL
     $compareHashWithBits = array_shift($pathParts);
-    [$compareHash, $bits] = explode(';', $compareHashWithBits . ';', 2);
+    [$compareHash, $bits] = explode('-', $compareHashWithBits . '-', 2);
     $this->_bits = base_convert(trim($bits, ';'), 36, 10);
 
     $requestPath = Path::custom('/', $pathParts);
