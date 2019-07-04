@@ -155,6 +155,8 @@ class DispatchTest extends TestCase
   {
     $dispatch = new Dispatch(Path::system(__DIR__, '_root'), 'http://assets.packaged.in');
     Dispatch::bind($dispatch);
+    Dispatch::instance()->setAcceptableContentTypes(['image/webp']);
+
     $request = Request::create(ResourceManager::resources()->getResourceUri('css/webptest.css'));
     $response = $dispatch->handleRequest($request);
     $this->assertContains('url(http://assets.packaged.in/r/30c60da9f504/img/test-sample.png)', $response->getContent());
@@ -165,15 +167,17 @@ class DispatchTest extends TestCase
 
     //Enable WebP
     Dispatch::instance()->config()->addItem('optimisation', 'webp', true);
+    Dispatch::instance()->setAcceptableContentTypes(['image/webp']);
+
     $request = Request::create(ResourceManager::resources()->getResourceUri('css/webptest.css'));
     $response = $dispatch->handleRequest($request);
 
     $this->assertNotContains(
-      'url(http://assets.packaged.in/r/30c60da9f504/img/test-sample.png)',
+      'url(http://assets.packaged.in/r/30c60da9f5041/img/test-sample.png)',
       $response->getContent()
     );
     $this->assertContains(
-      'url(http://assets.packaged.in/r/d6e2937fee66/img/test-sample.png.webp)',
+      'url(http://assets.packaged.in/r/d6e2937fee661/img/test-sample.png.webp)',
       $response->getContent()
     );
 

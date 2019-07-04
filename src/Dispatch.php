@@ -7,6 +7,7 @@ use Packaged\Dispatch\Resources\AbstractDispatchableResource;
 use Packaged\Dispatch\Resources\AbstractResource;
 use Packaged\Dispatch\Resources\DispatchableResource;
 use Packaged\Dispatch\Resources\ResourceFactory;
+use Packaged\Helpers\BitWise;
 use Packaged\Helpers\Path;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,7 @@ use function array_shift;
 use function dirname;
 use function explode;
 use function file_get_contents;
+use function in_array;
 use function ltrim;
 use function md5;
 use function pathinfo;
@@ -57,6 +59,10 @@ class Dispatch
    */
   protected $_classLoader;
   protected $_hashSalt = 'dispatch';
+
+  protected $_acceptableTypes;
+
+  private const BIT_WEBP = 0b1;
 
   public function __construct($projectRoot, $baseUri = null, ClassLoader $loader = null)
   {
@@ -321,4 +327,29 @@ class Dispatch
     return ltrim(str_replace($this->_projectRoot, '', $filePath), '/\\');
   }
 
+  public function setAcceptableContentTypes(array $acceptableTypes)
+  {
+    $this->_acceptableTypes = $acceptableTypes;
+    return $this;
+  }
+
+  public function getAcceptableContentTypes(): array
+  {
+    if($this->_acceptableTypes === null)
+    {
+      $this->setAcceptableContentTypes(Request::createFromGlobals()->getAcceptableContentTypes());
+    }
+    return $this->_acceptableTypes;
+  }
+
+  public function getBits()
+  {
+    $bits = 0;
+    if(in_array('image/webp', $this->getAcceptableContentTypes())
+      && $this->config()->getItem('optimisation', 'webp', false))
+    {
+      $bits = BitWise::add($bits, self::BIT_WEBP);
+    }
+    return $bits;
+  }
 }

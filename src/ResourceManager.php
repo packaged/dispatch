@@ -13,6 +13,7 @@ use function apcu_fetch;
 use function apcu_store;
 use function array_merge;
 use function array_unshift;
+use function base_convert;
 use function count;
 use function explode;
 use function file_exists;
@@ -287,13 +288,20 @@ class ResourceManager
     }
     $relHash = $this->getRelativeHash($filePath);
     $hash = $this->getFileHash($filePath);
+
+    $bits = Dispatch::instance()->getBits();
+
     if(!$hash)
     {
       return null;
     }
     return Path::custom(
       '/',
-      array_merge([Dispatch::instance()->getBaseUri()], $this->_baseUri, [$hash . $relHash, $relativeFullPath])
+      array_merge(
+        [Dispatch::instance()->getBaseUri()],
+        $this->_baseUri,
+        [$hash . $relHash . ($bits > 0 ? base_convert($bits, 10, 36) : ''), $relativeFullPath]
+      )
     );
   }
 
