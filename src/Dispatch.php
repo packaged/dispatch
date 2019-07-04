@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use function array_filter;
 use function array_shift;
+use function base_convert;
 use function dirname;
 use function explode;
 use function file_get_contents;
@@ -61,6 +62,7 @@ class Dispatch
   protected $_hashSalt = 'dispatch';
 
   protected $_acceptableTypes;
+  protected $_bits = 0;
 
   private const BIT_WEBP = 0b1;
 
@@ -227,7 +229,9 @@ class Dispatch
     }
 
     //Remove the hash from the URL
-    $compareHash = array_shift($pathParts);
+    $compareHashWithBits = array_shift($pathParts);
+    [$compareHash, $bits] = explode(';', $compareHashWithBits . ';', 2);
+    $this->_bits = base_convert(trim($bits, ';'), 36, 10);
 
     $requestPath = Path::custom('/', $pathParts);
     $fullPath = $manager->getFilePath($requestPath);
@@ -344,12 +348,11 @@ class Dispatch
 
   public function getBits()
   {
-    $bits = 0;
     if(in_array('image/webp', $this->getAcceptableContentTypes())
       && $this->config()->getItem('optimisation', 'webp', false))
     {
-      $bits = BitWise::add($bits, self::BIT_WEBP);
+      $this->_bits = BitWise::add($this->_bits, self::BIT_WEBP);
     }
-    return $bits;
+    return $this->_bits;
   }
 }
