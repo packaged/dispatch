@@ -20,11 +20,13 @@ use function file_exists;
 use function filectime;
 use function function_exists;
 use function get_class;
+use function in_array;
 use function ltrim;
 use function md5;
 use function md5_file;
 use function str_replace;
 use function strlen;
+use function substr;
 
 class ResourceManager
 {
@@ -308,12 +310,11 @@ class ResourceManager
   protected function _optimisePath($path, $relativeFullPath)
   {
     $optimise = ValueAs::bool(Dispatch::instance()->config()->getItem('optimisation', 'webp', false));
-    if($optimise)
+    if($optimise
+      && in_array(substr($path, -4), ['.jpg', 'jpeg', '.png', '.gif', '.bmp', 'tiff', '.svg'])
+      && file_exists($path . '.webp'))
     {
-      if(file_exists($path . '.webp'))
-      {
-        return [$path . '.webp', $relativeFullPath . '.webp'];
-      }
+      return [$path . '.webp', $relativeFullPath . '.webp'];
     }
     return [$path, $relativeFullPath];
   }
