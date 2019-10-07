@@ -95,9 +95,18 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
       $map = $this->_filePath . '.map';
       if(file_exists($map))
       {
-        $this->_content .= '/*# sourceMappingURL=data:application/json;charset=utf8;base64,'
-          . base64_encode(file_get_contents($map))
-          . '*/';
+
+        if(strpos($this->_path, '.js') !== false)
+        {
+          $this->_content .= PHP_EOL . '//# sourceMappingURL=data:application/json;charset=utf-8;base64,'
+            . base64_encode(file_get_contents($map));
+        }
+        else
+        {
+          $this->_content .= '/*# sourceMappingURL=data:application/json;charset=utf8;base64,'
+            . base64_encode(file_get_contents($map))
+            . '*/';
+        }
       }
     }
   }
