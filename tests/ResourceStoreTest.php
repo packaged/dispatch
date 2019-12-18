@@ -41,6 +41,14 @@ class ResourceStoreTest extends TestCase
     );
 
     $this->assertEquals(
+      [
+        'css/high.css' => null,
+        'css/test.css' => null,
+      ],
+      $store->getResources(ResourceStore::TYPE_CSS, null, [ResourceStore::PRIORITY_LOW])
+    );
+
+    $this->assertEquals(
       ['css/high.css' => null],
       $store->getResources(ResourceStore::TYPE_CSS, ResourceStore::PRIORITY_HIGH)
     );

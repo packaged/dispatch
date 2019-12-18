@@ -25,7 +25,7 @@ class ResourceStore
   // [type][priority][uri] = options
   protected $_store = [];
 
-  public function generateHtmlIncludes($for = self::TYPE_CSS)
+  public function generateHtmlIncludes($for = self::TYPE_CSS, int $priority = null, array $excludePriority = [])
   {
     if(!isset($this->_store[$for]) || empty($this->_store[$for]))
     {
@@ -43,7 +43,7 @@ class ResourceStore
     }
     $return = '';
 
-    foreach($this->getResources($for) as $uri => $options)
+    foreach($this->getResources($for, $priority, $excludePriority) as $uri => $options)
     {
       if(strlen($uri) == 32 && !stristr($uri, '/'))
       {
@@ -81,7 +81,7 @@ class ResourceStore
     return $return;
   }
 
-  public function getResources($type, int $priority = null)
+  public function getResources($type, int $priority = null, array $excludePriority = [])
   {
     if(isset($this->_store[$type][$priority]))
     {
@@ -93,11 +93,14 @@ class ResourceStore
       $return = [];
       //Sort based on store priority
       ksort($this->_store[$type]);
-      foreach($this->_store[$type] as $resources)
+      foreach($this->_store[$type] as $currentPriority => $resources)
       {
-        foreach($resources as $uri => $options)
+        if(!in_array($currentPriority, $excludePriority))
         {
-          $return[$uri] = $options;
+          foreach($resources as $uri => $options)
+          {
+            $return[$uri] = $options;
+          }
         }
       }
       return $return;
