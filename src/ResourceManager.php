@@ -11,7 +11,6 @@ use ReflectionClass;
 use RuntimeException;
 use function apcu_fetch;
 use function apcu_store;
-use function array_merge;
 use function array_unshift;
 use function base_convert;
 use function count;
@@ -43,7 +42,7 @@ class ResourceManager
 
   protected $_type = self::MAP_RESOURCES;
   protected $_mapOptions = [];
-  protected $_baseUri = [];
+  protected $_baseUri;
   protected $_componentPath;
   protected $_options = [];
 
@@ -69,7 +68,17 @@ class ResourceManager
       $this->setOption($option, $optionValue);
     }
     $this->_options = $options;
-    $this->_baseUri = array_merge([$type], $mapOptions);
+  }
+
+  public function getBaseUri()
+  {
+    if($this->_baseUri === null)
+    {
+      $this->_baseUri = (Dispatch::instance() ? Dispatch::instance()->getBaseUri() : '/')
+        . '/' . $this->_type . '/' . implode('/', $this->_mapOptions);
+      $this->_baseUri = trim($this->_baseUri, '/');
+    }
+    return $this->_baseUri;
   }
 
   /**
@@ -297,14 +306,10 @@ class ResourceManager
     {
       return null;
     }
-    return Path::custom(
-      '/',
-      array_merge(
-        [Dispatch::instance()->getBaseUri()],
-        $this->_baseUri,
-        [$hash . $relHash . ($bits > 0 ? '-' . base_convert($bits, 10, 36) : ''), $relativeFullPath]
-      )
-    );
+
+    return $this->getBaseUri()
+      . '/' . $hash . $relHash . ($bits > 0 ? '-' . base_convert($bits, 10, 36) : '')
+      . '/' . $relativeFullPath;
   }
 
   protected function _optimisePath($path, $relativeFullPath)
