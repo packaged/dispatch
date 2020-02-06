@@ -388,15 +388,15 @@ class ResourceManager
     return Dispatch::instance()->generateHash(Dispatch::instance()->calculateRelativePath($filePath), 4);
   }
 
-  protected $_fileHashCache = [];
+  protected static $_fileHashCache = [];
 
   public function getFileHash($fullPath)
   {
-    $cached = $this->_fileHashCache[$fullPath] ?? null;
+    $cached = static::$_fileHashCache[$fullPath] ?? null;
 
     if($cached === -1 || ($cached === null && !file_exists($fullPath)))
     {
-      $this->_fileHashCache[$fullPath] = -1;
+      self::$_fileHashCache[$fullPath] = -1;
       if($this->getOption(self::OPT_THROW_ON_FILE_NOT_FOUND, true))
       {
         throw new RuntimeException("Unable to find dispatch file '$fullPath'", 404);
@@ -418,13 +418,13 @@ class ResourceManager
       if($exists && $hash)
       {
         // @codeCoverageIgnoreStart
-        $this->_fileHashCache[$fullPath] = $hash;
+        self::$_fileHashCache[$fullPath] = $hash;
         return $hash;
         // @codeCoverageIgnoreEnd
       }
     }
 
-    $this->_fileHashCache[$fullPath] = $hash = Dispatch::instance()->generateHash(md5_file($fullPath), 8);
+    self::$_fileHashCache[$fullPath] = $hash = Dispatch::instance()->generateHash(md5_file($fullPath), 8);
     if($hash && function_exists('apcu_store'))
     {
       apcu_store($key, $hash, 86400);
