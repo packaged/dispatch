@@ -102,6 +102,7 @@ class Dispatch
   public function setHashSalt(string $hashSalt)
   {
     $this->_hashSalt = $hashSalt;
+    static::$_hashCache = [];
     return $this;
   }
 
