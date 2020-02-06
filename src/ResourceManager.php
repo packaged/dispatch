@@ -312,10 +312,16 @@ class ResourceManager
       . '/' . $relativeFullPath;
   }
 
+  protected $_optimizeWebP;
+
   protected function _optimisePath($path, $relativeFullPath)
   {
-    $optimise = ValueAs::bool(Dispatch::instance()->config()->getItem('optimisation', 'webp', false));
-    if($optimise
+    if($this->_optimizeWebP === null)
+    {
+      $this->_optimizeWebP = ValueAs::bool(Dispatch::instance()->config()->getItem('optimisation', 'webp', false));
+    }
+
+    if($this->_optimizeWebP
       && in_array(substr($path, -4), ['.jpg', 'jpeg', '.png', '.gif', '.bmp', 'tiff', '.svg'])
       && file_exists($path . '.webp'))
     {
