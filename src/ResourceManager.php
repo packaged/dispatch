@@ -394,7 +394,7 @@ class ResourceManager
   {
     $cached = $this->_fileHashCache[$fullPath] ?? null;
 
-    if(($cached === null || $cached === -1) && !file_exists($fullPath))
+    if($cached === -1 || ($cached === null && !file_exists($fullPath)))
     {
       $this->_fileHashCache[$fullPath] = -1;
       if($this->getOption(self::OPT_THROW_ON_FILE_NOT_FOUND, true))
