@@ -333,11 +333,11 @@ class ResourceManager
    */
   public function isExternalUrl($path)
   {
-    return strlen($path) > 8 && (
-        Strings::startsWith($path, 'http://', true, 7) ||
-        Strings::startsWith($path, 'https://', true, 8) ||
-        Strings::startsWith($path, '//', true, 2)
-      );
+    return isset($path[8])
+      && (
+        ($path[0] == '/' && $path[1] == '/')
+        || strncasecmp($path, 'http://', 7) == 0
+        || strncasecmp($path, 'https://', 8) == 0);
   }
 
   /**
