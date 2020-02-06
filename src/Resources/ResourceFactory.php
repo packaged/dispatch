@@ -22,7 +22,7 @@ use Packaged\Dispatch\Resources\Video\Mp4Resource;
 use Packaged\Dispatch\Resources\Video\MpegResource;
 use Packaged\Dispatch\Resources\Video\QuicktimeResource;
 use Packaged\Dispatch\Resources\Video\WebmResource;
-use Symfony\Component\HttpFoundation\Response;
+use Packaged\Http\Response;
 use function array_keys;
 use function file_exists;
 use function file_get_contents;
