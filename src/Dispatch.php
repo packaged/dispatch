@@ -102,8 +102,11 @@ class Dispatch
   public function setHashSalt(string $hashSalt)
   {
     $this->_hashSalt = $hashSalt;
+    static::$_hashCache = [];
     return $this;
   }
+
+  protected static $_hashCache = [];
 
   /**
    * Generate a hash against specific content, for a desired length
@@ -115,12 +118,16 @@ class Dispatch
    */
   public function generateHash($content, int $length = null)
   {
-    $hash = md5($content . $this->_hashSalt);
+    if(!isset(static::$_hashCache[$content]))
+    {
+      static::$_hashCache[$content] = md5($content . $this->_hashSalt);
+    }
+
     if($length !== null)
     {
-      return substr($hash, 0, $length);
+      return substr(static::$_hashCache[$content], 0, $length);
     }
-    return $hash;
+    return static::$_hashCache[$content];
   }
 
   public function getResourcesPath()
@@ -303,7 +310,7 @@ class Dispatch
   {
     if($this->_classLoader === null)
     {
-      foreach(spl_autoload_functions() as list($loader))
+      foreach(spl_autoload_functions() as [$loader])
       {
         if($loader instanceof ClassLoader)
         {

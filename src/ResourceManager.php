@@ -11,7 +11,6 @@ use ReflectionClass;
 use RuntimeException;
 use function apcu_fetch;
 use function apcu_store;
-use function array_merge;
 use function array_unshift;
 use function base_convert;
 use function count;
@@ -43,7 +42,7 @@ class ResourceManager
 
   protected $_type = self::MAP_RESOURCES;
   protected $_mapOptions = [];
-  protected $_baseUri = [];
+  protected $_baseUri;
   protected $_componentPath;
   protected $_options = [];
 
@@ -69,7 +68,17 @@ class ResourceManager
       $this->setOption($option, $optionValue);
     }
     $this->_options = $options;
-    $this->_baseUri = array_merge([$type], $mapOptions);
+  }
+
+  public function getBaseUri()
+  {
+    if($this->_baseUri === null)
+    {
+      $this->_baseUri = (Dispatch::instance() ? Dispatch::instance()->getBaseUri() : '/')
+        . '/' . $this->_type . '/' . implode('/', $this->_mapOptions);
+      $this->_baseUri = trim($this->_baseUri, '/');
+    }
+    return $this->_baseUri;
   }
 
   /**
@@ -297,20 +306,22 @@ class ResourceManager
     {
       return null;
     }
-    return Path::custom(
-      '/',
-      array_merge(
-        [Dispatch::instance()->getBaseUri()],
-        $this->_baseUri,
-        [$hash . $relHash . ($bits > 0 ? '-' . base_convert($bits, 10, 36) : ''), $relativeFullPath]
-      )
-    );
+
+    return $this->getBaseUri()
+      . '/' . $hash . $relHash . ($bits > 0 ? '-' . base_convert($bits, 10, 36) : '')
+      . '/' . $relativeFullPath;
   }
+
+  protected $_optimizeWebP;
 
   protected function _optimisePath($path, $relativeFullPath)
   {
-    $optimise = ValueAs::bool(Dispatch::instance()->config()->getItem('optimisation', 'webp', false));
-    if($optimise
+    if($this->_optimizeWebP === null)
+    {
+      $this->_optimizeWebP = ValueAs::bool(Dispatch::instance()->config()->getItem('optimisation', 'webp', false));
+    }
+
+    if($this->_optimizeWebP
       && in_array(substr($path, -4), ['.jpg', 'jpeg', '.png', '.gif', '.bmp', 'tiff', '.svg'])
       && file_exists($path . '.webp'))
     {
@@ -328,11 +339,11 @@ class ResourceManager
    */
   public function isExternalUrl($path)
   {
-    return strlen($path) > 8 && (
-        Strings::startsWith($path, 'http://', true, 7) ||
-        Strings::startsWith($path, 'https://', true, 8) ||
-        Strings::startsWith($path, '//', true, 2)
-      );
+    return isset($path[8])
+      && (
+        ($path[0] == '/' && $path[1] == '/')
+        || strncasecmp($path, 'http://', 7) == 0
+        || strncasecmp($path, 'https://', 8) == 0);
   }
 
   /**
@@ -377,16 +388,27 @@ class ResourceManager
     return Dispatch::instance()->generateHash(Dispatch::instance()->calculateRelativePath($filePath), 4);
   }
 
+  protected static $_fileHashCache = [];
+
   public function getFileHash($fullPath)
   {
-    if(!file_exists($fullPath))
+    $cached = static::$_fileHashCache[$fullPath] ?? null;
+
+    if($cached === -1 || ($cached === null && !file_exists($fullPath)))
     {
+      self::$_fileHashCache[$fullPath] = -1;
       if($this->getOption(self::OPT_THROW_ON_FILE_NOT_FOUND, true))
       {
         throw new RuntimeException("Unable to find dispatch file '$fullPath'", 404);
       }
       return null;
     }
+
+    if(!empty($cached))
+    {
+      return $cached;
+    }
+
     $key = 'pdspfh-' . md5($fullPath) . '-' . filectime($fullPath);
 
     if(function_exists("apcu_fetch"))
@@ -396,12 +418,13 @@ class ResourceManager
       if($exists && $hash)
       {
         // @codeCoverageIgnoreStart
+        self::$_fileHashCache[$fullPath] = $hash;
         return $hash;
         // @codeCoverageIgnoreEnd
       }
     }
 
-    $hash = Dispatch::instance()->generateHash(md5_file($fullPath), 8);
+    self::$_fileHashCache[$fullPath] = $hash = Dispatch::instance()->generateHash(md5_file($fullPath), 8);
     if($hash && function_exists('apcu_store'))
     {
       apcu_store($key, $hash, 86400);

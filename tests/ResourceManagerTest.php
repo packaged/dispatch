@@ -118,7 +118,13 @@ class ResourceManagerTest extends TestCase
   {
     $manager = ResourceManager::external();
     $this->assertTrue($manager->isExternalUrl('http://www.google.com'));
+    $this->assertTrue($manager->isExternalUrl('hTTp://www.google.com'));
     $this->assertFalse($manager->isExternalUrl('abhttp://www.google.com'));
+    $this->assertTrue($manager->isExternalUrl('https://www.google.com'));
+    $this->assertTrue($manager->isExternalUrl('httPS://www.google.com'));
+    $this->assertFalse($manager->isExternalUrl('abhttps://www.google.com'));
+    $this->assertTrue($manager->isExternalUrl('//www.google.com'));
+    $this->assertFalse($manager->isExternalUrl('://www.google.com'));
 
     //Check external still work on other resource types
     $manager = ResourceManager::public();
