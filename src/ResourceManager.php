@@ -74,9 +74,8 @@ class ResourceManager
   {
     if($this->_baseUri === null)
     {
-      $this->_baseUri = (Dispatch::instance() ? Dispatch::instance()->getBaseUri() : '/')
-        . '/' . $this->_type . '/' . implode('/', $this->_mapOptions);
-      $this->_baseUri = trim($this->_baseUri, '/');
+      $this->_baseUri = Dispatch::instance() ? Dispatch::instance()->getBaseUri() : '';
+      $this->_baseUri = Path::url($this->_baseUri, $this->_type, implode('/', $this->_mapOptions));
     }
     return $this->_baseUri;
   }
@@ -307,8 +306,8 @@ class ResourceManager
       return null;
     }
 
-    return $this->getBaseUri()
-      . '/' . $hash . $relHash . ($bits > 0 ? '-' . base_convert($bits, 10, 36) : '')
+    $uri = $this->getBaseUri();
+    return $uri . (empty($uri) ? '' : '/') . $hash . $relHash . ($bits > 0 ? '-' . base_convert($bits, 10, 36) : '')
       . '/' . $relativeFullPath;
   }
 
