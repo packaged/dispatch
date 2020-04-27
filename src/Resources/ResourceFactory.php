@@ -112,10 +112,11 @@ class ResourceFactory
   /**
    * @param DispatchResource $resource
    *
+   * @param bool             $cache
+   *
    * @return Response
-   * @throws \Exception
    */
-  public static function create(DispatchResource $resource)
+  public static function create(DispatchResource $resource, $cache = true)
   {
     $response = new Response();
 
@@ -127,20 +128,25 @@ class ResourceFactory
     //Domain specific content will vary on the uri itself
     $response->headers->set("Vary", "Accept-Encoding");
 
-    //Set the etag to the hash of the request uri, as it is in itself a hash
-    $response->setEtag($resource->getHash());
-    $response->setPublic();
+    if($cache)
+    {
+      //Set the etag to the hash of the request uri, as it is in itself a hash
+      $response->setEtag($resource->getHash());
+      $response->setPublic();
 
-    //This resource should last for 1 year in cache
-    $response->setMaxAge(31536000);
-    $response->setSharedMaxAge(31536000);
-    $response->setExpires((new \DateTime())->add(new \DateInterval('P365D')));
+      //This resource should last for 1 year in cache
+      $response->setMaxAge(31536000);
+      $response->setSharedMaxAge(31536000);
+      $response->setExpires((new \DateTime())->add(new \DateInterval('P365D')));
 
-    //Set the last modified date to now
-    $date = new \DateTime();
-    $date->setTimezone(new \DateTimeZone('UTC'));
-    $response->headers->set('Last-Modified', $date->format('D, d M Y H:i:s') . ' GMT');
+      //Set the last modified date to now
+      $date = new \DateTime();
+      $date->setTimezone(new \DateTimeZone('UTC'));
+      $response->headers->set('Last-Modified', $date->format('D, d M Y H:i:s') . ' GMT');
+    }
+
     $response->setContent($resource->getContent());
+
     return $response;
   }
 }

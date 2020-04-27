@@ -251,7 +251,8 @@ class Dispatch
       $failedHash = false;
     }
 
-    if((!$relativeHash || $failedHash) && $fileHash === $manager->getFileHash($fullPath))
+    $contentHashMatch = $fileHash === $manager->getFileHash($fullPath);
+    if((!$relativeHash || $failedHash) && $contentHashMatch)
     {
       $failedHash = false;
     }
@@ -281,7 +282,7 @@ class Dispatch
         $resource->setOptions($this->config()->getSection('ext.' . $ext)->getItems());
       }
     }
-    return ResourceFactory::create($resource);
+    return ResourceFactory::create($resource, $contentHashMatch);
   }
 
   public function config()
