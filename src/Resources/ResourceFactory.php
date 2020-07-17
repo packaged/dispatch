@@ -1,6 +1,10 @@
 <?php
 namespace Packaged\Dispatch\Resources;
 
+use DateInterval;
+use DateTime;
+use DateTimeZone;
+use Exception;
 use Packaged\Dispatch\Resources\Font\AfmResource;
 use Packaged\Dispatch\Resources\Font\DfontResource;
 use Packaged\Dispatch\Resources\Font\EotResource;
@@ -22,6 +26,7 @@ use Packaged\Dispatch\Resources\Video\Mp4Resource;
 use Packaged\Dispatch\Resources\Video\MpegResource;
 use Packaged\Dispatch\Resources\Video\QuicktimeResource;
 use Packaged\Dispatch\Resources\Video\WebmResource;
+use Packaged\Dispatch\ResponseCacheConfig;
 use Packaged\Http\Response;
 use function array_keys;
 use function file_exists;
@@ -110,11 +115,12 @@ class ResourceFactory
   }
 
   /**
-   * @param DispatchResource $resource
+   * @param DispatchResource         $resource
    *
-   * @param bool             $cache
+   * @param ResponseCacheConfig|bool $cache
    *
    * @return Response
+   * @throws Exception
    */
   public static function create(DispatchResource $resource, $cache = true)
   {
@@ -124,24 +130,31 @@ class ResourceFactory
     $response->headers->set('Content-Type', $resource->getContentType());
     $response->headers->set('X-Content-Type-Options', 'nosniff');
 
-    //Ensure the cache varies on the encoding
-    //Domain specific content will vary on the uri itself
-    $response->headers->set("Vary", "Accept-Encoding");
-
-    if($cache)
+    if($cache === true)
     {
+      $cache = new ResponseCacheConfig();
+    }
+
+    if($cache && $cache instanceof ResponseCacheConfig)
+    {
+      //Ensure the cache varies on the encoding
+      //Domain specific content will vary on the uri itself
+      $response->headers->set("Vary", $cache->getVaryHeader());
+
       //Set the etag to the hash of the request uri, as it is in itself a hash
       $response->setEtag($resource->getHash());
       $response->setPublic();
 
       //This resource should last for 1 year in cache
-      $response->setMaxAge(31536000);
-      $response->setSharedMaxAge(31536000);
-      $response->setExpires((new \DateTime())->add(new \DateInterval('P365D')));
+      $response->setMaxAge($cache->getCacheSeconds());
+      $response->setSharedMaxAge($cache->getCacheSeconds());
+      $response->setExpires(
+        (new DateTime())->add(DateInterval::createFromDateString($cache->getCacheSeconds() . ' seconds'))
+      );
 
       //Set the last modified date to now
-      $date = new \DateTime();
-      $date->setTimezone(new \DateTimeZone('UTC'));
+      $date = new DateTime();
+      $date->setTimezone(new DateTimeZone('UTC'));
       $response->headers->set('Last-Modified', $date->format('D, d M Y H:i:s') . ' GMT');
     }
 

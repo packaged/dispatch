@@ -1,6 +1,7 @@
 <?php
 namespace Packaged\Dispatch\Resources;
 
+use Exception;
 use Packaged\Helpers\Strings;
 use function preg_replace;
 use function preg_replace_callback;
@@ -45,7 +46,7 @@ class CssResource extends AbstractDispatchableResource
    * @param $uri
    *
    * @return string
-   * @throws \Exception
+   * @throws Exception
    */
   protected function _dispatchUrlPaths($uri)
   {

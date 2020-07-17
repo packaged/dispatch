@@ -2,6 +2,7 @@
 namespace Packaged\Dispatch;
 
 use Composer\Autoload\ClassLoader;
+use Exception;
 use Packaged\Config\Provider\ConfigProvider;
 use Packaged\Dispatch\Resources\AbstractDispatchableResource;
 use Packaged\Dispatch\Resources\AbstractResource;
@@ -65,12 +66,17 @@ class Dispatch
   protected $_bits = 0;
 
   private const BIT_WEBP = 0b1;
+  /**
+   * @var ResponseCacheConfig
+   */
+  protected $_defaultCacheConfig;
 
   public function __construct($projectRoot, $baseUri = null, ClassLoader $loader = null)
   {
     $this->_projectRoot = $projectRoot;
     $this->_config = new ConfigProvider();
     $this->_resourceStore = new ResourceStore();
+    $this->_defaultCacheConfig = new ResponseCacheConfig();
     $this->_baseUri = $baseUri;
     $this->_classLoader = $loader;
   }
@@ -176,7 +182,7 @@ class Dispatch
    * @param Request $request
    *
    * @return Response
-   * @throws \Exception
+   * @throws Exception
    */
   public function handleRequest(Request $request): Response
   {
@@ -282,7 +288,7 @@ class Dispatch
         $resource->setOptions($this->config()->getSection('ext.' . $ext)->getItems());
       }
     }
-    return ResourceFactory::create($resource, $contentHashMatch);
+    return ResourceFactory::create($resource, $contentHashMatch ? $this->_defaultCacheConfig : false);
   }
 
   public function config()

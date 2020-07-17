@@ -1,10 +1,12 @@
 <?php
 namespace Packaged\Dispatch\Resources;
 
+use Exception;
 use Packaged\Dispatch\ResourceManager;
 use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
 use Packaged\Helpers\ValueAs;
+use RuntimeException;
 use function array_shift;
 use function base64_encode;
 use function basename;
@@ -22,7 +24,6 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
    */
   protected $_manager;
   protected $_path;
-  protected $_workingDirectory;
   protected $_processedContent = false;
 
   public function setManager(ResourceManager $am)
@@ -119,7 +120,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
    * @param $path
    *
    * @return string
-   * @throws \Exception
+   * @throws Exception
    */
   protected function _getDispatchUrl($path): string
   {
@@ -145,7 +146,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
       {
         $appendChar = min($queryPos, $fragPos) == $queryPos ? '?' : '#';
       }
-      list($newPath, $append) = Strings::explode($appendChar, $path, [$path, null], 2);
+      [$newPath, $append] = Strings::explode($appendChar, $path, [$path, null], 2);
       $append = $append ? $appendChar . $append : null;
     }
     else
@@ -160,7 +161,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
     {
       $url = $this->_manager->getResourceUri($newPath);
     }
-    catch(\RuntimeException $e)
+    catch(RuntimeException $e)
     {
       $url = null;
     }
@@ -202,7 +203,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
     $relativePath = Path::url(...$newParts);
 
     // currentDir
-    $relativePath = preg_replace('~(?<=\/|^).\/~', '', $relativePath);
+    $relativePath = preg_replace('~(?<=/|^)./~', '', $relativePath);
 
     return $relativePath;
   }

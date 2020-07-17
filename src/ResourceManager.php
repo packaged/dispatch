@@ -374,7 +374,7 @@ class ResourceManager
     {
       return Path::system($this->_componentPath, $relativePath);
     }
-    throw new \Exception("invalid map type");
+    throw new Exception("invalid map type");
   }
 
   public static function componentClass(string $componentClassName, $options = [])

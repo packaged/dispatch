@@ -1,6 +1,7 @@
 <?php
 namespace Packaged\Dispatch\Resources;
 
+use Exception;
 use JShrink\Minifier;
 use Packaged\Helpers\Strings;
 use function file_exists;
@@ -40,7 +41,7 @@ class JavascriptResource extends AbstractDispatchableResource
    * @param $uri
    *
    * @return string
-   * @throws \Exception
+   * @throws Exception
    */
   protected function _dispatchImportUrls($uri)
   {
@@ -67,7 +68,7 @@ class JavascriptResource extends AbstractDispatchableResource
     {
       $this->_content = Minifier::minify($this->_content);
     }
-    catch(\Exception $e)
+    catch(Exception $e)
     {
       //If minification doesnt work, return the original content
     }
