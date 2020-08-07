@@ -114,7 +114,7 @@ class ResourceStore
    * Clear the entire resource store with a type of null, or all items stored
    * by a type if supplied
    *
-   * @param string $type Store Type e.g. ResourceStore::TYPE_CSS
+   * @param string|null $type Store Type e.g. ResourceStore::TYPE_CSS
    */
   public function clearStore(string $type = null)
   {
@@ -151,8 +151,20 @@ class ResourceStore
    * @param     $uri
    * @param     $options
    * @param int $priority
+   *
+   * @return ResourceStore
    */
   public function addResource(string $type, string $uri, ?array $options = [], int $priority = self::PRIORITY_DEFAULT)
+  {
+    $this->_addResource($type, $uri, $this->_defaultOptions($type, $options, $priority), $priority);
+    if($priority === self::PRIORITY_PRELOAD)
+    {
+      $this->preloadResource($type, $uri);
+    }
+    return $this;
+  }
+
+  protected function _addResource(string $type, string $uri, array $options, int $priority)
   {
     if(!empty($uri))
     {
@@ -165,8 +177,24 @@ class ResourceStore
         $this->_store[$type][$priority] = [];
       }
 
-      $this->_store[$type][$priority][$uri] = $this->_defaultOptions($type, $options, $priority);
+      $this->_store[$type][$priority][$uri] = $options;
     }
+    return $this;
+  }
+
+  public function preloadResource(string $type, string $uri)
+  {
+    $opts = ['rel' => 'preload'];
+    switch($type)
+    {
+      case self::TYPE_CSS:
+        $opts['as'] = 'style';
+        break;
+      case self::TYPE_JS:
+        $opts['as'] = 'script';
+        break;
+    }
+    return $this->_addResource($type, $uri, $opts, -1);
   }
 
   protected function _defaultOptions(string $type, ?array $options, int $priority): array
@@ -174,13 +202,6 @@ class ResourceStore
     if($options === null)
     {
       $options = [];
-    }
-
-    if($priority === self::PRIORITY_PRELOAD)
-    {
-      $options['rel'] = 'preload';
-      $options['as'] = $type === self::TYPE_JS ? 'script' : 'style';
-      return $options;
     }
 
     switch($type)

@@ -54,6 +54,30 @@ class ResourceStoreTest extends TestCase
     );
   }
 
+  public function testPreload()
+  {
+    $store = new ResourceStore();
+    $store->requireCss('css/test.css');
+    $store->requireCss('css/preload.css', [], ResourceStore::PRIORITY_PRELOAD);
+
+    $this->assertEquals(
+      [
+        'css/preload.css',
+        'css/test.css',
+      ],
+      array_keys($store->getResources(ResourceStore::TYPE_CSS))
+    );
+
+    $this->assertEquals(
+      ['css/preload.css'],
+      array_keys($store->getResources(ResourceStore::TYPE_CSS, ResourceStore::PRIORITY_PRELOAD))
+    );
+    $this->assertEquals(
+      ['css/preload.css'],
+      array_keys($store->getResources(ResourceStore::TYPE_CSS, -1))
+    );
+  }
+
   public function testGenerateHtmlIncludes()
   {
     $store = new ResourceStore();
