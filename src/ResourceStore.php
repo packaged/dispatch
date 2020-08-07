@@ -1,8 +1,7 @@
 <?php
 namespace Packaged\Dispatch;
 
-use Packaged\Helpers\ValueAs;
-use function is_array;
+use function htmlspecialchars;
 use function ksort;
 use function md5;
 use function sprintf;
@@ -11,19 +10,37 @@ use function strlen;
 
 class ResourceStore
 {
+  private const TYPE_PRELOAD = '_preload';
+  private const PRIORITY_PRELOADED = -1;
+
   const TYPE_CSS = 'css';
   const TYPE_JS = 'js';
+  /** @deprecated  - Please use priorities */
   const TYPE_PRE_CSS = 'pre.css';
+  /** @deprecated  - Please use priorities */
   const TYPE_PRE_JS = 'pre.js';
+  /** @deprecated  - Please use priorities */
   const TYPE_POST_CSS = 'post.css';
+  /** @deprecated  - Please use priorities */
   const TYPE_POST_JS = 'post.js';
 
+  const PRIORITY_PRELOAD = 1;
   const PRIORITY_HIGH = 10;
   const PRIORITY_DEFAULT = 500;
   const PRIORITY_LOW = 1000;
 
   // [type][priority][uri] = options
   protected $_store = [];
+
+  public function generateHtmlPreloads()
+  {
+    $return = '';
+    foreach($this->getResources(self::TYPE_PRELOAD, self::PRIORITY_PRELOADED) as $uri => $options)
+    {
+      $return .= sprintf('<link rel="preload" href="%s" as="%s">', $uri, $options['as']);
+    }
+    return $return;
+  }
 
   public function generateHtmlIncludes($for = self::TYPE_CSS, int $priority = null, array $excludePriority = [])
   {
@@ -33,11 +50,7 @@ class ResourceStore
     }
 
     $template = '<link href="%s"%s>';
-    if($for == self::TYPE_CSS)
-    {
-      $template = '<link href="%s" rel="stylesheet" type="text/css"%s>';
-    }
-    else if($for == self::TYPE_JS)
+    if($for == self::TYPE_JS)
     {
       $template = '<script src="%s"%s></script>';
     }
@@ -47,32 +60,33 @@ class ResourceStore
     {
       if(strlen($uri) == 32 && !stristr($uri, '/'))
       {
+        $inlineContent = isset($options['_']) ? $options['_'] : null;
         if($for == self::TYPE_CSS)
         {
-          $return .= '<style>' . $options . '</style>';
+          $return .= '<style>' . $inlineContent . '</style>';
         }
         else if($for == self::TYPE_JS)
         {
-          $return .= '<script>' . $options . '</script>';
+          $return .= '<script>' . $inlineContent . '</script>';
         }
       }
       else if(!empty($uri))
       {
-        $opts = $options;
-        if(is_array($options))
+        $opts = '';
+        foreach((array)$options as $key => $value)
         {
-          $opts = '';
-          foreach($options as $key => $value)
+          $opts .= " $key";
+          if($value === null || $value === true)
           {
-            if($value === null)
-            {
-              $opts .= " $key";
-            }
-            else
-            {
-              $value = ValueAs::string($value);
-              $opts .= " $key=\"$value\"";
-            }
+            //Do not append value
+          }
+          else if(is_string($value))
+          {
+            $opts .= '="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"';
+          }
+          else if(is_numeric($value))
+          {
+            $opts .= '="' . $value . '"';
           }
         }
         $return .= sprintf($template, $uri, $opts);
@@ -113,7 +127,7 @@ class ResourceStore
    * Clear the entire resource store with a type of null, or all items stored
    * by a type if supplied
    *
-   * @param string $type Store Type e.g. ResourceStore::TYPE_CSS
+   * @param string|null $type Store Type e.g. ResourceStore::TYPE_CSS
    */
   public function clearStore(string $type = null)
   {
@@ -134,7 +148,7 @@ class ResourceStore
    * @param     $options
    * @param int $priority
    */
-  public function requireJs($filename, $options = null, int $priority = self::PRIORITY_DEFAULT)
+  public function requireJs($filename, ?array $options = [], int $priority = self::PRIORITY_DEFAULT)
   {
     $filenames = (array)$filename;
     foreach($filenames as $filename)
@@ -150,8 +164,20 @@ class ResourceStore
    * @param     $uri
    * @param     $options
    * @param int $priority
+   *
+   * @return ResourceStore
    */
-  public function addResource(string $type, string $uri, $options = null, int $priority = self::PRIORITY_DEFAULT)
+  public function addResource(string $type, string $uri, ?array $options = [], int $priority = self::PRIORITY_DEFAULT)
+  {
+    $this->_addResource($type, $uri, $this->_defaultOptions($type, $options, $priority), $priority);
+    if($priority === self::PRIORITY_PRELOAD)
+    {
+      $this->preloadResource($type, $uri);
+    }
+    return $this;
+  }
+
+  protected function _addResource(string $type, string $uri, array $options, int $priority)
   {
     if(!empty($uri))
     {
@@ -163,8 +189,48 @@ class ResourceStore
       {
         $this->_store[$type][$priority] = [];
       }
+
       $this->_store[$type][$priority][$uri] = $options;
     }
+    return $this;
+  }
+
+  public function preloadResource(string $type, string $uri)
+  {
+    $opts = [];
+    switch($type)
+    {
+      case self::TYPE_CSS:
+        $opts['as'] = 'style';
+        break;
+      case self::TYPE_JS:
+        $opts['as'] = 'script';
+        break;
+    }
+    return $this->_addResource(self::TYPE_PRELOAD, $uri, $opts, self::PRIORITY_PRELOADED);
+  }
+
+  protected function _defaultOptions(string $type, ?array $options, int $priority): array
+  {
+    if($options === null)
+    {
+      $options = [];
+    }
+
+    switch($type)
+    {
+      case self::TYPE_CSS:
+        if(!isset($options['rel']))
+        {
+          $options['rel'] = 'stylesheet';
+        }
+        if(!isset($options['type']))
+        {
+          $options['type'] = 'text/css';
+        }
+        break;
+    }
+    return $options;
   }
 
   /**
@@ -175,7 +241,7 @@ class ResourceStore
    */
   public function requireInlineJs($javascript, int $priority = self::PRIORITY_DEFAULT)
   {
-    $this->addResource(self::TYPE_JS, md5($javascript), $javascript, $priority);
+    $this->addResource(self::TYPE_JS, md5($javascript), ['_' => $javascript], $priority);
   }
 
   /**
@@ -185,7 +251,7 @@ class ResourceStore
    * @param     $options
    * @param int $priority
    */
-  public function requireCss($filename, $options = null, int $priority = self::PRIORITY_DEFAULT)
+  public function requireCss($filename, ?array $options = [], int $priority = self::PRIORITY_DEFAULT)
   {
     $filenames = (array)$filename;
     foreach($filenames as $filename)
@@ -202,6 +268,6 @@ class ResourceStore
    */
   public function requireInlineCss($stylesheet, int $priority = self::PRIORITY_DEFAULT)
   {
-    $this->addResource(self::TYPE_CSS, md5($stylesheet), $stylesheet, $priority);
+    $this->addResource(self::TYPE_CSS, md5($stylesheet), ['_' => $stylesheet], $priority);
   }
 }

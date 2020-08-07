@@ -218,7 +218,7 @@ class ResourceManager
    *
    * @return ResourceManager
    */
-  public function includeJs($toRequire, $options = null, int $priority = ResourceStore::PRIORITY_DEFAULT)
+  public function includeJs($toRequire, array $options = [], int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
     try
     {
@@ -241,7 +241,7 @@ class ResourceManager
    * @return ResourceManager
    * @throws Exception
    */
-  public function requireJs($toRequire, $options = null, int $priority = ResourceStore::PRIORITY_DEFAULT)
+  public function requireJs($toRequire, ?array $options = [], int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
     if($this->_type == self::MAP_INLINE)
     {
@@ -447,7 +447,7 @@ class ResourceManager
    *
    * @return ResourceManager
    */
-  public function includeCss($toRequire, $options = null, int $priority = ResourceStore::PRIORITY_DEFAULT)
+  public function includeCss($toRequire, array $options = [], int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
     try
     {
@@ -470,7 +470,7 @@ class ResourceManager
    * @return ResourceManager
    * @throws Exception
    */
-  public function requireCss($toRequire, $options = null, int $priority = ResourceStore::PRIORITY_DEFAULT)
+  public function requireCss($toRequire, ?array $options = [], int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
     if($this->_type == self::MAP_INLINE)
     {

@@ -33,24 +33,48 @@ class ResourceStoreTest extends TestCase
 
     $this->assertEquals(
       [
-        'css/high.css' => null,
-        'css/test.css' => null,
-        'css/low.css'  => null,
+        'css/high.css',
+        'css/test.css',
+        'css/low.css',
       ],
-      $store->getResources(ResourceStore::TYPE_CSS)
+      array_keys($store->getResources(ResourceStore::TYPE_CSS))
     );
 
     $this->assertEquals(
       [
-        'css/high.css' => null,
-        'css/test.css' => null,
+        'css/high.css',
+        'css/test.css',
       ],
-      $store->getResources(ResourceStore::TYPE_CSS, null, [ResourceStore::PRIORITY_LOW])
+      array_keys($store->getResources(ResourceStore::TYPE_CSS, null, [ResourceStore::PRIORITY_LOW]))
     );
 
     $this->assertEquals(
-      ['css/high.css' => null],
-      $store->getResources(ResourceStore::TYPE_CSS, ResourceStore::PRIORITY_HIGH)
+      ['css/high.css'],
+      array_keys($store->getResources(ResourceStore::TYPE_CSS, ResourceStore::PRIORITY_HIGH))
+    );
+  }
+
+  public function testPreload()
+  {
+    $store = new ResourceStore();
+    $store->requireCss('css/test.css');
+    $store->requireCss('css/preload.css', [], ResourceStore::PRIORITY_PRELOAD);
+
+    $this->assertEquals(
+      [
+        'css/preload.css',
+        'css/test.css',
+      ],
+      array_keys($store->getResources(ResourceStore::TYPE_CSS))
+    );
+
+    $this->assertEquals(
+      ['css/preload.css'],
+      array_keys($store->getResources(ResourceStore::TYPE_CSS, ResourceStore::PRIORITY_PRELOAD))
+    );
+    $this->assertEquals(
+      '<link rel="preload" href="css/preload.css" as="style">',
+      $store->generateHtmlPreloads()
     );
   }
 
