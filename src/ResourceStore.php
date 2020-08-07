@@ -10,6 +10,9 @@ use function strlen;
 
 class ResourceStore
 {
+  private const TYPE_PRELOAD = '_preload';
+  private const PRIORITY_PRELOADED = -1;
+
   const TYPE_CSS = 'css';
   const TYPE_JS = 'js';
   /** @deprecated  - Please use priorities */
@@ -28,6 +31,16 @@ class ResourceStore
 
   // [type][priority][uri] = options
   protected $_store = [];
+
+  public function generateHtmlPreloads()
+  {
+    $return = '';
+    foreach($this->getResources(self::TYPE_PRELOAD, self::PRIORITY_PRELOADED) as $uri => $options)
+    {
+      $return .= sprintf('<link rel="preload" href="%s" as="%s">', $uri, $options['as']);
+    }
+    return $return;
+  }
 
   public function generateHtmlIncludes($for = self::TYPE_CSS, int $priority = null, array $excludePriority = [])
   {
@@ -184,7 +197,7 @@ class ResourceStore
 
   public function preloadResource(string $type, string $uri)
   {
-    $opts = ['rel' => 'preload'];
+    $opts = [];
     switch($type)
     {
       case self::TYPE_CSS:
@@ -194,7 +207,7 @@ class ResourceStore
         $opts['as'] = 'script';
         break;
     }
-    return $this->_addResource($type, $uri, $opts, -1);
+    return $this->_addResource(self::TYPE_PRELOAD, $uri, $opts, self::PRIORITY_PRELOADED);
   }
 
   protected function _defaultOptions(string $type, ?array $options, int $priority): array

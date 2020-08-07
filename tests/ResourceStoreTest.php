@@ -73,8 +73,8 @@ class ResourceStoreTest extends TestCase
       array_keys($store->getResources(ResourceStore::TYPE_CSS, ResourceStore::PRIORITY_PRELOAD))
     );
     $this->assertEquals(
-      ['css/preload.css'],
-      array_keys($store->getResources(ResourceStore::TYPE_CSS, -1))
+      '<link rel="preload" href="css/preload.css" as="style">',
+      $store->generateHtmlPreloads()
     );
   }
 
