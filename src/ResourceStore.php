@@ -175,10 +175,12 @@ class ResourceStore
     {
       $options = [];
     }
+
     if($priority === self::PRIORITY_PRELOAD)
     {
       $options['rel'] = 'preload';
       $options['as'] = $type === self::TYPE_JS ? 'script' : 'style';
+      return $options;
     }
 
     switch($type)
