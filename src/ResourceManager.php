@@ -218,7 +218,7 @@ class ResourceManager
    *
    * @return ResourceManager
    */
-  public function includeJs($toRequire, array $options = [], int $priority = ResourceStore::PRIORITY_DEFAULT)
+  public function includeJs($toRequire, ?array $options = [], int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
     try
     {
@@ -449,7 +449,7 @@ class ResourceManager
    *
    * @return ResourceManager
    */
-  public function includeCss($toRequire, array $options = [], int $priority = ResourceStore::PRIORITY_DEFAULT)
+  public function includeCss($toRequire, ?array $options = [], int $priority = ResourceStore::PRIORITY_DEFAULT)
   {
     try
     {
