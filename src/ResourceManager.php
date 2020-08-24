@@ -245,7 +245,7 @@ class ResourceManager
   {
     if($this->_type == self::MAP_INLINE)
     {
-      return $this->_requireInlineJs($toRequire, $priority);
+      return $this->_requireInlineJs($toRequire, $options, $priority);
     }
     $this->getResourceStore()->requireJs($this->getResourceUri($toRequire, false), $options, $priority);
     return $this;
@@ -254,15 +254,17 @@ class ResourceManager
   /**
    * Add a js script to the store
    *
-   * @param     $javascript
+   * @param            $javascript
    *
-   * @param int $priority
+   * @param array|null $options
+   * @param int        $priority
    *
    * @return ResourceManager
    */
-  protected function _requireInlineJs($javascript, int $priority = ResourceStore::PRIORITY_DEFAULT)
+  protected function _requireInlineJs($javascript, ?array $options = [], int $priority = ResourceStore::PRIORITY_DEFAULT
+  )
   {
-    $this->getResourceStore()->requireInlineJs($javascript, $priority);
+    $this->getResourceStore()->requireInlineJs($javascript, $options, $priority);
     return $this;
   }
 
@@ -474,7 +476,7 @@ class ResourceManager
   {
     if($this->_type == self::MAP_INLINE)
     {
-      return $this->_requireInlineCss($toRequire, $priority);
+      return $this->_requireInlineCss($toRequire, $options, $priority);
     }
     $this->getResourceStore()->requireCss($this->getResourceUri($toRequire, false), $options, $priority);
     return $this;
@@ -483,15 +485,18 @@ class ResourceManager
   /**
    * Add css to the store
    *
-   * @param     $stylesheet
+   * @param            $stylesheet
    *
-   * @param int $priority
+   * @param array|null $options
+   * @param int        $priority
    *
    * @return ResourceManager
    */
-  protected function _requireInlineCss($stylesheet, int $priority = ResourceStore::PRIORITY_DEFAULT)
+  protected function _requireInlineCss(
+    $stylesheet, ?array $options = [], int $priority = ResourceStore::PRIORITY_DEFAULT
+  )
   {
-    $this->getResourceStore()->requireInlineCss($stylesheet, $priority);
+    $this->getResourceStore()->requireInlineCss($stylesheet, $options, $priority);
     return $this;
   }
 }

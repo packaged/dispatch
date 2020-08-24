@@ -174,12 +174,12 @@ class ResourceManagerTest extends TestCase
     Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     ResourceManager::inline()->requireCss("body{background:green;}");
     $this->assertEquals(
-      '<style>body{background:green;}</style>',
+      '<style type=\'text/css\'>body{background:green;}</style>',
       Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_CSS)
     );
     ResourceManager::inline()->requireCss("body{background:red;}", null, ResourceStore::PRIORITY_HIGH);
     $this->assertEquals(
-      '<style>body{background:red;}</style><style>body{background:green;}</style>',
+      '<style type=\'text/css\'>body{background:red;}</style><style type=\'text/css\'>body{background:green;}</style>',
       Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_CSS)
     );
   }

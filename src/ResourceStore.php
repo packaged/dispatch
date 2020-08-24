@@ -61,13 +61,30 @@ class ResourceStore
       if(strlen($uri) == 32 && !stristr($uri, '/'))
       {
         $inlineContent = isset($options['_']) ? $options['_'] : null;
+        $attrs = [];
+        foreach($options as $opt => $optV)
+        {
+          if($opt === '_' || $opt === 'rel')
+          {
+            continue;
+          }
+          if($optV === true)
+          {
+            $attrs[] = $opt;
+          }
+          else
+          {
+            $attrs[] = "$opt='" . \htmlspecialchars($optV, ENT_QUOTES, 'UTF-8') . "'";
+          }
+        }
+        $attr = empty($attrs) ? '' : ' ' . implode(' ', $attrs);
         if($for == self::TYPE_CSS)
         {
-          $return .= '<style>' . $inlineContent . '</style>';
+          $return .= '<style' . $attr . '>' . $inlineContent . '</style>';
         }
         else if($for == self::TYPE_JS)
         {
-          $return .= '<script>' . $inlineContent . '</script>';
+          $return .= '<script' . $attr . '>' . $inlineContent . '</script>';
         }
       }
       else if(!empty($uri))
@@ -236,12 +253,13 @@ class ResourceStore
   /**
    * Add a js script to the store
    *
-   * @param     $javascript
-   * @param int $priority
+   * @param            $javascript
+   * @param array|null $options
+   * @param int        $priority
    */
-  public function requireInlineJs($javascript, int $priority = self::PRIORITY_DEFAULT)
+  public function requireInlineJs($javascript, ?array $options = [], int $priority = self::PRIORITY_DEFAULT)
   {
-    $this->addResource(self::TYPE_JS, md5($javascript), ['_' => $javascript], $priority);
+    $this->addResource(self::TYPE_JS, md5($javascript), array_merge($options ?? [], ['_' => $javascript]), $priority);
   }
 
   /**
@@ -263,11 +281,12 @@ class ResourceStore
   /**
    * Add css to the store
    *
-   * @param     $stylesheet
-   * @param int $priority
+   * @param            $stylesheet
+   * @param array|null $options
+   * @param int        $priority
    */
-  public function requireInlineCss($stylesheet, int $priority = self::PRIORITY_DEFAULT)
+  public function requireInlineCss($stylesheet, ?array $options = [], int $priority = self::PRIORITY_DEFAULT)
   {
-    $this->addResource(self::TYPE_CSS, md5($stylesheet), ['_' => $stylesheet], $priority);
+    $this->addResource(self::TYPE_CSS, md5($stylesheet), array_merge($options ?? [], ['_' => $stylesheet]), $priority);
   }
 }

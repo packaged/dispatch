@@ -94,7 +94,7 @@ class ResourceStoreTest extends TestCase
     );
     $this->assertContains('<script>alert(\'hi\');</script>', $store->generateHtmlIncludes(ResourceStore::TYPE_JS));
     $this->assertContains(
-      '<style>body{background:red;}</style>',
+      '<style type=\'text/css\'>body{background:red;}</style>',
       $store->generateHtmlIncludes(ResourceStore::TYPE_CSS)
     );
   }
