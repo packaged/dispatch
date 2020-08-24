@@ -62,6 +62,22 @@ class ResourceStore
       {
         $inlineContent = isset($options['_']) ? $options['_'] : null;
         $attrs = [];
+
+        if(isset($options['defer']) && !isset($options['src']))
+        {
+          if(is_int($options['defer']))
+          {
+            $attrs['src'] = 'src=\'data:text/javascript;base64,'
+              . base64_encode('setTimeout(function(){' . $inlineContent . '},' . $options['defer'] . ');') . '\'';
+            $options['defer'] = true;
+          }
+          else
+          {
+            $attrs[] = 'src=\'data:text/javascript;base64,' . base64_encode($inlineContent) . '\'';
+          }
+          $inlineContent = null;
+        }
+
         foreach($options as $opt => $optV)
         {
           if($opt === '_' || $opt === 'rel')
