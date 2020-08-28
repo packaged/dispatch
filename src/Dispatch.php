@@ -65,7 +65,7 @@ class Dispatch
   protected $_acceptableTypes;
   protected $_bits = 0;
 
-  private const BIT_WEBP = 0b1;
+  public const BIT_WEBP = 0b1;
   /**
    * @var ResponseCacheConfig
    */
