@@ -159,7 +159,10 @@ class DispatchTest extends TestCase
 
     $request = Request::create(ResourceManager::resources()->getResourceUri('css/webptest.css'));
     $response = $dispatch->handleRequest($request);
-    $this->assertContains('url(http://assets.packaged.in/r/30c60da9f504/img/test-sample.png?abc=def#xyz)', $response->getContent());
+    $this->assertContains(
+      'url(http://assets.packaged.in/r/30c60da9f504/img/test-sample.png?abc=def#xyz)',
+      $response->getContent()
+    );
     $this->assertNotContains(
       'url(http://assets.packaged.in/r/30c60da9f504/img/test-sample.png.webp?abc=def#xyz)',
       $response->getContent()
@@ -181,6 +184,29 @@ class DispatchTest extends TestCase
       $response->getContent()
     );
 
+    Dispatch::destroy();
+  }
+
+  public function testPdf()
+  {
+    $dispatch = new Dispatch(Path::system(__DIR__, '_root'), 'http://assets.packaged.in');
+    Dispatch::bind($dispatch);
+
+    $request = Request::create(
+      ResourceManager::resources()
+        ->getResourceUri('css/webptest.css')
+    );
+
+    $response = $dispatch->handleRequest($request);
+    $this->assertFalse($response->headers->has('Content-Disposition'));
+
+    $request = Request::create(
+      ResourceManager::resources()
+        ->getResourceUri('css/webptest.css', true, Dispatch::FLAG_CONTENT_ATTACHMENT)
+    );
+
+    $response = $dispatch->handleRequest($request);
+    $this->assertTrue($response->headers->has('Content-Disposition'));
     Dispatch::destroy();
   }
 
