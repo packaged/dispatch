@@ -4,6 +4,7 @@ namespace Packaged\Dispatch;
 use Exception;
 use Packaged\Dispatch\Component\DispatchableComponent;
 use Packaged\Dispatch\Component\FixedClassComponent;
+use Packaged\Helpers\BitWise;
 use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
 use Packaged\Helpers\ValueAs;
@@ -322,7 +323,7 @@ class ResourceManager
       $this->_optimizeWebP = ValueAs::bool(Dispatch::instance()->config()->getItem('optimisation', 'webp', false));
     }
 
-    if($this->_optimizeWebP
+    if($this->_optimizeWebP && BitWise::has(($this->_dispatch ?: Dispatch::instance())->getBits(), Dispatch::BIT_WEBP)
       && in_array(substr($path, -4), ['.jpg', 'jpeg', '.png', '.gif', '.bmp', 'tiff', '.svg'])
       && file_exists($path . '.webp'))
     {
