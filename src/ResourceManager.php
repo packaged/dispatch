@@ -274,10 +274,12 @@ class ResourceManager
    *
    * @param bool $allowComponentBubble If the resource does not exist in a component, attempt to load from its parent
    *
+   * @param null $flags
+   *
    * @return string|null
-   * @throws Exception
+   * @throws \ReflectionException
    */
-  public function getResourceUri($relativeFullPath, bool $allowComponentBubble = true): ?string
+  public function getResourceUri($relativeFullPath, bool $allowComponentBubble = true, $flags = null): ?string
   {
     if($this->_type == self::MAP_EXTERNAL || $this->isExternalUrl($relativeFullPath))
     {
@@ -303,6 +305,10 @@ class ResourceManager
     $hash = $this->getFileHash($filePath);
 
     $bits = Dispatch::instance()->getBits();
+    if($flags !== null)
+    {
+      $bits = BitWise::add($bits, $flags);
+    }
 
     if(!$hash)
     {
@@ -323,7 +329,7 @@ class ResourceManager
       $this->_optimizeWebP = ValueAs::bool(Dispatch::instance()->config()->getItem('optimisation', 'webp', false));
     }
 
-    if($this->_optimizeWebP && BitWise::has(($this->_dispatch ?: Dispatch::instance())->getBits(), Dispatch::BIT_WEBP)
+    if($this->_optimizeWebP && BitWise::has(($this->_dispatch ?: Dispatch::instance())->getBits(), Dispatch::FLAG_WEBP)
       && in_array(substr($path, -4), ['.jpg', 'jpeg', '.png', '.gif', '.bmp', 'tiff', '.svg'])
       && file_exists($path . '.webp'))
     {

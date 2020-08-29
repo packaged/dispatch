@@ -65,7 +65,8 @@ class Dispatch
   protected $_acceptableTypes;
   protected $_bits = 0;
 
-  public const BIT_WEBP = 0b1;
+  public const FLAG_WEBP = 0b1;
+  public const FLAG_CONTENT_ATTACHMENT = 0b10;
   /**
    * @var ResponseCacheConfig
    */
@@ -288,7 +289,13 @@ class Dispatch
         $resource->setOptions($this->config()->getSection('ext.' . $ext)->getItems());
       }
     }
-    return ResourceFactory::create($resource, $contentHashMatch ? $this->_defaultCacheConfig : false);
+    $response = ResourceFactory::create($resource, $contentHashMatch ? $this->_defaultCacheConfig : false);
+    if(BitWise::has($this->getBits(), self::FLAG_CONTENT_ATTACHMENT))
+    {
+      $filename = pathinfo($fullPath, PATHINFO_FILENAME);
+      $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+    }
+    return $response;
   }
 
   public function config()
@@ -365,7 +372,7 @@ class Dispatch
     if(in_array('image/webp', $this->getAcceptableContentTypes())
       && $this->config()->getItem('optimisation', 'webp', false))
     {
-      $this->_bits = BitWise::add($this->_bits, self::BIT_WEBP);
+      $this->_bits = BitWise::add($this->_bits, self::FLAG_WEBP);
     }
     return $this->_bits;
   }
