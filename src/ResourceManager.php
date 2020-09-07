@@ -524,4 +524,10 @@ class ResourceManager
     $this->getResourceStore()->requireInlineCss($stylesheet, $options, $priority);
     return $this;
   }
+
+  public static function clearCache()
+  {
+    static::$cmc = [];
+    static::$_fileHashCache = [];
+  }
 }

@@ -80,11 +80,13 @@ class Dispatch
     $this->_defaultCacheConfig = new ResponseCacheConfig();
     $this->_baseUri = $baseUri;
     $this->_classLoader = $loader;
+    ResourceManager::clearCache();
   }
 
   public static function bind(Dispatch $instance)
   {
     self::$_instance = $instance;
+    ResourceManager::clearCache();
     return $instance;
   }
 
@@ -96,6 +98,7 @@ class Dispatch
   public static function destroy()
   {
     self::$_instance = null;
+    ResourceManager::clearCache();
   }
 
   /**
@@ -171,6 +174,7 @@ class Dispatch
   public function addComponentAlias($namespace, $alias)
   {
     $this->_componentAliases['_' . $alias] = $namespace;
+    ResourceManager::clearCache();
     return $this;
   }
 
