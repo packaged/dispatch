@@ -154,8 +154,16 @@ class ResourceManager
     return $manager;
   }
 
+  //Component Manager Caching
+  protected static $cmc = [];
+
   protected static function _componentManager($fullClass, Dispatch $dispatch = null, $options = []): ResourceManager
   {
+    if(isset(static::$cmc[$fullClass]))
+    {
+      return static::$cmc[$fullClass];
+    }
+
     $class = ltrim($fullClass, '\\');
     if(!$dispatch)
     {
@@ -186,6 +194,7 @@ class ResourceManager
     $manager = new static(self::MAP_COMPONENT, $parts, $options);
     $manager->_componentPath = $dispatch->componentClassResourcePath($fullClass);
     $manager->_dispatch = $dispatch;
+    static::$cmc[$fullClass] = $manager;
     return $manager;
   }
 
@@ -269,6 +278,8 @@ class ResourceManager
     return $this;
   }
 
+  protected $_resourceUriCache = [];
+
   /**
    * @param      $relativeFullPath
    *
@@ -286,38 +297,45 @@ class ResourceManager
       return $relativeFullPath;
     }
 
-    [$filePath, $relativeFullPath] = $this->_optimisePath($this->getFilePath($relativeFullPath), $relativeFullPath);
-    //Do not allow bubbling if the component is a fixed class component
-    if($allowComponentBubble && $this->_component && $this->_component instanceof FixedClassComponent)
+    $cacheKey = ($allowComponentBubble ? '1' : '0') . $relativeFullPath . $flags;
+    if(!isset($this->_resourceUriCache[$cacheKey]))
     {
-      $allowComponentBubble = false;
-    }
-    if($allowComponentBubble && $this->_type == self::MAP_COMPONENT && $this->_component && !file_exists($filePath))
-    {
-      $parent = (new ReflectionClass($this->_component))->getParentClass();
-      if($parent && !$parent->isAbstract() && $parent->implementsInterface(DispatchableComponent::class))
+
+      [$filePath, $relativeFullPath] = $this->_optimisePath($this->getFilePath($relativeFullPath), $relativeFullPath);
+      //Do not allow bubbling if the component is a fixed class component
+      if($allowComponentBubble && $this->_component && $this->_component instanceof FixedClassComponent)
       {
-        return self::componentClass($parent->getName(), $this->_options)
-          ->getResourceUri($relativeFullPath, $allowComponentBubble);
+        $allowComponentBubble = false;
       }
-    }
-    $relHash = $this->getRelativeHash($filePath);
-    $hash = $this->getFileHash($filePath);
+      if($allowComponentBubble && $this->_type == self::MAP_COMPONENT && $this->_component && !file_exists($filePath))
+      {
+        $parent = (new ReflectionClass($this->_component))->getParentClass();
+        if($parent && !$parent->isAbstract() && $parent->implementsInterface(DispatchableComponent::class))
+        {
+          return self::componentClass($parent->getName(), $this->_options)
+            ->getResourceUri($relativeFullPath, $allowComponentBubble);
+        }
+      }
+      $relHash = $this->getRelativeHash($filePath);
+      $hash = $this->getFileHash($filePath);
 
-    $bits = Dispatch::instance()->getBits();
-    if($flags !== null)
-    {
-      $bits = BitWise::add($bits, $flags);
+      $bits = Dispatch::instance()->getBits();
+      if($flags !== null)
+      {
+        $bits = BitWise::add($bits, $flags);
+      }
+
+      if(!$hash)
+      {
+        return null;
+      }
+
+      $uri = $this->getBaseUri();
+      $this->_resourceUriCache[$cacheKey] = $uri . (empty($uri) ? '' : '/') . $hash . $relHash
+        . ($bits > 0 ? '-' . base_convert($bits, 10, 36) : '') . '/' . $relativeFullPath;
     }
 
-    if(!$hash)
-    {
-      return null;
-    }
-
-    $uri = $this->getBaseUri();
-    return $uri . (empty($uri) ? '' : '/') . $hash . $relHash . ($bits > 0 ? '-' . base_convert($bits, 10, 36) : '')
-      . '/' . $relativeFullPath;
+    return $this->_resourceUriCache[$cacheKey];
   }
 
   protected $_optimizeWebP;
@@ -505,5 +523,11 @@ class ResourceManager
   {
     $this->getResourceStore()->requireInlineCss($stylesheet, $options, $priority);
     return $this;
+  }
+
+  public static function clearCache()
+  {
+    static::$cmc = [];
+    static::$_fileHashCache = [];
   }
 }
