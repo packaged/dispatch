@@ -296,7 +296,7 @@ class Dispatch
     $response = ResourceFactory::create($resource, $contentHashMatch ? $this->_defaultCacheConfig : false);
     if(BitWise::has($this->getBits(), self::FLAG_CONTENT_ATTACHMENT))
     {
-      $filename = pathinfo($fullPath, PATHINFO_FILENAME);
+      $filename = pathinfo($fullPath, PATHINFO_FILENAME) . '.' . $ext;
       $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }
     return $response;
