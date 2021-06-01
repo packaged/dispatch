@@ -145,6 +145,8 @@ class ResourceFactory
       $response->setEtag($resource->getHash());
       $response->setPublic();
 
+      $response->setImmutable($cache->isImmutable());
+
       //This resource should last for 1 year in cache
       $response->setMaxAge($cache->getCacheSeconds());
       $response->setSharedMaxAge($cache->getCacheSeconds());

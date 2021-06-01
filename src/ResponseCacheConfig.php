@@ -5,6 +5,7 @@ class ResponseCacheConfig
 {
   protected $_varyHeader = 'Accept-Encoding, Accept';
   protected $_cacheSeconds = 31536000;
+  protected $_immutable = true;
 
   /**
    * @return string
@@ -41,6 +42,25 @@ class ResponseCacheConfig
   public function setCacheSeconds(int $cacheTimeSeconds)
   {
     $this->_cacheSeconds = $cacheTimeSeconds;
+    return $this;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isImmutable(): bool
+  {
+    return $this->_immutable;
+  }
+
+  /**
+   * @param bool $immutable
+   *
+   * @return ResponseCacheConfig
+   */
+  public function setImmutable(bool $immutable)
+  {
+    $this->_immutable = $immutable;
     return $this;
   }
 
