@@ -53,9 +53,12 @@ class Dispatch
    * @var ConfigProvider
    */
   protected $_config;
-  protected $_aliases = [];
   protected $_projectRoot;
+
+  protected $_aliases = [];
   protected $_componentAliases = [];
+  protected $_vendorAliases = [];
+  protected $_vendorReverseAliases = [];
   /**
    * @var ClassLoader
    */
@@ -155,6 +158,18 @@ class Dispatch
     return Path::system($this->_projectRoot, self::VENDOR_DIR, $vendor, $package);
   }
 
+  public function getVendorOptions($vendor, $package)
+  {
+    return $this->_vendorReverseAliases[$vendor][$package] ?? null;
+  }
+
+  public function addVendorAlias($vendor, $package, $alias)
+  {
+    $this->_vendorAliases[$alias] = [$vendor, $package];
+    $this->_vendorReverseAliases[$vendor][$package] = $alias;
+    return $this;
+  }
+
   public function addAlias($alias, $path)
   {
     $this->_aliases[$alias] = $path;
@@ -203,7 +218,16 @@ class Dispatch
         $manager = ResourceManager::alias(array_shift($pathParts));
         break;
       case ResourceManager::MAP_VENDOR:
-        $manager = ResourceManager::vendor(array_shift($pathParts), array_shift($pathParts));
+        $vendor = array_shift($pathParts);
+        if(isset($this->_vendorAliases[$vendor]))
+        {
+          [$vendor, $package] = $this->_vendorAliases[$vendor];
+        }
+        else
+        {
+          $package = array_shift($pathParts);
+        }
+        $manager = ResourceManager::vendor($vendor, $package);
         break;
       case ResourceManager::MAP_PUBLIC:
         $manager = ResourceManager::public();
