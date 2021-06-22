@@ -43,6 +43,7 @@ class ResourceManager
 
   protected $_type = self::MAP_RESOURCES;
   protected $_mapOptions = [];
+  protected $_uriPrefix;
   protected $_baseUri;
   protected $_componentPath;
   protected $_options = [];
@@ -76,7 +77,7 @@ class ResourceManager
     if($this->_baseUri === null)
     {
       $this->_baseUri = Dispatch::instance() ? Dispatch::instance()->getBaseUri() : '';
-      $this->_baseUri = Path::url($this->_baseUri, $this->_type, implode('/', $this->_mapOptions));
+      $this->_baseUri = Path::url($this->_baseUri, $this->_type, $this->_uriPrefix ?? implode('/', $this->_mapOptions));
     }
     return $this->_baseUri;
   }
@@ -118,7 +119,9 @@ class ResourceManager
 
   public static function vendor($vendor, $package, $options = [])
   {
-    return new static(self::MAP_VENDOR, [$vendor, $package], $options);
+    $rm = new static(self::MAP_VENDOR, [$vendor, $package], $options);
+    $rm->_uriPrefix = Dispatch::instance() ? Dispatch::instance()->getVendorOptions($vendor, $package) : null;
+    return $rm;
   }
 
   public static function alias($alias, $options = [])

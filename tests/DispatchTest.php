@@ -72,6 +72,13 @@ class DispatchTest extends TestCase
     $response = $dispatch->handleRequest($request);
     $this->assertContains('body{background:orange}', $response->getContent());
 
+    $dispatch->addVendorAlias('packaged', 'dispatch', 'pdsp');
+    $uri = ResourceManager::vendor('packaged', 'dispatch')->getResourceUri('css/vendor.css');
+    self::assertContains('v/pdsp', $uri);
+    $request = Request::create($uri);
+    $response = $dispatch->handleRequest($request);
+    $this->assertContains('body{background:orange}', $response->getContent());
+
     Dispatch::instance()->config()->addItem('ext.css', 'sourcemap', true);
     $uri = ResourceManager::vendor('packaged', 'dispatch')->getResourceUri('css/vendor.css');
     $request = Request::create($uri);
