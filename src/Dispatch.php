@@ -206,7 +206,7 @@ class Dispatch
    */
   public function handleRequest(Request $request): Response
   {
-    $path = substr($request->getPathInfo(), strlen(Request::create($this->_baseUri)->getPathInfo()));
+    $path = urldecode(substr($request->getPathInfo(), strlen(Request::create($this->_baseUri)->getPathInfo())));
     $pathParts = array_filter(explode('/', $path));
     $type = array_shift($pathParts);
     switch($type)
