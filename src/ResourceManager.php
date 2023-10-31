@@ -48,6 +48,11 @@ class ResourceManager
   protected $_componentPath;
   protected $_options = [];
 
+  protected static $defaultOptions = [
+    self::OPT_THROW_ON_FILE_NOT_FOUND => true,
+    self::OPT_RESOURCE_STORE          => null,
+  ];
+
   /**
    * @var Dispatch|null Dispatch in use for components to calculate paths
    */
@@ -464,7 +469,7 @@ class ResourceManager
 
   public function getOption($option, $default = null)
   {
-    return $this->_options[$option] ?? $default;
+    return $this->_options[$option] ?? $this->_defaultOption($option, $default);
   }
 
   /**
@@ -532,5 +537,21 @@ class ResourceManager
   {
     static::$cmc = [];
     static::$_fileHashCache = [];
+  }
+
+  /**
+   * @param string $key
+   * @param mixed  $value
+   *
+   * @return void
+   */
+  public static function setDefaultOption(string $key, $value)
+  {
+    static::$defaultOptions[$key] = $value;
+  }
+
+  protected function _defaultOption(string $key, $default = null)
+  {
+    return static::$defaultOptions[$key] ?? $default;
   }
 }

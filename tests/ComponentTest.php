@@ -34,7 +34,7 @@ class ComponentTest extends TestCase
     $request = Request::create('/' . $uri);
     $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
-    $this->assertContains('body{color:red}', $response->getContent());
+    $this->assertStringContainsString('body{color:red}', $response->getContent());
 
     Dispatch::instance()->store()->clearStore(ResourceStore::TYPE_CSS);
     $this->assertCount(0, Dispatch::instance()->store()->getResources(ResourceStore::TYPE_CSS));
@@ -44,7 +44,7 @@ class ComponentTest extends TestCase
     $request = Request::create('/' . $manager->getResourceUri('style.css'));
     $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
-    $this->assertContains('body{color:red}', $response->getContent());
+    $this->assertStringContainsString('body{color:red}', $response->getContent());
 
     //Required for testing correct namespace validation
     Dispatch::instance()->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents\DemoComponent', 'DC');
@@ -56,7 +56,7 @@ class ComponentTest extends TestCase
     $request = Request::create('/c/3/_/MissingComponent/DemoComponent/a4197ed8/style.css');
     $response = $dispatch->handleRequest($request);
     $this->assertEquals(404, $response->getStatusCode());
-    $this->assertContains('Component Not Found', $response->getContent());
+    $this->assertStringContainsString('Component Not Found', $response->getContent());
 
     $manager = ResourceManager::component(new ChildComponent());
     $uri = $manager->getResourceUri('style.css');
