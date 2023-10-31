@@ -86,14 +86,17 @@ class ResourceStoreTest extends TestCase
     $store->requireJs('js/defer.js', ['defer' => null, 'type' => 'application/javascript']);
     $store->requireInlineJs("alert('hi');");
     $store->requireInlineCss("body{background:red;}");
-    $this->assertContains('href="css/test.css"', $store->generateHtmlIncludes(ResourceStore::TYPE_CSS));
-    $this->assertContains('src="js/alert.js"', $store->generateHtmlIncludes(ResourceStore::TYPE_JS));
-    $this->assertContains(
+    $this->assertStringContainsString('href="css/test.css"', $store->generateHtmlIncludes(ResourceStore::TYPE_CSS));
+    $this->assertStringContainsString('src="js/alert.js"', $store->generateHtmlIncludes(ResourceStore::TYPE_JS));
+    $this->assertStringContainsString(
       'src="js/defer.js" defer type="application/javascript"',
       $store->generateHtmlIncludes(ResourceStore::TYPE_JS)
     );
-    $this->assertContains('<script>alert(\'hi\');</script>', $store->generateHtmlIncludes(ResourceStore::TYPE_JS));
-    $this->assertContains(
+    $this->assertStringContainsString(
+      '<script>alert(\'hi\');</script>',
+      $store->generateHtmlIncludes(ResourceStore::TYPE_JS)
+    );
+    $this->assertStringContainsString(
       '<style type=\'text/css\'>body{background:red;}</style>',
       $store->generateHtmlIncludes(ResourceStore::TYPE_CSS)
     );

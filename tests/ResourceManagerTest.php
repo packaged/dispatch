@@ -78,7 +78,7 @@ class ResourceManagerTest extends TestCase
   {
     Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     ResourceManager::resources()->requireJs('js/alert.js');
-    $this->assertContains(
+    $this->assertStringContainsString(
       'src="r/f417133ec50f/js/alert.js"',
       Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_JS)
     );
@@ -101,7 +101,7 @@ class ResourceManagerTest extends TestCase
     Dispatch::bind(new Dispatch(Path::system(__DIR__, '_root')));
     ResourceManager::resources()->includeCss('css/test.css');
     ResourceManager::resources()->requireCss('css/test.css');
-    $this->assertContains(
+    $this->assertStringContainsString(
       'href="r/bd04a6113c11/css/test.css"',
       Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_CSS)
     );
@@ -242,5 +242,19 @@ class ResourceManagerTest extends TestCase
     $manager->setOption(ResourceManager::OPT_RESOURCE_STORE, $store1);
     $this->assertSame($store1, $manager->getResourceStore());
     $this->assertNotSame($store2, $manager->getResourceStore());
+  }
+
+  public function testDefaultOptions()
+  {
+    $manager = ResourceManager::resources();
+    static::assertTrue($manager->getOption(ResourceManager::OPT_THROW_ON_FILE_NOT_FOUND, true));
+
+    ResourceManager::setDefaultOption(ResourceManager::OPT_THROW_ON_FILE_NOT_FOUND, false);
+    static::assertFalse($manager->getOption(ResourceManager::OPT_THROW_ON_FILE_NOT_FOUND, true));
+
+    $manager->setOption(ResourceManager::OPT_THROW_ON_FILE_NOT_FOUND, true);
+    static::assertTrue($manager->getOption(ResourceManager::OPT_THROW_ON_FILE_NOT_FOUND, true));
+
+    ResourceManager::setDefaultOption(ResourceManager::OPT_THROW_ON_FILE_NOT_FOUND, true);
   }
 }

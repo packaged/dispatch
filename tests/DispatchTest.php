@@ -54,37 +54,37 @@ class DispatchTest extends TestCase
     $request = Request::create('/r/bd04a611ed6d/css/test.css');
     $response = $dispatch->handleRequest($request);
     $this->assertEquals(200, $response->getStatusCode());
-    $this->assertContains('url(r/395d1a0e8999/img/x.jpg)', $response->getContent());
+    $this->assertStringContainsString('url(r/395d1a0e8999/img/x.jpg)', $response->getContent());
 
     $uri = ResourceManager::public()->getResourceUri('css/placeholder.css');
     $request = Request::create($uri);
     $response = $dispatch->handleRequest($request);
-    $this->assertContains('font-size:14px', $response->getContent());
-    $this->assertContains('background:url(p/942e325b1780/img/test.svg#test)', $response->getContent());
+    $this->assertStringContainsString('font-size:14px', $response->getContent());
+    $this->assertStringContainsString('background:url(p/942e325b1780/img/test.svg#test)', $response->getContent());
 
     $dispatch->addAlias('abc', 'resources/css');
     $request = Request::create('/a/abc/bd04a611ed6d/test.css');
     $response = $dispatch->handleRequest($request);
-    $this->assertContains('url("a/abc/942e325be95f/sub/subimg.jpg")', $response->getContent());
+    $this->assertStringContainsString('url("a/abc/942e325be95f/sub/subimg.jpg")', $response->getContent());
 
     $uri = ResourceManager::vendor('packaged', 'dispatch')->getResourceUri('css/vendor.css');
     $request = Request::create($uri);
     $response = $dispatch->handleRequest($request);
-    $this->assertContains('body{background:orange}', $response->getContent());
+    $this->assertStringContainsString('body{background:orange}', $response->getContent());
 
     $dispatch->addVendorAlias('packaged', 'dispatch', 'pdsp');
     $uri = ResourceManager::vendor('packaged', 'dispatch')->getResourceUri('css/vendor.css');
-    self::assertContains('v/pdsp', $uri);
+    self::assertStringContainsString('v/pdsp', $uri);
     $request = Request::create($uri);
     $response = $dispatch->handleRequest($request);
-    $this->assertContains('body{background:orange}', $response->getContent());
+    $this->assertStringContainsString('body{background:orange}', $response->getContent());
 
     Dispatch::instance()->config()->addItem('ext.css', 'sourcemap', true);
     $uri = ResourceManager::vendor('packaged', 'dispatch')->getResourceUri('css/vendor.css');
     $request = Request::create($uri);
     $response = $dispatch->handleRequest($request);
-    $this->assertContains('sourceMappingURL', $response->getContent());
-    $this->assertContains('Q1NTLU1BUAo', $response->getContent());
+    $this->assertStringContainsString('sourceMappingURL', $response->getContent());
+    $this->assertStringContainsString('Q1NTLU1BUAo', $response->getContent());
 
     Dispatch::destroy();
   }
@@ -95,7 +95,10 @@ class DispatchTest extends TestCase
     Dispatch::bind($dispatch);
     $request = Request::create('/r/bd04a611ed6d/css/test.css');
     $response = $dispatch->handleRequest($request);
-    $this->assertContains('url(http://assets.packaged.in/r/395d1a0e8999/img/x.jpg)', $response->getContent());
+    $this->assertStringContainsString(
+      'url(http://assets.packaged.in/r/395d1a0e8999/img/x.jpg)',
+      $response->getContent()
+    );
     Dispatch::destroy();
   }
 
@@ -105,10 +108,10 @@ class DispatchTest extends TestCase
     ResourceManager::resources()->requireCss('css/test.css');
     ResourceManager::resources()->requireCss('css/do-not-modify.css');
     $response = Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_CSS);
-    $this->assertContains('href="http://assets.packaged.in/r/bd04a6113c11/css/test.css"', $response);
+    $this->assertStringContainsString('href="http://assets.packaged.in/r/bd04a6113c11/css/test.css"', $response);
     ResourceManager::resources()->requireJs('js/alert.js');
     $response = Dispatch::instance()->store()->generateHtmlIncludes(ResourceStore::TYPE_JS);
-    $this->assertContains('src="http://assets.packaged.in/r/f417133ec50f/js/alert.js"', $response);
+    $this->assertStringContainsString('src="http://assets.packaged.in/r/f417133ec50f/js/alert.js"', $response);
     Dispatch::destroy();
   }
 
@@ -166,11 +169,11 @@ class DispatchTest extends TestCase
 
     $request = Request::create(ResourceManager::resources()->getResourceUri('css/webptest.css'));
     $response = $dispatch->handleRequest($request);
-    $this->assertContains(
+    $this->assertStringContainsString(
       'url(http://assets.packaged.in/r/30c60da9f504/img/test-sample.png?abc=def#xyz)',
       $response->getContent()
     );
-    $this->assertNotContains(
+    $this->assertStringNotContainsString(
       'url(http://assets.packaged.in/r/30c60da9f504/img/test-sample.png.webp?abc=def#xyz)',
       $response->getContent()
     );
@@ -182,11 +185,11 @@ class DispatchTest extends TestCase
     $request = Request::create(ResourceManager::resources()->getResourceUri('css/webptest.css'));
     $response = $dispatch->handleRequest($request);
 
-    $this->assertNotContains(
+    $this->assertStringNotContainsString(
       'url(http://assets.packaged.in/r/30c60da9f504-1/img/test-sample.png?abc=def#xyz)',
       $response->getContent()
     );
-    $this->assertContains(
+    $this->assertStringContainsString(
       'url(http://assets.packaged.in/r/d6e2937fee66-1/img/test-sample.png.webp?abc=def#xyz)',
       $response->getContent()
     );

@@ -20,6 +20,6 @@ class NestedResourceTest extends TestCase
     $resource->setProcessingPath('css/test.css');
     $resource->setContent(file_get_contents(Path::system($root, Dispatch::RESOURCES_DIR, 'css', 'test.css')));
     $content = $resource->getContent();
-    $this->assertContains('url(/_r/r/395d1a0e8999/img/x.jpg?x=y&request=b)', $content);
+    $this->assertStringContainsString('url(/_r/r/395d1a0e8999/img/x.jpg?x=y&request=b)', $content);
   }
 }
