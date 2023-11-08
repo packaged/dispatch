@@ -212,10 +212,10 @@ class Dispatch
     switch($type)
     {
       case ResourceManager::MAP_RESOURCES:
-        $manager = ResourceManager::resources();
+        $manager = ResourceManager::resources([], $this);
         break;
       case ResourceManager::MAP_ALIAS:
-        $manager = ResourceManager::alias(array_shift($pathParts));
+        $manager = ResourceManager::alias(array_shift($pathParts), [], $this);
         break;
       case ResourceManager::MAP_VENDOR:
         $vendor = array_shift($pathParts);
@@ -227,10 +227,10 @@ class Dispatch
         {
           $package = array_shift($pathParts);
         }
-        $manager = ResourceManager::vendor($vendor, $package);
+        $manager = ResourceManager::vendor($vendor, $package, [], $this);
         break;
       case ResourceManager::MAP_PUBLIC:
-        $manager = ResourceManager::public();
+        $manager = ResourceManager::public([], $this);
         break;
       case ResourceManager::MAP_COMPONENT:
 
@@ -253,7 +253,7 @@ class Dispatch
         {
           try
           {
-            $manager = ResourceManager::componentClass($class);
+            $manager = ResourceManager::componentClass($class, [], $this);
           }
           catch(RuntimeException $e)
           {
