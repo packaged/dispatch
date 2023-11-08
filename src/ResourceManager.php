@@ -66,7 +66,7 @@ class ResourceManager
    */
   protected $_store;
 
-  public function __construct($type, array $mapOptions = [], array $options = [])
+  public function __construct($type, array $mapOptions = [], array $options = [], ?Dispatch $dispatch = null)
   {
     $this->_type = $type;
     $this->_mapOptions = $mapOptions;
@@ -75,13 +75,33 @@ class ResourceManager
       $this->setOption($option, $optionValue);
     }
     $this->_options = $options;
+    if($dispatch !== null)
+    {
+      $this->setDispatch($dispatch);
+    }
+  }
+
+  protected function _dispatch(): ?Dispatch
+  {
+    return $this->_dispatch ?? Dispatch::instance();
+  }
+
+  public function setDispatch(Dispatch $dispatch)
+  {
+    $this->_dispatch = $dispatch;
+    if($this->_store === null)
+    {
+      $this->_store = $dispatch->store();
+    }
+    return $this;
   }
 
   public function getBaseUri()
   {
     if($this->_baseUri === null)
     {
-      $this->_baseUri = Dispatch::instance() ? Dispatch::instance()->getBaseUri() : '';
+      $d = $this->_dispatch();
+      $this->_baseUri = $d ? $d->getBaseUri() : '';
       $this->_baseUri = Path::url($this->_baseUri, $this->_type, $this->_uriPrefix ?? implode('/', $this->_mapOptions));
     }
     return $this->_baseUri;
@@ -92,7 +112,7 @@ class ResourceManager
    */
   public function getResourceStore(): ResourceStore
   {
-    return $this->_store ?: Dispatch::instance()->store();
+    return $this->_store ?: $this->_dispatch()->store();
   }
 
   public function hasResourceStore(): bool
@@ -122,42 +142,43 @@ class ResourceManager
     return $this;
   }
 
-  public static function vendor($vendor, $package, $options = [])
+  public static function vendor($vendor, $package, $options = [], ?Dispatch $dispatch = null)
   {
-    $rm = new static(self::MAP_VENDOR, [$vendor, $package], $options);
-    $rm->_uriPrefix = Dispatch::instance() ? Dispatch::instance()->getVendorOptions($vendor, $package) : null;
+    $rm = new static(self::MAP_VENDOR, [$vendor, $package], $options, $dispatch);
+    $dispatch = $rm->_dispatch();
+    $rm->_uriPrefix = $dispatch ? $dispatch->getVendorOptions($vendor, $package) : null;
     return $rm;
   }
 
-  public static function alias($alias, $options = [])
+  public static function alias($alias, $options = [], ?Dispatch $dispatch = null)
   {
-    return new static(self::MAP_ALIAS, [$alias], $options);
+    return new static(self::MAP_ALIAS, [$alias], $options, $dispatch);
   }
 
-  public static function resources($options = [])
+  public static function resources($options = [], ?Dispatch $dispatch = null)
   {
-    return new static(self::MAP_RESOURCES, [], $options);
+    return new static(self::MAP_RESOURCES, [], $options, $dispatch);
   }
 
-  public static function public($options = [])
+  public static function public($options = [], ?Dispatch $dispatch = null)
   {
-    return new static(self::MAP_PUBLIC, [], $options);
+    return new static(self::MAP_PUBLIC, [], $options, $dispatch);
   }
 
-  public static function inline($options = [])
+  public static function inline($options = [], ?Dispatch $dispatch = null)
   {
-    return new static(self::MAP_INLINE, [], $options);
+    return new static(self::MAP_INLINE, [], $options, $dispatch);
   }
 
-  public static function external($options = [])
+  public static function external($options = [], ?Dispatch $dispatch = null)
   {
-    return new static(self::MAP_EXTERNAL, [], $options);
+    return new static(self::MAP_EXTERNAL, [], $options, $dispatch);
   }
 
-  public static function component(DispatchableComponent $component, $options = [])
+  public static function component(DispatchableComponent $component, $options = [], ?Dispatch $dispatch = null)
   {
     $fullClass = $component instanceof FixedClassComponent ? $component->getComponentClass() : get_class($component);
-    $manager = static::_componentManager($fullClass, Dispatch::instance(), $options);
+    $manager = static::_componentManager($fullClass, $dispatch, $options);
     $manager->_component = $component;
     return $manager;
   }
@@ -327,7 +348,7 @@ class ResourceManager
       $relHash = $this->getRelativeHash($filePath);
       $hash = $this->getFileHash($filePath);
 
-      $bits = Dispatch::instance()->getBits();
+      $bits = $this->_dispatch()->getBits();
       if($flags !== null)
       {
         $bits = BitWise::add($bits, $flags);
@@ -352,10 +373,10 @@ class ResourceManager
   {
     if($this->_optimizeWebP === null)
     {
-      $this->_optimizeWebP = ValueAs::bool(Dispatch::instance()->config()->getItem('optimisation', 'webp', false));
+      $this->_optimizeWebP = ValueAs::bool($this->_dispatch()->config()->getItem('optimisation', 'webp', false));
     }
 
-    if($this->_optimizeWebP && BitWise::has(($this->_dispatch ?: Dispatch::instance())->getBits(), Dispatch::FLAG_WEBP)
+    if($this->_optimizeWebP && BitWise::has($this->_dispatch()->getBits(), Dispatch::FLAG_WEBP)
       && in_array(substr($path, -4), ['.jpg', 'jpeg', '.png', '.gif', '.bmp', 'tiff', '.svg'])
       && file_exists($path . '.webp'))
     {
@@ -390,20 +411,20 @@ class ResourceManager
   {
     if($this->_type == self::MAP_RESOURCES)
     {
-      return Path::system(Dispatch::instance()->getResourcesPath(), $relativePath);
+      return Path::system($this->_dispatch()->getResourcesPath(), $relativePath);
     }
     else if($this->_type == self::MAP_PUBLIC)
     {
-      return Path::system(Dispatch::instance()->getPublicPath(), $relativePath);
+      return Path::system($this->_dispatch()->getPublicPath(), $relativePath);
     }
     else if($this->_type == self::MAP_VENDOR)
     {
       [$vendor, $package] = $this->_mapOptions;
-      return Path::system(Dispatch::instance()->getVendorPath($vendor, $package), $relativePath);
+      return Path::system($this->_dispatch()->getVendorPath($vendor, $package), $relativePath);
     }
     else if($this->_type == self::MAP_ALIAS)
     {
-      return Path::system(Dispatch::instance()->getAliasPath($this->_mapOptions[0]), $relativePath);
+      return Path::system($this->_dispatch()->getAliasPath($this->_mapOptions[0]), $relativePath);
     }
     else if($this->_type == self::MAP_COMPONENT)
     {
@@ -412,14 +433,14 @@ class ResourceManager
     throw new Exception("invalid map type");
   }
 
-  public static function componentClass(string $componentClassName, $options = [])
+  public static function componentClass(string $componentClassName, $options = [], ?Dispatch $dispatch = null)
   {
-    return static::_componentManager($componentClassName, Dispatch::instance(), $options);
+    return static::_componentManager($componentClassName, $dispatch, $options);
   }
 
   public function getRelativeHash($filePath)
   {
-    return Dispatch::instance()->generateHash(Dispatch::instance()->calculateRelativePath($filePath), 4);
+    return $this->_dispatch()->generateHash($this->_dispatch()->calculateRelativePath($filePath), 4);
   }
 
   protected static $_fileHashCache = [];
@@ -458,7 +479,7 @@ class ResourceManager
       }
     }
 
-    self::$_fileHashCache[$fullPath] = $hash = Dispatch::instance()->generateHash(md5_file($fullPath), 8);
+    self::$_fileHashCache[$fullPath] = $hash = $this->_dispatch()->generateHash(md5_file($fullPath), 8);
     if($hash && function_exists('apcu_store'))
     {
       apcu_store($key, $hash, 86400);
