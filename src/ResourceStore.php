@@ -15,6 +15,8 @@ class ResourceStore
 
   const TYPE_CSS = 'css';
   const TYPE_JS = 'js';
+  const TYPE_IMG = 'img';
+
   /** @deprecated  - Please use priorities */
   const TYPE_PRE_CSS = 'pre.css';
   /** @deprecated  - Please use priorities */
