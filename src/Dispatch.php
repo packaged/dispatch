@@ -10,9 +10,9 @@ use Packaged\Dispatch\Resources\DispatchableResource;
 use Packaged\Dispatch\Resources\ResourceFactory;
 use Packaged\Helpers\BitWise;
 use Packaged\Helpers\Path;
+use Packaged\Http\Response;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use function array_filter;
 use function array_shift;
 use function base_convert;
@@ -47,7 +47,7 @@ class Dispatch
    * @var ResourceStore
    */
   protected $_resourceStore;
-  protected $_baseUri;
+  protected $_baseUri = "";
   protected $_requireFileHash = false;
   /**
    * @var ConfigProvider
@@ -106,7 +106,6 @@ class Dispatch
 
   /**
    * Add salt to dispatch hashes, for additional resource security
-   *
    *
    * @param string $hashSalt
    *
@@ -206,7 +205,7 @@ class Dispatch
    */
   public function handleRequest(Request $request): Response
   {
-    $path = urldecode(substr($request->getPathInfo(), strlen(Request::create($this->_baseUri)->getPathInfo())));
+    $path = urldecode(substr($request->getPathInfo(), strlen(Request::create($this->_baseUri ?? "")->getPathInfo())));
     $pathParts = array_filter(explode('/', $path));
     $type = array_shift($pathParts);
     switch($type)
