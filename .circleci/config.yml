@@ -38,6 +38,14 @@ jobs:
     <<: *defaults
     docker:
       - image: php:8.2-alpine
+  build-php83:
+    <<: *defaults
+    docker:
+      - image: php:8.3-alpine
+  build-php84:
+    <<: *defaults
+    docker:
+      - image: php:8.4-alpine
 
 workflows:
   version: 2
@@ -47,3 +55,5 @@ workflows:
       - build-php80
       - build-php81
       - build-php82
+      - build-php83
+      - build-php84

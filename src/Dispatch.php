@@ -75,7 +75,7 @@ class Dispatch
    */
   protected $_defaultCacheConfig;
 
-  public function __construct($projectRoot, $baseUri = null, ClassLoader $loader = null)
+  public function __construct($projectRoot, $baseUri = null, ?ClassLoader $loader = null)
   {
     $this->_projectRoot = $projectRoot;
     $this->_config = new ConfigProvider();
@@ -128,7 +128,7 @@ class Dispatch
    *
    * @return string
    */
-  public function generateHash($content, int $length = null)
+  public function generateHash($content, ?int $length = null)
   {
     if(!isset(static::$_hashCache[$content]))
     {

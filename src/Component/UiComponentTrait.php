@@ -7,7 +7,7 @@ trait UiComponentTrait
 {
   private static $_initComponents = [];
 
-  protected function _initDispatchableComponent(DispatchableComponent $component = null)
+  protected function _initDispatchableComponent(?DispatchableComponent $component = null)
   {
     if(!isset(self::$_initComponents[static::class]))
     {
