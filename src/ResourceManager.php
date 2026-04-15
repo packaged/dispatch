@@ -186,7 +186,7 @@ class ResourceManager
   //Component Manager Caching
   protected static $cmc = [];
 
-  protected static function _componentManager($fullClass, Dispatch $dispatch = null, $options = []): ResourceManager
+  protected static function _componentManager($fullClass, ?Dispatch $dispatch = null, $options = []): ResourceManager
   {
     if(isset(static::$cmc[$fullClass]))
     {

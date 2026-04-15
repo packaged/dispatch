@@ -44,7 +44,7 @@ class ResourceStore
     return $return;
   }
 
-  public function generateHtmlIncludes($for = self::TYPE_CSS, int $priority = null, array $excludePriority = [])
+  public function generateHtmlIncludes($for = self::TYPE_CSS, ?int $priority = null, array $excludePriority = [])
   {
     if(!isset($this->_store[$for]) || empty($this->_store[$for]))
     {
@@ -129,7 +129,7 @@ class ResourceStore
     return $return;
   }
 
-  public function getResources($type, int $priority = null, array $excludePriority = [])
+  public function getResources($type, ?int $priority = null, array $excludePriority = [])
   {
     if(isset($this->_store[$type][$priority]))
     {
@@ -163,7 +163,7 @@ class ResourceStore
    *
    * @param string|null $type Store Type e.g. ResourceStore::TYPE_CSS
    */
-  public function clearStore(string $type = null)
+  public function clearStore(?string $type = null)
   {
     if($type === null)
     {
