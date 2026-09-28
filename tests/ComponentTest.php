@@ -118,4 +118,16 @@ class ComponentTest extends TestCase
     $this->expectException(RuntimeException::class);
     $dispatch->handleRequest(Request::create('/' . $childComponent->getParentFile(false)));
   }
+
+  public function testAliasMatchesWholeNamespace()
+  {
+    $dispatch = new Dispatch(Path::system(__DIR__, '_root'));
+    Dispatch::bind($dispatch);
+    $dispatch->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents\Demo', 'D');
+
+    $uri = ResourceManager::component(new DemoComponent())->getResourceUri('style.css');
+    $this->assertStringStartsWith('c/6/Packaged/Dispatch/Tests/TestComponents/DemoComponent/DemoComponent/', $uri);
+    $this->assertEquals(200, $dispatch->handleRequest(Request::create('/' . $uri))->getStatusCode());
+    Dispatch::destroy();
+  }
 }
