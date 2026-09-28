@@ -205,6 +205,39 @@ class Dispatch
   }
 
   /**
+   * An alias may cover part of a namespace segment, so try every alias that prefixes the first part, longest first
+   */
+  protected function _componentClassFromParts(array $parts): string
+  {
+    if(empty($parts))
+    {
+      return '';
+    }
+    $first = array_shift($parts);
+    $rest = empty($parts) ? '' : '\\' . implode('\\', $parts);
+
+    $aliases = [];
+    foreach($this->_componentAliases as $alias => $namespace)
+    {
+      if(strncmp($first, $alias, strlen($alias)) === 0)
+      {
+        $aliases[$alias] = strlen($alias);
+      }
+    }
+    arsort($aliases);
+
+    foreach(array_keys($aliases) as $alias)
+    {
+      $class = '\\' . ltrim($this->_componentAliases[$alias], '\\') . substr($first, strlen($alias)) . $rest;
+      if(class_exists($class))
+      {
+        return $class;
+      }
+    }
+    return '\\' . $first . $rest;
+  }
+
+  /**
    * @param Request $request
    *
    * @return Response
@@ -244,20 +277,7 @@ class Dispatch
         break;
       case ResourceManager::MAP_COMPONENT:
 
-        $len = array_shift($pathParts);
-        $class = '';
-        for($i = 0; $i < $len; $i++)
-        {
-          $part = array_shift($pathParts);
-          if($i == 0 && isset($this->_componentAliases[$part]))
-          {
-            $class = $this->_componentAliases[$part];
-          }
-          else
-          {
-            $class .= '\\' . $part;
-          }
-        }
+        $class = $this->_componentClassFromParts(array_splice($pathParts, 0, (int)array_shift($pathParts)));
 
         if(!empty($class))
         {

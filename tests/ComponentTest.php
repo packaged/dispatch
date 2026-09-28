@@ -119,14 +119,25 @@ class ComponentTest extends TestCase
     $dispatch->handleRequest(Request::create('/' . $childComponent->getParentFile(false)));
   }
 
-  public function testAliasMatchesWholeNamespace()
+  public function testAliasWithinNamespaceSegment()
   {
     $dispatch = new Dispatch(Path::system(__DIR__, '_root'));
     Dispatch::bind($dispatch);
     $dispatch->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents\Demo', 'D');
 
+    $dispatch->addComponentAlias('\Packaged\Dispatch\Tests\TestComponents', '');
+
     $uri = ResourceManager::component(new DemoComponent())->getResourceUri('style.css');
-    $this->assertStringStartsWith('c/6/Packaged/Dispatch/Tests/TestComponents/DemoComponent/DemoComponent/', $uri);
+    $this->assertStringStartsWith('c/2/_DComponent/DemoComponent/', $uri);
+    $this->assertEquals(200, $dispatch->handleRequest(Request::create('/' . $uri))->getStatusCode());
+
+    $uri = ResourceManager::component(new ChildDemoComponent())->getResourceUri('style.css');
+    $this->assertStringStartsWith('c/3/_DComponent/Child/ChildDemoComponent/', $uri);
+    $this->assertEquals(200, $dispatch->handleRequest(Request::create('/' . $uri))->getStatusCode());
+
+    //The empty alias is a prefix of every other alias
+    $uri = ResourceManager::component(new ChildComponent())->getResourceUri('style.css');
+    $this->assertStringStartsWith('c/2/_/AbstractComponent/', $uri);
     $this->assertEquals(200, $dispatch->handleRequest(Request::create('/' . $uri))->getStatusCode());
     Dispatch::destroy();
   }
