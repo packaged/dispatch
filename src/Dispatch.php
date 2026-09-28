@@ -3,7 +3,6 @@ namespace Packaged\Dispatch;
 
 use Packaged\Config\Provider\ConfigSection;
 use Packaged\Dispatch\Assets\IDispatchableAsset;
-use Packaged\Helpers\Path;
 use Packaged\Helpers\Strings;
 use Packaged\Helpers\ValueAs;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -127,7 +126,7 @@ class Dispatch implements HttpKernelInterface
 
     if($this->isDispatchRequest($request))
     {
-      $dispatchKey = 'dsptch:' . base64_encode($request->getUri());
+      $dispatchKey = 'dsptch-contained-v1:' . base64_encode($request->getUri());
       $success = $response = null;
       if(function_exists('apcu_fetch'))
       {
@@ -159,7 +158,8 @@ class Dispatch implements HttpKernelInterface
       }
 
       //Check to see if the client already has the content
-      if($request->server->has('HTTP_IF_MODIFIED_SINCE'))
+      if($response->getStatusCode() === 200
+        && $request->server->has('HTTP_IF_MODIFIED_SINCE'))
       {
         $response->setNotModified();
         $response->setContent('');
@@ -182,7 +182,11 @@ class Dispatch implements HttpKernelInterface
    */
   public function notFoundResponse($path)
   {
-    return new Response($path . ' could not be located', 404);
+    return new Response(
+      $path . ' could not be located',
+      404,
+      ['Content-Type' => 'text/plain', 'X-Content-Type-Options' => 'nosniff']
+    );
   }
 
   /**
@@ -212,10 +216,9 @@ class Dispatch implements HttpKernelInterface
     //decode so we can match filename on the filesystem
     $path = urldecode($path);
 
-    //Resolve only within the configured asset directories
-    if(in_array('..', preg_split('#[/\\\\]#', $path), true))
+    if(!PathGuard::isSafe($path))
     {
-      return $this->invalidUrlResponse();
+      return $this->notFoundResponse('File');
     }
 
     $pathInfo = pathinfo($path);
@@ -247,9 +250,9 @@ class Dispatch implements HttpKernelInterface
 
     //Lookup the full path on the filesystem
     $dirMapper = new DirectoryMapper($this->_baseDirectory, $this->_config);
-    $directory = $dirMapper->urlToPath($pathInfo['dirname']);
-
-    $filePath = Path::build($directory, $pathInfo['basename']);
+    // Resolve the complete filename too: a file symlink can escape a safe directory.
+    $filePath = $dirMapper->urlToPath($path);
+    $directory = $filePath === null ? null : dirname($filePath);
 
     //Do not minify files ending in .min.ext
     if(substr($pathInfo['filename'], -4) == '.min')
@@ -258,17 +261,7 @@ class Dispatch implements HttpKernelInterface
     }
 
     //If the asset does not exist on disk, return a not found error
-    if($directory === null || !file_exists($filePath))
-    {
-      return $this->notFoundResponse($path);
-    }
-
-    //The resolved file must sit beneath the base directory
-    $baseDirectory = realpath($this->_baseDirectory);
-    $realPath = realpath($filePath);
-    if($baseDirectory === false || $realPath === false
-      || strpos($realPath, $baseDirectory . DIRECTORY_SEPARATOR) !== 0
-    )
+    if($directory === null || !is_file($filePath) || !is_readable($filePath))
     {
       return $this->notFoundResponse($path);
     }
