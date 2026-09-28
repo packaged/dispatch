@@ -260,9 +260,19 @@ class AssetManager
     $reflection = new \ReflectionObject($object);
     $filename = $reflection->getFileName();
 
-    //Find the common start to the filename of the callee and this file, which
-    //is known to be in the vendor directory
-    $prefix = Strings::commonPrefix($filename, $this->ownFile());
+    //Find the directories shared by the callee and this file, which is known
+    //to be in the vendor directory
+    $prefix = '';
+    $ownDirs = array_slice(explode(DIRECTORY_SEPARATOR, $this->ownFile()), 0, -1);
+    $calleeDirs = array_slice(explode(DIRECTORY_SEPARATOR, $filename), 0, -1);
+    foreach($calleeDirs as $i => $dir)
+    {
+      if(!isset($ownDirs[$i]) || $ownDirs[$i] !== $dir)
+      {
+        break;
+      }
+      $prefix .= $dir . DIRECTORY_SEPARATOR;
+    }
 
     //Account for other packaged repos that may offer resources
     if(Strings::endsWith($prefix, 'packaged' . DIRECTORY_SEPARATOR, true, 9))

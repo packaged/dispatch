@@ -203,6 +203,59 @@ class AssetManagerTest extends \PHPUnit\Framework\TestCase
     ];
   }
 
+  /**
+   * @dataProvider vendorPackageProvider
+   *
+   * @param $projectDir
+   * @param $vendor
+   * @param $package
+   */
+  public function testVendorDetectedByDirectory($projectDir, $vendor, $package)
+  {
+    $root = sys_get_temp_dir() . '/' . $projectDir . '-' . uniqid();
+    mkdir($root, 0700);
+    $root = realpath($root);
+    $src = Path::build($root, 'vendor', $vendor, $package, 'src');
+    mkdir($src, 0700, true);
+    $class = 'VendorPathWidget' . uniqid();
+    file_put_contents(
+      Path::build($src, $class . '.php'), "<?php class $class {}"
+    );
+    try
+    {
+      require Path::build($src, $class . '.php');
+      FixedPathAssetManager::$ownFile = Path::build(
+        $root, 'vendor', 'packaged', 'dispatch', 'src', 'AssetManager.php'
+      );
+      $manager = new FixedPathAssetManager(new $class());
+      $this->assertEquals(
+        \Packaged\Dispatch\DirectoryMapper::MAP_VENDOR,
+        $manager->getMapType()
+      );
+      $this->assertEquals([$vendor, $package], $manager->getLookupParts());
+    }
+    finally
+    {
+      unlink(Path::build($src, $class . '.php'));
+      for($dir = $src; $dir !== dirname($root); $dir = dirname($dir))
+      {
+        rmdir($dir);
+      }
+    }
+  }
+
+  public function vendorPackageProvider()
+  {
+    return [
+      ['dispatch-app', 'acme', 'widget'],
+      //Digits in the project path
+      ['dispatch-release-20260928', 'acme', 'widget'],
+      //Names sharing leading characters with packaged/dispatch
+      ['dispatch-app', 'paypal', 'sdk'],
+      ['dispatch-app', 'packaged', 'dal'],
+    ];
+  }
+
   public function testExternalResource()
   {
     $am = \Packaged\Dispatch\AssetManager::sourceType();
@@ -222,5 +275,15 @@ class AssetManagerTester extends \Packaged\Dispatch\AssetManager
         'src',
         'AssetManager.php'
       );
+  }
+}
+
+class FixedPathAssetManager extends \Packaged\Dispatch\AssetManager
+{
+  public static $ownFile;
+
+  protected function ownFile()
+  {
+    return static::$ownFile;
   }
 }
