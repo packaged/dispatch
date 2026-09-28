@@ -5,6 +5,10 @@
 
 Resource Management for PHP
 
+The current 2.x development branch requires PHP 8.2 or later and
+`packaged/http` 2.x. Development installs also require the APCu extension;
+enable `apc.enable_cli=1` when running tests to exercise the cache paths.
+
 
 ## Basic Installation
 

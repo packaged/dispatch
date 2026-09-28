@@ -380,7 +380,7 @@ class ResourceManager
       && in_array(substr($path, -4), ['.jpg', 'jpeg', '.png', '.gif', '.bmp', 'tiff', '.svg'])
       && file_exists($path . '.webp'))
     {
-      return [$path . '.webp', $relativeFullPath . '.webp'];
+      return [$this->getFilePath($relativeFullPath . '.webp'), $relativeFullPath . '.webp'];
     }
     return [$path, $relativeFullPath];
   }
@@ -409,28 +409,37 @@ class ResourceManager
    */
   public function getFilePath($relativePath)
   {
+    if(!PathGuard::isSafe($relativePath))
+    {
+      throw new RuntimeException("File Not Found", 404);
+    }
     if($this->_type == self::MAP_RESOURCES)
     {
-      return Path::system($this->_dispatch()->getResourcesPath(), $relativePath);
+      $base = $this->_dispatch()->getResourcesPath();
     }
     else if($this->_type == self::MAP_PUBLIC)
     {
-      return Path::system($this->_dispatch()->getPublicPath(), $relativePath);
+      $base = $this->_dispatch()->getPublicPath();
     }
     else if($this->_type == self::MAP_VENDOR)
     {
       [$vendor, $package] = $this->_mapOptions;
-      return Path::system($this->_dispatch()->getVendorPath($vendor, $package), $relativePath);
+      $base = $this->_dispatch()->getVendorPath($vendor, $package);
     }
     else if($this->_type == self::MAP_ALIAS)
     {
-      return Path::system($this->_dispatch()->getAliasPath($this->_mapOptions[0]), $relativePath);
+      $base = $this->_dispatch()->getAliasPath($this->_mapOptions[0]);
     }
     else if($this->_type == self::MAP_COMPONENT)
     {
-      return Path::system($this->_componentPath, $relativePath);
+      $base = $this->_componentPath;
     }
-    throw new Exception("invalid map type");
+    else
+    {
+      throw new Exception("invalid map type");
+    }
+    // Empty paths preserve missing-file options and component parent fallback.
+    return PathGuard::resolve($base, Path::system($base, $relativePath)) ?? '';
   }
 
   public static function componentClass(string $componentClassName, $options = [], ?Dispatch $dispatch = null)

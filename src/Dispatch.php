@@ -154,6 +154,13 @@ class Dispatch
 
   public function getVendorPath($vendor, $package)
   {
+    foreach([$vendor, $package] as $part)
+    {
+      if(!PathGuard::isSafe($part) || $part === '' || $part === '.' || strpos($part, '/') !== false)
+      {
+        throw new RuntimeException("File Not Found", 404);
+      }
+    }
     return Path::system($this->_projectRoot, self::VENDOR_DIR, $vendor, $package);
   }
 
@@ -206,6 +213,10 @@ class Dispatch
   public function handleRequest(Request $request): Response
   {
     $path = urldecode(substr($request->getPathInfo(), strlen(Request::create($this->_baseUri ?? "")->getPathInfo())));
+    if(!PathGuard::isSafe($path))
+    {
+      return Response::create("File Not Found", 404);
+    }
     $pathParts = array_filter(explode('/', $path));
     $type = array_shift($pathParts);
     switch($type)
@@ -275,7 +286,18 @@ class Dispatch
     $this->_bits = base_convert(trim($bits, ';-/'), 36, 10);
 
     $requestPath = Path::custom('/', $pathParts);
-    $fullPath = $manager->getFilePath($requestPath);
+    try
+    {
+      $fullPath = $manager->getFilePath($requestPath);
+    }
+    catch(RuntimeException $e)
+    {
+      return Response::create("File Not Found", 404);
+    }
+    if($fullPath === '' || !is_file($fullPath) || !is_readable($fullPath))
+    {
+      return Response::create("File Not Found", 404);
+    }
 
     [$fileHash, $relativeHash] = str_split($compareHash . ' ', 8);
     $relativeHash = trim($relativeHash);
