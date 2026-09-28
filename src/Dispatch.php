@@ -299,6 +299,13 @@ class Dispatch
       return Response::create("File Not Found", 404);
     }
 
+    //Only serve registered resource types, never unregistered source or config files.
+    $ext = pathinfo($fullPath, PATHINFO_EXTENSION);
+    if(!ResourceFactory::hasExtension($ext))
+    {
+      return Response::create("File Not Found", 404);
+    }
+
     [$fileHash, $relativeHash] = str_split($compareHash . ' ', 8);
     $relativeHash = trim($relativeHash);
     $failedHash = true;
@@ -318,7 +325,6 @@ class Dispatch
       return Response::create("File Not Found", 404);
     }
 
-    $ext = pathinfo($fullPath, PATHINFO_EXTENSION);
     $resource = ResourceFactory::getExtensionResource($ext);
     if($resource instanceof DispatchableResource)
     {

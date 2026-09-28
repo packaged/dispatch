@@ -71,8 +71,11 @@ class ComponentTest extends TestCase
     );
   }
 
+  #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
   public function testResourceExtension()
   {
+    //These inheritance fixtures use text files, which must be explicitly registered.
+    \Packaged\Dispatch\Resources\ResourceFactory::addExtension('txt', \Packaged\Dispatch\Resources\UnknownResource::class);
     $dispatch = new Dispatch(Path::system(__DIR__, '_root'));
     Dispatch::bind($dispatch);
 
