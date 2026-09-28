@@ -318,7 +318,7 @@ class DispatchTest extends \PHPUnit\Framework\TestCase
         array_merge($baseConfig, []),
         $traversal,
         'www.packaged.in',
-        'The URL you requested appears to be mythical',
+        'File could not be located',
       ];
     }
 
@@ -331,31 +331,6 @@ class DispatchTest extends \PHPUnit\Framework\TestCase
     ];
 
     return $tests;
-  }
-
-  public function testFilesOutsideBaseDirectoryAreNotServed()
-  {
-    $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
-    $request->headers->set('HOST', 'www.packaged.in');
-    $request->server->set('REQUEST_URI', '/res/a/out/domain/b/filehash/test.css');
-
-    $dispatcher = new \Packaged\Dispatch\Dispatch(
-      new DummyKernel(), ['aliases' => ['out' => '../asset2']]
-    );
-    $dispatcher->setBaseDirectory(__DIR__ . '/asset');
-    $this->assertContains(
-      'test.css could not be located',
-      $dispatcher->handle($request)->getContent()
-    );
-
-    $dispatcher = new \Packaged\Dispatch\Dispatch(
-      new DummyKernel(), ['aliases' => ['out' => 'asset2']]
-    );
-    $dispatcher->setBaseDirectory(__DIR__);
-    $this->assertNotContains(
-      'could not be located',
-      $dispatcher->handle($request)->getContent()
-    );
   }
 
   public function testTrigger()

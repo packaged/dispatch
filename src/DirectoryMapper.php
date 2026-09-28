@@ -46,6 +46,10 @@ class DirectoryMapper
    */
   public function urlToPath($path)
   {
+    if(!PathGuard::isSafe($path))
+    {
+      return null;
+    }
     $parts = explode('/', $path);
     $partCount = count($parts);
 
@@ -99,6 +103,10 @@ class DirectoryMapper
   public function vendorPath($parts)
   {
     list($vendor, $package) = array_slice($parts, 1, 2);
+    if($vendor === '' || $vendor === '.' || $package === '' || $package === '.')
+    {
+      return null;
+    }
     return Path::build('vendor', $vendor, $package);
   }
 
@@ -151,17 +159,24 @@ class DirectoryMapper
    */
   public function processDirHash($base, $pathHash, $url)
   {
-    $path = $this->findPathFromHash(
-      Path::build($this->_workingDirectory, $base),
-      $pathHash
-    );
+    if($base === null || !PathGuard::isSafe(implode('/', $url))
+      || !PathGuard::isSafe($pathHash)
+    )
+    {
+      return null;
+    }
+    $base = Path::build($this->_workingDirectory, $base);
+    $path = $this->findPathFromHash($base, $pathHash);
 
     if($path === null)
     {
       return null;
     }
 
-    return Path::build($path, implode(DIRECTORY_SEPARATOR, $url));
+    return PathGuard::resolve(
+      $base,
+      Path::build($path, implode(DIRECTORY_SEPARATOR, $url))
+    );
   }
 
   /**
