@@ -52,7 +52,7 @@ class GenericResourceTest extends TestCase
     $this->assertEquals($extType[$ext], $class->getContentType());
   }
 
-  public function resourceProvider()
+  public static function resourceProvider()
   {
     $attempt = [];
     $attempt[] = [null, new UnknownResource()];
