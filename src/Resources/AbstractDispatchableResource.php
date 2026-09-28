@@ -93,7 +93,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
 
     if($this->getOption('sourcemap', false))
     {
-      $map = $this->_filePath . '.map';
+      $map = $this->_manager ? $this->_manager->getFilePath($this->_path . '.map') : '';
       if(file_exists($map))
       {
 
