@@ -212,6 +212,12 @@ class Dispatch implements HttpKernelInterface
     //decode so we can match filename on the filesystem
     $path = urldecode($path);
 
+    //Resolve only within the configured asset directories
+    if(in_array('..', preg_split('#[/\\\\]#', $path), true))
+    {
+      return $this->invalidUrlResponse();
+    }
+
     $pathInfo = pathinfo($path);
 
     //Every dispatch request needs an extension

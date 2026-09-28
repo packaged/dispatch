@@ -306,6 +306,22 @@ class DispatchTest extends \PHPUnit\Framework\TestCase
       . 'test(mStyle.background);}',
     ];
 
+    //Encoded traversal must not escape the asset directories
+    foreach([
+              'res/p/domain/b/filehash/..%2FAssetManagerTest.php',
+              'res/p/domain/b/filehash/..%5CAssetManagerTest.php',
+              'res/v/..%2Ftests/domain/b/filehash/AssetManagerTest.php',
+              'res/a/tdir/domain/b/filehash/..%2FAssetManagerTest.php',
+            ] as $traversal)
+    {
+      $tests[] = [
+        array_merge($baseConfig, []),
+        $traversal,
+        'www.packaged.in',
+        'The URL you requested appears to be mythical',
+      ];
+    }
+
     return $tests;
   }
 
