@@ -19,6 +19,20 @@ class ResourceFactoryTest extends TestCase
     $this->assertContains('png', ResourceFactory::getExtensions());
   }
 
+  public function testHasExtension()
+  {
+    $this->assertTrue(ResourceFactory::hasExtension('PNG'));
+    $this->assertFalse(ResourceFactory::hasExtension('php'));
+    $this->assertFalse(ResourceFactory::hasExtension(''));
+  }
+
+  public function testUnregisteredFileIsNotServed()
+  {
+    $response = ResourceFactory::fromFile(__FILE__);
+    $this->assertSame(404, $response->getStatusCode());
+    $this->assertSame('File Not Found', $response->getContent());
+  }
+
   public function testGetExtensionResource()
   {
     $this->assertInstanceOf(ZipResource::class, ResourceFactory::getExtensionResource('zip'));
@@ -28,6 +42,7 @@ class ResourceFactoryTest extends TestCase
   public function testAddExtension()
   {
     ResourceFactory::addExtension('tar', ZipResource::class);
+    $this->assertTrue(ResourceFactory::hasExtension('tar'));
     $this->assertInstanceOf(ZipResource::class, ResourceFactory::getExtensionResource('tar'));
 
     ResourceFactory::addExtension('gz', new ZipResource());

@@ -1,6 +1,9 @@
 <?php
 namespace Packaged\Dispatch\Resources;
 
+use Packaged\Dispatch\Resources\Audio\Mp3Resource;
+use Packaged\Dispatch\Resources\Font\Woff2Resource;
+use Packaged\Dispatch\Resources\Image\WebpResource;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -29,7 +32,7 @@ use Packaged\Dispatch\Resources\Video\WebmResource;
 use Packaged\Dispatch\ResponseCacheConfig;
 use Packaged\Http\Response;
 use function array_keys;
-use function file_exists;
+use function is_file;
 use function file_get_contents;
 use function get_class;
 use function is_object;
@@ -42,6 +45,10 @@ class ResourceFactory
   private static $_resourceMap = [
     'js'    => JavascriptResource::class,
     'json'  => JsonResource::class,
+    'map'   => SourceMapResource::class,
+    'mp3'   => Mp3Resource::class,
+    'woff2' => Woff2Resource::class,
+    'webp'  => WebpResource::class,
     'css'   => CssResource::class,
     'swf'   => FlashResource::class,
     'pdf'   => PdfResource::class,
@@ -74,6 +81,11 @@ class ResourceFactory
     return array_keys(self::$_resourceMap);
   }
 
+  public static function hasExtension($extension)
+  {
+    return isset(self::$_resourceMap[strtolower($extension)]);
+  }
+
   public static function addExtension($ext, $classname)
   {
     if(is_object($classname))
@@ -85,7 +97,7 @@ class ResourceFactory
 
   public static function fromFile($fullPath)
   {
-    if(!file_exists($fullPath))
+    if(!is_file($fullPath) || !self::hasExtension(pathinfo($fullPath, PATHINFO_EXTENSION)))
     {
       return Response::create('File Not Found', 404);
     }
