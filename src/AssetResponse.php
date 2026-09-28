@@ -11,6 +11,7 @@ class AssetResponse
   private static $_assetMap = [
     'js'    => '\Packaged\Dispatch\Assets\JavascriptAsset',
     'json'  => '\Packaged\Dispatch\Assets\JsonAsset',
+    'map'   => '\Packaged\Dispatch\Assets\SourceMapAsset',
     'css'   => '\Packaged\Dispatch\Assets\CssAsset',
     'swf'   => '\Packaged\Dispatch\Assets\FlashAsset',
     'pdf'   => '\Packaged\Dispatch\Assets\PdfAsset',
@@ -26,6 +27,7 @@ class AssetResponse
     'mpeg'  => '\Packaged\Dispatch\Assets\Video\MpegAsset',
     'mov'   => '\Packaged\Dispatch\Assets\Video\QuicktimeAsset',
     'webm'  => '\Packaged\Dispatch\Assets\Video\WebmAsset',
+    'mp3'   => '\Packaged\Dispatch\Assets\Audio\Mp3Asset',
     'afm'   => '\Packaged\Dispatch\Assets\Font\AfmAsset',
     'dfont' => '\Packaged\Dispatch\Assets\Font\DfontAsset',
     'eot'   => '\Packaged\Dispatch\Assets\Font\EotAsset',
@@ -36,11 +38,17 @@ class AssetResponse
     'ttc'   => '\Packaged\Dispatch\Assets\Font\TtcAsset',
     'ttf'   => '\Packaged\Dispatch\Assets\Font\TtfAsset',
     'woff'  => '\Packaged\Dispatch\Assets\Font\WoffAsset',
+    'woff2' => '\Packaged\Dispatch\Assets\Font\Woff2Asset',
   ];
 
   public static function getExtensions()
   {
     return array_keys(self::$_assetMap);
+  }
+
+  public static function hasExtension($extension)
+  {
+    return isset(self::$_assetMap[strtolower($extension)]);
   }
 
   public static function addAssetType($ext, $classname)
