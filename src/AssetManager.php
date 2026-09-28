@@ -262,7 +262,7 @@ class AssetManager
 
     //Find the common start to the filename of the callee and this file, which
     //is known to be in the vendor directory
-    $prefix = Strings::commonPrefix($filename, $this->ownFile());
+    $prefix = Strings::commonPrefix($filename, $this->ownFile(), false);
 
     //Account for other packaged repos that may offer resources
     if(Strings::endsWith($prefix, 'packaged' . DIRECTORY_SEPARATOR, true, 9))

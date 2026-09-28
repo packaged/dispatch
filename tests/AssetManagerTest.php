@@ -203,6 +203,40 @@ class AssetManagerTest extends \PHPUnit\Framework\TestCase
     ];
   }
 
+  public function testVendorDetectedWhenProjectPathContainsDigits()
+  {
+    $root = sys_get_temp_dir() . '/dispatch-release-20260928-' . uniqid();
+    mkdir($root, 0700);
+    $root = realpath($root);
+    $src = Path::build($root, 'vendor', 'acme', 'widget', 'src');
+    mkdir($src, 0700, true);
+    $class = 'DigitPathWidget' . uniqid();
+    file_put_contents(
+      Path::build($src, $class . '.php'), "<?php class $class {}"
+    );
+    try
+    {
+      require Path::build($src, $class . '.php');
+      DigitPathAssetManager::$ownFile = Path::build(
+        $root, 'vendor', 'packaged', 'dispatch', 'src', 'AssetManager.php'
+      );
+      $manager = new DigitPathAssetManager(new $class());
+      $this->assertEquals(
+        \Packaged\Dispatch\DirectoryMapper::MAP_VENDOR,
+        $manager->getMapType()
+      );
+      $this->assertEquals(['acme', 'widget'], $manager->getLookupParts());
+    }
+    finally
+    {
+      unlink(Path::build($src, $class . '.php'));
+      for($dir = $src; $dir !== dirname($root); $dir = dirname($dir))
+      {
+        rmdir($dir);
+      }
+    }
+  }
+
   public function testExternalResource()
   {
     $am = \Packaged\Dispatch\AssetManager::sourceType();
@@ -222,5 +256,15 @@ class AssetManagerTester extends \Packaged\Dispatch\AssetManager
         'src',
         'AssetManager.php'
       );
+  }
+}
+
+class DigitPathAssetManager extends \Packaged\Dispatch\AssetManager
+{
+  public static $ownFile;
+
+  protected function ownFile()
+  {
+    return static::$ownFile;
   }
 }
