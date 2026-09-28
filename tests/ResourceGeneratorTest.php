@@ -51,6 +51,9 @@ class ResourceGeneratorTest extends \PHPUnit\Framework\TestCase
     $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
     $request->headers->set('HOST', 'packaged.in');
     $tests = [];
+    $configHash = substr(
+      md5_file(dirname(__DIR__) . '/vendor/packaged/config/composer.json'), 0, 7
+    );
 
     $dispatch = $this->getDispatch();
     $event = new \Packaged\Dispatch\DispatchEvent();
@@ -96,7 +99,7 @@ class ResourceGeneratorTest extends \PHPUnit\Framework\TestCase
     $event->setPath('');
     $event->setLookupParts(['packaged', 'config']);
     $expect = '//www.packaged.in/res/v/packaged/' .
-      'config/8cac7/b/4568ecc/composer.json';
+      'config/8cac7/b/' . $configHash . '/composer.json';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch();
@@ -115,7 +118,8 @@ class ResourceGeneratorTest extends \PHPUnit\Framework\TestCase
     $event->setFilename('composer.json');
     $event->setMapType(\Packaged\Dispatch\DirectoryMapper::MAP_ALIAS);
     $event->setLookupParts(['cfger']);
-    $expect = '//www.packaged.in/res/a/cfger/8cac7/b/4568ecc/composer.json';
+    $expect = '//www.packaged.in/res/a/cfger/8cac7/b/' . $configHash
+      . '/composer.json';
     $tests[] = [$event, $dispatch, $request, $expect];
 
     $dispatch = $this->getDispatch(
