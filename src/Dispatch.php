@@ -226,6 +226,12 @@ class Dispatch implements HttpKernelInterface
       return $this->invalidUrlResponse();
     }
 
+    //Only serve registered asset types, never source or config files
+    if(!AssetResponse::hasExtension($pathInfo['extension']))
+    {
+      return $this->notFoundResponse($path);
+    }
+
     $response = new AssetResponse();
 
     //Grab the correct asset for the requesting extension
@@ -253,6 +259,16 @@ class Dispatch implements HttpKernelInterface
 
     //If the asset does not exist on disk, return a not found error
     if($directory === null || !file_exists($filePath))
+    {
+      return $this->notFoundResponse($path);
+    }
+
+    //The resolved file must sit beneath the base directory
+    $baseDirectory = realpath($this->_baseDirectory);
+    $realPath = realpath($filePath);
+    if($baseDirectory === false || $realPath === false
+      || strpos($realPath, $baseDirectory . DIRECTORY_SEPARATOR) !== 0
+    )
     {
       return $this->notFoundResponse($path);
     }

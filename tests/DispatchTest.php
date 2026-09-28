@@ -77,7 +77,7 @@ class DispatchTest extends \PHPUnit\Framework\TestCase
       array_merge($baseConfig, []),
       'res/p/domain/b/filehash/test.unknown',
       'www.packaged.in',
-      'test file content',
+      'test.unknown could not be located',
     ];
 
     $tests[] = [
@@ -322,7 +322,40 @@ class DispatchTest extends \PHPUnit\Framework\TestCase
       ];
     }
 
+    //Files without a registered asset type are never served
+    $tests[] = [
+      array_merge($baseConfig, []),
+      'res/s/domain/b/filehash/AssetManagerTest.php',
+      'www.packaged.in',
+      'AssetManagerTest.php could not be located',
+    ];
+
     return $tests;
+  }
+
+  public function testFilesOutsideBaseDirectoryAreNotServed()
+  {
+    $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    $request->headers->set('HOST', 'www.packaged.in');
+    $request->server->set('REQUEST_URI', '/res/a/out/domain/b/filehash/test.css');
+
+    $dispatcher = new \Packaged\Dispatch\Dispatch(
+      new DummyKernel(), ['aliases' => ['out' => '../asset2']]
+    );
+    $dispatcher->setBaseDirectory(__DIR__ . '/asset');
+    $this->assertContains(
+      'test.css could not be located',
+      $dispatcher->handle($request)->getContent()
+    );
+
+    $dispatcher = new \Packaged\Dispatch\Dispatch(
+      new DummyKernel(), ['aliases' => ['out' => 'asset2']]
+    );
+    $dispatcher->setBaseDirectory(__DIR__);
+    $this->assertNotContains(
+      'could not be located',
+      $dispatcher->handle($request)->getContent()
+    );
   }
 
   public function testTrigger()
