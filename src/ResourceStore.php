@@ -131,7 +131,7 @@ class ResourceStore
 
   public function getResources($type, ?int $priority = null, array $excludePriority = [])
   {
-    if(isset($this->_store[$type][$priority]))
+    if($priority !== null && isset($this->_store[$type][$priority]))
     {
       return $this->_store[$type][$priority];
     }
