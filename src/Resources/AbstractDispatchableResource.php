@@ -80,7 +80,7 @@ abstract class AbstractDispatchableResource extends AbstractResource implements 
       $this->_dispatch();
     }
 
-    $file = basename($this->_filePath);
+    $file = basename((string)$this->_filePath);
     $preMinified = (strpos($file, '.min.') > 0 || strpos($file, '-min.') > 0);
 
     //Return the raw content if minification has been disabled or @do-not-minify is set
