@@ -42,7 +42,7 @@ class DispatchTest extends \PHPUnit\Framework\TestCase
 
     $dispatcher = new \Packaged\Dispatch\Dispatch(new DummyKernel(), $config);
     $resp = $dispatcher->handle($request);
-    $this->assertContains($expect, $resp->getContent());
+    $this->assertStringContainsString($expect, $resp->getContent());
   }
 
   public function urlProvider()

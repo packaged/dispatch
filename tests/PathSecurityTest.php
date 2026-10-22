@@ -9,7 +9,7 @@ class PathSecurityTest extends TestCase
 {
   private $root;
 
-  protected function setUp()
+  protected function setUp(): void
   {
     $this->root = sys_get_temp_dir() . '/dispatch-security-' . uniqid();
     foreach(['resources/nested', 'public', 'src', 'vendor/acme/package', 'resources-private'] as $dir)
@@ -29,7 +29,7 @@ class PathSecurityTest extends TestCase
     symlink($this->root . '/absent', $this->root . '/resources/broken.css');
   }
 
-  protected function tearDown()
+  protected function tearDown(): void
   {
     $files = new RecursiveIteratorIterator(
       new RecursiveDirectoryIterator($this->root, FilesystemIterator::SKIP_DOTS),

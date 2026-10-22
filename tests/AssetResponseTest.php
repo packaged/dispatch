@@ -24,7 +24,7 @@ class AssetResponseTest extends \PHPUnit\Framework\TestCase
     $response = $builder->createResponse($asset, $request);
 
     $this->assertEquals('text/css', $response->headers->get('Content-Type'));
-    $this->assertContains('background:blue', (string)$response);
+    $this->assertStringContainsString('background:blue', (string)$response);
     $this->assertInstanceOf(
       '\Symfony\Component\HttpFoundation\Response',
       $response
