@@ -49,11 +49,11 @@ class GenericResourceTest extends TestCase
       "woff"  => "application/x-font-woff",
       "zip"   => "application/zip",
       "pdf"   => "application/pdf",
-      null    => "application/octet-stream",
+      ""      => "application/octet-stream",
     ];
 
     $this->assertEquals($ext, $class->getExtension());
-    $this->assertEquals($extType[$ext], $class->getContentType());
+    $this->assertEquals($extType[$ext ?? ""], $class->getContentType());
   }
 
   public static function resourceProvider()
