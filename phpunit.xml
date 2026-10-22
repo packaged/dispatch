@@ -3,16 +3,14 @@
          bootstrap="vendor/autoload.php"
          colors="true"
          verbose="true"
-         strict="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         syntaxCheck="false"
   >
   <testsuites>
-    <testsuite>
+    <testsuite name="dispatch">
       <directory>tests</directory>
     </testsuite>
   </testsuites>
